@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 23.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://fc26.efendiler.net/torunfc/api"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascApiKeyPath": "/opt/torunfc/server/AuthKey_3PN2KTL8W2.p8",
+        "ascApiKeyIssuerId": "d6bc64f8-1166-4df2-86e9-a06fab2d338e",
+        "ascApiKeyId": "3PN2KTL8W2",
+        "ascAppId": "6809420736"
+      }
+    }
+  }
+}

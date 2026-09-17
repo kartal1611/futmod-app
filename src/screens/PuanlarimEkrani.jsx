@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePointsStore } from '../store/pointsStore';
 import { useAuthStore } from '../store/authStore';
 import { api } from '../services/api';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
+import { useRenkler, useOrtakStil } from '../constants/theme';
 
 function kalanSureHesapla(hedefIso) {
   if (!hedefIso) return null;
@@ -37,6 +38,9 @@ function useCanliGeriSayim(hedefIso) {
 }
 
 export default function PuanlarimEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   const { user, refreshUser } = useAuthStore();
   const { balance, wheelStatus, loading, fetchBalance, fetchWheelStatus, spinWheel, redeem, error } = usePointsStore();
@@ -65,9 +69,9 @@ export default function PuanlarimEkrani() {
     try {
       const result = await spinWheel();
       if (result.streak?.rewardGranted) {
-        setSpinMesaj(`🎉 7 gün üst üste çevirdin! %${result.streak.discountPercent} indirimin hazır — bugün kullan.`);
+        setSpinMesaj(`🎉 ${result.streak.targetDays} gün üst üste çevirdin! %${result.streak.discountPercent} indirimin hazır — bugün kullan.`);
       } else {
-        setSpinMesaj(`${result.streak.streakDays}/7 gün tamamlandı — yarın da unutma!`);
+        setSpinMesaj(`${result.streak.streakDays}/${result.streak.targetDays} gün tamamlandı — yarın da unutma!`);
       }
       refreshUser();
     } catch (err) {
@@ -90,12 +94,14 @@ export default function PuanlarimEkrani() {
   const paylas = async () => {
     if (!user?.referralCode) return;
     try {
-      await Share.share({ message: `TorunFC'ye katıl, referans kodum: ${user.referralCode}` });
+      await Share.share({ message: `FutMod'a katıl, referans kodum: ${user.referralCode}` });
     } catch { /* ignore */ }
   };
 
   return (
-    <ScrollView style={ORTAK_STIL.ekran} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
+    <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
       <Text style={styles.baslik}>Puanlarım 🏆</Text>
 
       <View style={[ORTAK_STIL.kart, { marginTop: 16, alignItems: 'center' }]}>
@@ -110,7 +116,7 @@ export default function PuanlarimEkrani() {
       >
         <View style={styles.carkKarartma} />
         <Text style={styles.bolumBaslik}>Günlük Çark 🎡</Text>
-        {wheelStatus?.vip ? <Text style={styles.vipNot}>⭐ VIP olarak günde 2 kez çevirebilirsin</Text> : null}
+        {wheelStatus?.vip ? <Text style={styles.vipNot}>⭐ VIP olarak 3 günde bir %5 indirim kazanırsın</Text> : null}
 
         {typeof wheelStatus?.streakDays === 'number' ? (
           <View style={{ marginTop: 10 }}>
@@ -129,9 +135,14 @@ export default function PuanlarimEkrani() {
           </View>
         ) : null}
 
-        {wheelStatus?.canSpin ? (
+        {wheelStatus?.lockedOut ? (
+          <View style={[styles.devreDisiButon, { marginTop: 12 }]}>
+            <Text style={styles.kilitMetin}>🔒 2 indirim çevrimini art arda tamamladın</Text>
+            <Text style={styles.devreDisiMetin}>Çark bugün kilitli — yarın tekrar deneyebilirsin</Text>
+          </View>
+        ) : wheelStatus?.canSpin ? (
           <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 12 }]} onPress={cevir} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonMetin}>Çarkı Çevir ve Kazan</Text>}
+            {loading ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.buttonMetin}>Çarkı Çevir ve Kazan</Text>}
           </TouchableOpacity>
         ) : (
           <View style={[styles.devreDisiButon, { marginTop: 12 }]}>
@@ -175,18 +186,21 @@ export default function PuanlarimEkrani() {
           <Text style={styles.buttonMetin}>Kodu Paylaş</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   baslik: { fontSize: 24, fontWeight: '800', color: RENKLER.metin },
   bolumBaslik: { fontSize: 16, fontWeight: '700', color: RENKLER.metin },
   bakiyeEtiket: { fontSize: 13, color: RENKLER.metinIkincil },
   bakiye: { fontSize: 40, fontWeight: '800', color: RENKLER.vurgu, marginTop: 4 },
-  buttonMetin: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  buttonMetin: { color: RENKLER.bg, fontWeight: '700', fontSize: 15 },
   devreDisiButon: { backgroundColor: RENKLER.bg3, borderRadius: 12, padding: 14, alignItems: 'center' },
   devreDisiMetin: { color: RENKLER.metinIkincil, fontSize: 13, textAlign: 'center' },
+  kilitMetin: { color: RENKLER.uyari, fontSize: 13, fontWeight: '700', textAlign: 'center', marginBottom: 4 },
   geriSayimMetin: { color: RENKLER.vurgu2, fontSize: 22, fontWeight: '800', marginTop: 6, fontVariant: ['tabular-nums'] },
   bilgiMesaj: { marginTop: 10, color: RENKLER.vurgu2, fontSize: 13 },
   kodInput: {
@@ -205,4 +219,5 @@ const styles = StyleSheet.create({
   streakMetin: { fontSize: 11, color: RENKLER.metinIkincil, marginTop: 6 },
   streakOdulKutu: { marginTop: 10, backgroundColor: `${RENKLER.basari}22`, borderRadius: 10, padding: 10, borderWidth: 1, borderColor: RENKLER.basari },
   streakOdulMetin: { fontSize: 12.5, color: RENKLER.basari, fontWeight: '700', textAlign: 'center' },
-});
+  });
+}

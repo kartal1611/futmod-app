@@ -3,10 +3,14 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
+import NeonParilti from '../components/NeonParilti';
 import { useAuthStore } from '../store/authStore';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useRenkler, useOrtakStil } from '../constants/theme';
 
 export default function LoginEkrani({ onAdminGiris }) {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const { login, register, error } = useAuthStore();
   const [kayitModu, setKayitModu] = useState(false);
   const [email, setEmail] = useState('');
@@ -31,8 +35,9 @@ export default function LoginEkrani({ onAdminGiris }) {
       style={ORTAK_STIL.ekran}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      <NeonParilti />
       <ScrollView contentContainerStyle={styles.icerik} keyboardShouldPersistTaps="handled">
-        <Text style={styles.logo}>TorunFC ⚽</Text>
+        <Text style={styles.logo}>FutMod ⚽</Text>
         <Text style={styles.altBaslik}>EAFC 27'de bir adım önde ol</Text>
 
         <View style={[ORTAK_STIL.kart, { marginTop: 32, width: '100%' }]}>
@@ -81,7 +86,7 @@ export default function LoginEkrani({ onAdminGiris }) {
 
           <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 16 }]} onPress={gonder} disabled={gonderiliyor}>
             {gonderiliyor ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={RENKLER.bg} />
             ) : (
               <Text style={styles.buttonMetin}>{kayitModu ? 'Kayıt Ol' : 'Giriş Yap'}</Text>
             )}
@@ -104,7 +109,9 @@ export default function LoginEkrani({ onAdminGiris }) {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
+  neonParilti: { position: 'absolute', top: 0, left: 0, right: 0, height: 320 },
   icerik: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   logo: { fontSize: 36, fontWeight: '800', color: RENKLER.vurgu, marginTop: 24 },
   altBaslik: { fontSize: 14, color: RENKLER.metinIkincil, marginTop: 4 },
@@ -119,8 +126,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: RENKLER.ayrici,
   },
-  buttonMetin: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  buttonMetin: { color: RENKLER.bg, fontWeight: '700', fontSize: 16 },
   gecis: { color: RENKLER.vurgu2, textAlign: 'center' },
   hata: { color: RENKLER.hata, marginBottom: 8 },
   yoneticiLink: { color: RENKLER.metinUcuncul, fontSize: 12.5, textDecorationLine: 'underline' },
-});
+  });
+}

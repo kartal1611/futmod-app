@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../services/api';
-import { getTokens, setTokens, clearTokens } from '../services/api';
+import { getTokens, setTokens, clearTokens, getPanelMode, setPanelMode } from '../services/api';
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -20,8 +20,11 @@ export const useAuthStore = create((set, get) => ({
       // Slow/unstable tunnel connections must not hang the app on launch —
       // fall back to "not logged in" and let the user retry via login.
       const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
-      const data = await Promise.race([api.me(), timeout]);
-      set({ user: data.user, loading: false });
+      const [data, panelMode] = await Promise.all([
+        Promise.race([api.me(), timeout]),
+        getPanelMode(),
+      ]);
+      set({ user: data.user, panelMode, loading: false });
     } catch {
       set({ user: null, loading: false });
     }
@@ -32,6 +35,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const data = await api.register({ email, password, displayName, referralCode });
       await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      await setPanelMode('member');
       set({ user: data.user, panelMode: 'member' });
       return true;
     } catch (err) {
@@ -45,6 +49,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const data = await api.login({ email, password });
       await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      await setPanelMode('member');
       set({ user: data.user, panelMode: 'member' });
       return true;
     } catch (err) {
@@ -58,6 +63,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const data = await api.adminLogin({ email, password });
       await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      await setPanelMode('admin');
       set({ user: data.user, panelMode: 'admin' });
       return true;
     } catch (err) {
@@ -68,6 +74,7 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     await clearTokens();
+    await setPanelMode('member');
     set({ user: null, panelMode: 'member' });
   },
 

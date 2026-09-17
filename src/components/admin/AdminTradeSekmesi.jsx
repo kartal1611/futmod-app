@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, Image, ScrollView, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { api, getServerRootUrl } from '../../services/api';
-import { RENKLER, ORTAK_STIL } from '../../constants/theme';
+import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 function tamGorselUrl(imageUrl) {
   if (!imageUrl) return null;
@@ -10,6 +10,9 @@ function tamGorselUrl(imageUrl) {
 }
 
 export default function AdminTradeSekmesi() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const [liste, setListe] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [duzenlenenId, setDuzenlenenId] = useState(null); // null = yeni kart
@@ -125,7 +128,7 @@ export default function AdminTradeSekmesi() {
 
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
           <Pressable style={[ORTAK_STIL.buyukButon, { flex: 1 }]} onPress={kaydet} disabled={kaydediliyor}>
-            {kaydediliyor ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonMetin}>{duzenlenenId ? 'Güncelle' : 'Ekle'}</Text>}
+            {kaydediliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.buttonMetin}>{duzenlenenId ? 'Güncelle' : 'Ekle'}</Text>}
           </Pressable>
           {duzenlenenId ? (
             <Pressable style={styles.vazgecButon} onPress={formuSifirla}>
@@ -167,7 +170,8 @@ export default function AdminTradeSekmesi() {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   baslik: { fontSize: 15, fontWeight: '700', color: RENKLER.metin },
   aciklama: { fontSize: 12, color: RENKLER.metinIkincil, marginTop: 6, marginBottom: 12 },
   gorselAlani: {
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: RENKLER.bg3, borderRadius: 10, padding: 14, minHeight: 100, textAlignVertical: 'top',
     color: RENKLER.metin, borderWidth: 1, borderColor: RENKLER.ayrici, fontSize: 13.5,
   },
-  buttonMetin: { color: '#fff', fontWeight: '800', fontSize: 14 },
+  buttonMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 14 },
   vazgecButon: { paddingHorizontal: 18, justifyContent: 'center', borderRadius: 14, backgroundColor: RENKLER.bg3 },
   vazgecMetin: { color: RENKLER.metinIkincil, fontWeight: '700' },
   mesaj: { marginTop: 12, color: RENKLER.vurgu2, textAlign: 'center', fontSize: 13 },
@@ -190,4 +194,5 @@ const styles = StyleSheet.create({
   listeMetin: { fontSize: 12.5, color: RENKLER.metin, lineHeight: 18 },
   duzenleLink: { fontSize: 12, color: RENKLER.vurgu2, fontWeight: '700' },
   silLink: { fontSize: 12, color: RENKLER.hata, fontWeight: '700' },
-});
+  });
+}

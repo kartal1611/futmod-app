@@ -1,13 +1,17 @@
+import NeonParilti from '../components/NeonParilti';
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, Pressable, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useRenkler, useOrtakStil } from '../constants/theme';
 
 const PLATFORM_BASLIK = { pc: 'PC Coin', 'ps-xbox': 'PS - Xbox Coin' };
 
 export default function ToruncoinUrunlerEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { platform } = useLocalSearchParams();
@@ -25,6 +29,7 @@ export default function ToruncoinUrunlerEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>
@@ -62,7 +67,8 @@ export default function ToruncoinUrunlerEkrani() {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   ustBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingTop: 24, paddingBottom: 12,
@@ -74,4 +80,5 @@ const styles = StyleSheet.create({
   fiyat: { fontSize: 14, color: RENKLER.uyari, fontWeight: '800', marginTop: 4 },
   ok: { fontSize: 24, color: RENKLER.metinUcuncul, fontWeight: '300' },
   bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 40, paddingHorizontal: 24 },
-});
+  });
+}

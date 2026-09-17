@@ -4,9 +4,12 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { useAuthStore } from '../store/authStore';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useRenkler, useOrtakStil } from '../constants/theme';
 
 export default function AdminLoginEkrani({ onGeri }) {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const { adminLogin, error } = useAuthStore();
   const [email, setEmail] = useState('');
   const [sifre, setSifre] = useState('');
@@ -47,7 +50,7 @@ export default function AdminLoginEkrani({ onGeri }) {
           {error ? <Text style={styles.hata}>{error}</Text> : null}
 
           <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 16 }]} onPress={gonder} disabled={gonderiliyor}>
-            {gonderiliyor ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonMetin}>Giriş Yap</Text>}
+            {gonderiliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.buttonMetin}>Giriş Yap</Text>}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onGeri} style={{ marginTop: 16 }}>
@@ -59,7 +62,8 @@ export default function AdminLoginEkrani({ onGeri }) {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   icerik: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   logo: { fontSize: 24, fontWeight: '800', color: RENKLER.metin, marginTop: 24 },
   altBaslik: { fontSize: 13, color: RENKLER.metinIkincil, marginTop: 4 },
@@ -67,7 +71,8 @@ const styles = StyleSheet.create({
     backgroundColor: RENKLER.bg3, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
     color: RENKLER.metin, marginBottom: 12, borderWidth: 1, borderColor: RENKLER.ayrici,
   },
-  buttonMetin: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  buttonMetin: { color: RENKLER.bg, fontWeight: '700', fontSize: 16 },
   gecis: { color: RENKLER.vurgu2, textAlign: 'center' },
   hata: { color: RENKLER.hata, marginBottom: 8 },
-});
+  });
+}

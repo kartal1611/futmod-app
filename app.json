@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "TorunFC",
+    "name": "FutMod",
     "slug": "torunfc-app",
     "owner": "kartall",
     "privacy": "unlisted",
     "version": "1.1.1",
     "orientation": "portrait",
-    "scheme": "torunfc",
+    "scheme": "futmod",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0a1f15"
+      "backgroundColor": "#0a0b0a"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.torunfc.app",
+      "bundleIdentifier": "com.futmod.app",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -25,9 +25,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0a1f15"
+        "backgroundColor": "#0a0b0a"
       },
-      "package": "com.torunfc.app",
+      "package": "com.futmod.app",
       "versionCode": 1,
       "permissions": [
         "NOTIFICATIONS"
@@ -44,11 +44,20 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0a1f15",
+          "backgroundColor": "#0a0b0a",
           "image": "./assets/splash.png",
           "imageWidth": 200
         }
-      ]
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "FutMod, paylaşım görsellerini galerine kaydetmek için izin istiyor.",
+          "savePhotosPermission": "FutMod, paylaşım görsellerini galerine kaydetmek için izin istiyor."
+        }
+      ],
+      "expo-sharing",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": false

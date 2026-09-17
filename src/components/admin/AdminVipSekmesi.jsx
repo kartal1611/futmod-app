@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { api } from '../../services/api';
-import { RENKLER, ORTAK_STIL } from '../../constants/theme';
+import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 const SURELER = [
   { key: '1', label: '1 Ay', durationMonths: 1 },
@@ -12,6 +12,9 @@ const SURELER = [
 ];
 
 export default function AdminVipSekmesi() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const [email, setEmail] = useState('');
   const [bulunanKullanici, setBulunanKullanici] = useState(null);
   const [ariyor, setAriyor] = useState(false);
@@ -160,7 +163,8 @@ export default function AdminVipSekmesi() {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   baslik: { fontSize: 14, fontWeight: '700', color: RENKLER.metin },
   input: {
     flex: 1, backgroundColor: RENKLER.bg3, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
@@ -177,4 +181,5 @@ const styles = StyleSheet.create({
   kaldirButon: { marginTop: 14, alignItems: 'center', paddingVertical: 10 },
   kaldirButonMetin: { color: RENKLER.hata, fontWeight: '700', fontSize: 13 },
   mesaj: { marginTop: 16, color: RENKLER.vurgu2, textAlign: 'center', fontSize: 13 },
-});
+  });
+}

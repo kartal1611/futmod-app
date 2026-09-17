@@ -4,9 +4,13 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api, getServerRootUrl } from '../services/api';
 import { TELEGRAM_URL } from '../constants/contact';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useRenkler, useOrtakStil } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
 
 export default function TradeListEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [trade, setTrade] = useState(null);
@@ -23,6 +27,7 @@ export default function TradeListEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>
@@ -74,7 +79,8 @@ export default function TradeListEkrani() {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   ustBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingTop: 24, paddingBottom: 12,
@@ -89,4 +95,5 @@ const styles = StyleSheet.create({
   tarih: { fontSize: 10.5, color: RENKLER.metinUcuncul, marginTop: 6 },
   sabitButon: { margin: 16, backgroundColor: RENKLER.basari, borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
   sabitButonMetin: { color: '#fff', fontWeight: '800', fontSize: 14.5 },
-});
+  });
+}

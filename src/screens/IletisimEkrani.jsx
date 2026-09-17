@@ -1,7 +1,8 @@
 import { View, Text, ScrollView, Pressable, Linking, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TELEGRAM_URL } from '../constants/contact';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
+import { useRenkler, useOrtakStil } from '../constants/theme';
 
 const KANALLAR = [
   { etiket: 'Telegram', deger: '@haintorun', link: TELEGRAM_URL, tiklanabilir: true },
@@ -10,9 +11,14 @@ const KANALLAR = [
 ];
 
 export default function IletisimEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   return (
-    <ScrollView style={ORTAK_STIL.ekran} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
+    <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
       <Text style={styles.baslik}>İletişim ✉️</Text>
       <Text style={styles.altBaslik}>Aklında ne varsa bize ulaştır, seni dinliyoruz</Text>
 
@@ -31,13 +37,16 @@ export default function IletisimEkrani() {
           );
         })}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   baslik: { fontSize: 24, fontWeight: '800', color: RENKLER.metin },
   altBaslik: { fontSize: 13, color: RENKLER.metinIkincil, marginTop: 4 },
   etiket: { fontSize: 11, fontWeight: '700', color: RENKLER.vurgu, textTransform: 'uppercase', letterSpacing: 0.4 },
   deger: { fontSize: 15, color: RENKLER.metin, marginTop: 4, fontWeight: '600' },
-});
+  });
+}

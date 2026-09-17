@@ -1,9 +1,10 @@
+import NeonParilti from '../components/NeonParilti';
 import { useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, Image, Pressable, ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useContentStore } from '../store/contentStore';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useContentStore, useContentItems } from '../store/contentStore';
+import { useRenkler, useOrtakStil } from '../constants/theme';
 
 const KATEGORI_ETIKET = {
   players: 'Oyuncu',
@@ -21,9 +22,13 @@ function kategoriAl(slug) {
 }
 
 export default function SbcListEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { items, loading, fetchFeed } = useContentStore();
+  const { loading, fetchFeed } = useContentStore();
+  const items = useContentItems('sbc');
   const [aktifKategori, setAktifKategori] = useState('all');
 
   useEffect(() => { fetchFeed('sbc'); }, []);
@@ -44,6 +49,7 @@ export default function SbcListEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>
@@ -51,7 +57,7 @@ export default function SbcListEkrani() {
         <Text style={styles.baslik}>SBC Merkezi 📋</Text>
         <View style={{ width: 24 }} />
       </View>
-      {items.length > 0 ? <Text style={styles.sayac}>{items.length} SBC · fut.gg'den canlı</Text> : null}
+      {items.length > 0 ? <Text style={styles.sayac}>{items.length} SBC · canlı veri</Text> : null}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtreSatiri}>
         <Filtre etiket="Tümü" sayi={items.length} secili={aktifKategori === 'all'} onPress={() => setAktifKategori('all')} />
@@ -70,7 +76,7 @@ export default function SbcListEkrani() {
           refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchFeed('sbc')} tintColor={RENKLER.vurgu} />}
           ListEmptyComponent={
             <Text style={styles.bos}>
-              {items.length === 0 ? "Henüz SBC yok. Sunucuda `npm run sync:futgg` çalıştırılmalı." : 'Bu kategoride SBC yok.'}
+              {items.length === 0 ? 'Henüz SBC yok.' : 'Bu kategoride SBC yok.'}
             </Text>
           }
           renderItem={({ item }) => {
@@ -94,7 +100,7 @@ export default function SbcListEkrani() {
                     <Text style={styles.kartBaslik} numberOfLines={2}>{item.title}</Text>
                     {p.description ? <Text style={styles.aciklama} numberOfLines={2}>{p.description}</Text> : null}
                     {p.priceCoins ? (
-                      <Text style={styles.maliyet}>{p.priceCoins.toLocaleString('tr-TR')} coin</Text>
+                      <Text style={styles.maliyet}>{p.priceCoins.toLocaleString('tr-TR')} points</Text>
                     ) : null}
                   </View>
                   <Text style={styles.ok}>›</Text>
@@ -125,6 +131,8 @@ export default function SbcListEkrani() {
 }
 
 function Filtre({ etiket, sayi, secili, onPress }) {
+  const RENKLER = useRenkler();
+  const styles = olusturStyles(RENKLER);
   return (
     <Pressable onPress={onPress} style={[styles.filtreChip, secili && styles.filtreChipSecili]}>
       <Text style={[styles.filtreMetin, secili && styles.filtreMetinSecili]}>{etiket}{sayi ? ` (${sayi})` : ''}</Text>
@@ -133,6 +141,8 @@ function Filtre({ etiket, sayi, secili, onPress }) {
 }
 
 function Istatistik({ etiket, deger }) {
+  const RENKLER = useRenkler();
+  const styles = olusturStyles(RENKLER);
   return (
     <View style={styles.istatistikKutu}>
       <Text style={styles.istatistikEtiket}>{etiket}</Text>
@@ -141,7 +151,8 @@ function Istatistik({ etiket, deger }) {
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   ustBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,4 +185,5 @@ const styles = StyleSheet.create({
   oyBar: { height: 4, borderRadius: 2, backgroundColor: RENKLER.hata, overflow: 'hidden' },
   oyDoluBar: { height: 4, backgroundColor: RENKLER.basari },
   oyMetin: { fontSize: 10.5, color: RENKLER.metinUcuncul },
-});
+  });
+}

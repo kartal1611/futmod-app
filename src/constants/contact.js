@@ -8,3 +8,8 @@ export function telegramSatinAlLinki({ platformBaslik, coinAdi, indirimliFiyat, 
   }
   return `${TELEGRAM_URL}?text=${encodeURIComponent(mesaj)}`;
 }
+
+export function telegramHizmetLinki(hizmetBaslik) {
+  const mesaj = `Merhaba, ${hizmetBaslik} hizmeti hakkında bilgi almak istiyorum.`;
+  return `${TELEGRAM_URL}?text=${encodeURIComponent(mesaj)}`;
+}

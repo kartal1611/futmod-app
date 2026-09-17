@@ -19,8 +19,8 @@ export function getServerRootUrl() {
   return getBaseUrl().replace(/\/api\/?$/, '');
 }
 
-const ACCESS_KEY = 'torunfc_access_token';
-const REFRESH_KEY = 'torunfc_refresh_token';
+const ACCESS_KEY = 'futmod_access_token';
+const REFRESH_KEY = 'futmod_refresh_token';
 
 export async function getTokens() {
   const [accessToken, refreshToken] = await Promise.all([
@@ -42,6 +42,17 @@ export async function clearTokens() {
     SecureStore.deleteItemAsync(ACCESS_KEY),
     SecureStore.deleteItemAsync(REFRESH_KEY),
   ]);
+}
+
+const PANEL_MODE_KEY = 'futmod_panel_mode';
+
+/** Persists whether the stored session is a member or admin-panel login, so reopening the app restores the right screen. */
+export async function setPanelMode(mode) {
+  await SecureStore.setItemAsync(PANEL_MODE_KEY, mode);
+}
+
+export async function getPanelMode() {
+  return (await SecureStore.getItemAsync(PANEL_MODE_KEY)) || 'member';
 }
 
 let refreshing = null;
@@ -120,6 +131,17 @@ export const api = {
     return apiFetch(`/content${qs ? `?${qs}` : ''}`);
   },
   contentItem: (id) => apiFetch(`/content/${id}`),
+  contentCounts: () => apiFetch('/content/counts'),
+  contentNewToday: () => apiFetch('/content/new-today'),
+  playerCounts: () => apiFetch('/players/counts'),
+
+  players: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/players${qs ? `?${qs}` : ''}`);
+  },
+  playerItem: (futggId, src) => apiFetch(`/players/${futggId}${src ? `?src=${encodeURIComponent(src)}` : ''}`),
+  playerFilterOptions: () => apiFetch('/players/filter-options'),
+  playerVersions: (futggId) => apiFetch(`/players/${futggId}/versions`),
 
   coins: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
@@ -155,6 +177,47 @@ export const api = {
   adminCreateTrade: (payload) => apiFetch('/admin/trade', { method: 'POST', body: payload }),
   adminUpdateTrade: (id, payload) => apiFetch(`/admin/trade/${id}`, { method: 'PUT', body: payload }),
   adminDeleteTrade: (id) => apiFetch(`/admin/trade/${id}`, { method: 'DELETE' }),
+
+  kadroPosts: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/squad${qs ? `?${qs}` : ''}`);
+  },
+  kadroPostItem: (id) => apiFetch(`/squad/${id}`),
+  kadroCreatePost: (payload) => apiFetch('/squad', { method: 'POST', body: payload }),
+  kadroDeletePost: (id) => apiFetch(`/squad/${id}`, { method: 'DELETE' }),
+  kadroAddComment: (id, body) => apiFetch(`/squad/${id}/comments`, { method: 'POST', body: { body } }),
+  kadroDeleteComment: (id) => apiFetch(`/squad/comments/${id}`, { method: 'DELETE' }),
+  kadroUploadImage: async (fileUri, fileName) => {
+    const { accessToken } = await getTokens();
+    const form = new FormData();
+    form.append('image', { uri: fileUri, name: fileName || 'kadro.jpg', type: 'image/jpeg' });
+    const res = await fetch(`${getBaseUrl()}/squad/upload-image`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Görsel yüklenemedi');
+    return data;
+  },
+
+  forumMessages: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/forum${qs ? `?${qs}` : ''}`);
+  },
+  forumSend: (body) => apiFetch('/forum', { method: 'POST', body: { body } }),
+  forumDelete: (id) => apiFetch(`/forum/${id}`, { method: 'DELETE' }),
+
+  services: () => apiFetch('/services'),
+  adminListServices: () => apiFetch('/admin/services'),
+  adminCreateService: (payload) => apiFetch('/admin/services', { method: 'POST', body: payload }),
+  adminUpdateService: (id, payload) => apiFetch(`/admin/services/${id}`, { method: 'PUT', body: payload }),
+  adminDeleteService: (id) => apiFetch(`/admin/services/${id}`, { method: 'DELETE' }),
+
+  adminListPayments: (status) => apiFetch(`/admin/payments${status ? `?status=${status}` : ''}`),
+  adminCreatePayment: (payload) => apiFetch('/admin/payments', { method: 'POST', body: payload }),
+  adminMarkPaymentPaid: (id, payload) => apiFetch(`/admin/payments/${id}/mark-paid`, { method: 'POST', body: payload }),
+  adminMarkPaymentFailed: (id) => apiFetch(`/admin/payments/${id}/mark-failed`, { method: 'POST' }),
   adminUploadTradeImage: async (fileUri, fileName) => {
     const { accessToken } = await getTokens();
     const form = new FormData();

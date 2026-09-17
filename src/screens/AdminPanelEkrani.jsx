@@ -1,19 +1,25 @@
 import { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
-import { RENKLER } from '../constants/theme';
+import { useRenkler } from '../constants/theme';
 import AdminVipSekmesi from '../components/admin/AdminVipSekmesi';
 import AdminTradeSekmesi from '../components/admin/AdminTradeSekmesi';
 import AdminBildirimSekmesi from '../components/admin/AdminBildirimSekmesi';
+import AdminHizmetlerSekmesi from '../components/admin/AdminHizmetlerSekmesi';
+import AdminOdemelerSekmesi from '../components/admin/AdminOdemelerSekmesi';
 
 const SEKMELER = [
   { key: 'vip', baslik: 'VIP', emoji: '⭐' },
   { key: 'trade', baslik: 'Trade', emoji: '📈' },
+  { key: 'hizmetler', baslik: 'Hizmetler', emoji: '🧰' },
+  { key: 'odemeler', baslik: 'Ödemeler', emoji: '💳' },
   { key: 'bildirim', baslik: 'Bildirim', emoji: '🔔' },
 ];
 
 export default function AdminPanelEkrani() {
+  const RENKLER = useRenkler();
+  const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuthStore();
   const [aktifSekme, setAktifSekme] = useState('vip');
@@ -30,25 +36,28 @@ export default function AdminPanelEkrani() {
         </Pressable>
       </View>
 
-      <View style={styles.sekmeSatiri}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sekmeSatiri}>
         {SEKMELER.map((s) => (
           <Pressable key={s.key} onPress={() => setAktifSekme(s.key)} style={[styles.sekme, aktifSekme === s.key && styles.sekmeSecili]}>
             <Text style={styles.sekmeEmoji}>{s.emoji}</Text>
             <Text style={[styles.sekmeMetin, aktifSekme === s.key && styles.sekmeMetinSecili]}>{s.baslik}</Text>
           </Pressable>
         ))}
-      </View>
+      </ScrollView>
 
       <View style={{ flex: 1 }}>
         {aktifSekme === 'vip' ? <AdminVipSekmesi /> : null}
         {aktifSekme === 'trade' ? <AdminTradeSekmesi /> : null}
+        {aktifSekme === 'hizmetler' ? <AdminHizmetlerSekmesi /> : null}
+        {aktifSekme === 'odemeler' ? <AdminOdemelerSekmesi /> : null}
         {aktifSekme === 'bildirim' ? <AdminBildirimSekmesi /> : null}
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   ustBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 16, paddingBottom: 12,
@@ -58,11 +67,12 @@ const styles = StyleSheet.create({
   cikis: { color: RENKLER.hata, fontWeight: '700', fontSize: 13 },
   sekmeSatiri: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, marginBottom: 12 },
   sekme: {
-    flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 12,
+    alignItems: 'center', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 12,
     backgroundColor: RENKLER.bg2, borderWidth: 1, borderColor: RENKLER.ayrici,
   },
   sekmeSecili: { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu },
   sekmeEmoji: { fontSize: 18 },
   sekmeMetin: { fontSize: 11, fontWeight: '700', color: RENKLER.metinIkincil, marginTop: 2 },
   sekmeMetinSecili: { color: RENKLER.bg },
-});
+  });
+}

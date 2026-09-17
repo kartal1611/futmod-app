@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Image, Pressable, ActivityIndicator, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useAuthStore } from '../store/authStore';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useRenkler, useOrtakStil } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
+import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
+import PaylasButonu from '../components/share/PaylasButonu';
+import PaylasAkisiModal from '../components/share/PaylasAkisiModal';
+import PaylasimKarti from '../components/share/PaylasimKarti';
 
 function zamanFormatla(iso) {
   if (!iso) return '';
@@ -18,6 +23,9 @@ function zamanFormatla(iso) {
 }
 
 export default function SbcDetayEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
@@ -28,6 +36,10 @@ export default function SbcDetayEkrani() {
   const [yorumlar, setYorumlar] = useState([]);
   const [yorumMetni, setYorumMetni] = useState('');
   const [yorumGonderiliyor, setYorumGonderiliyor] = useState(false);
+  const sbcRef = useRef(null);
+  const paylasAkisi = usePaylasAkisi({
+    sbc: { baslik: 'SBC Kartı', ref: sbcRef },
+  });
 
   const yorumlariGetir = () => {
     api.comments(id).then((data) => setYorumlar(data.comments)).catch(() => {});
@@ -104,12 +116,67 @@ export default function SbcDetayEkrani() {
 
   return (
     <KeyboardAvoidingView style={ORTAK_STIL.ekran} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={insets.top}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>
         </Pressable>
         <Text style={styles.baslik} numberOfLines={1}>{item.title}</Text>
-        <View style={{ width: 24 }} />
+        <PaylasButonu onPress={paylasAkisi.ac} calisiyor={paylasAkisi.yukleniyor} />
+      </View>
+      <PaylasAkisiModal akis={paylasAkisi} />
+
+      {/* Görünmez, ekran dışı — sadece "paylaş" tıklandığında görsel olarak yakalanır. */}
+      <View style={{ position: 'absolute', left: -9999, top: 0 }} collapsable={false}>
+        <View ref={sbcRef} collapsable={false}>
+          <PaylasimKarti baslik="SBC" vurguRenk={RENKLER.vurgu}>
+            <View style={{ alignItems: 'center' }}>
+              {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.paylasGorsel} resizeMode="contain" /> : null}
+              <Text style={styles.paylasBaslik} numberOfLines={2}>{item.title}</Text>
+              {item.payload?.description ? <Text style={styles.paylasAciklama}>{item.payload.description}</Text> : null}
+            </View>
+
+            <View style={styles.paylasIstatistikSatiri}>
+              <PaylasIstatistik etiket="Kadro" deger={item.payload?.challengeCount ?? '-'} RENKLER={RENKLER} />
+              <PaylasIstatistik etiket="Bitiş" deger={item.payload?.expires || '-'} RENKLER={RENKLER} />
+              <PaylasIstatistik etiket="Tekrar" deger={item.payload?.repeatable || '-'} RENKLER={RENKLER} />
+              <PaylasIstatistik etiket="Yenilenme" deger={item.payload?.refreshesEvery || '-'} RENKLER={RENKLER} />
+            </View>
+
+            {(item.payload?.priceCoins || item.payload?.totalCoinsCost) ? (
+              <View style={styles.paylasFiyatSatiri}>
+                {item.payload?.priceCoins ? (
+                  <View style={styles.paylasFiyatKutu}>
+                    <Text style={styles.paylasFiyatEtiket}>LİSTE FİYATI</Text>
+                    <Text style={[styles.paylasFiyatDeger, { color: RENKLER.vurgu }]}>{item.payload.priceCoins.toLocaleString('tr-TR')} points</Text>
+                  </View>
+                ) : null}
+                {item.payload?.totalCoinsCost ? (
+                  <View style={styles.paylasFiyatKutu}>
+                    <Text style={styles.paylasFiyatEtiket}>ŞARTLAR TOPLAMI</Text>
+                    <Text style={[styles.paylasFiyatDeger, { color: RENKLER.vurgu }]}>{item.payload.totalCoinsCost.toLocaleString('tr-TR')} points</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+
+            {challenges.length > 0 ? (
+              <View style={{ marginTop: 18, gap: 10 }}>
+                {challenges.map((c, i) => (
+                  <View key={i} style={styles.paylasKadroKart}>
+                    <View style={styles.paylasKadroBaslikSatiri}>
+                      <Text style={styles.paylasKadroBaslik}>{c.title || `Kadro ${i + 1}`}</Text>
+                      {c.costCoins ? <Text style={[styles.paylasKadroMaliyet, { color: RENKLER.vurgu }]}>{c.costCoins.toLocaleString('tr-TR')} points</Text> : null}
+                    </View>
+                    {(c.requirements || []).map((req, j) => (
+                      <Text key={j} style={styles.paylasSartMetin}>• {req}</Text>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            ) : null}
+          </PaylasimKarti>
+        </View>
       </View>
 
       <FlatList
@@ -145,19 +212,29 @@ export default function SbcDetayEkrani() {
             {item.payload?.priceCoins ? (
               <View style={styles.toplamMaliyetKutu}>
                 <Text style={styles.toplamMaliyetEtiket}>Liste Fiyatı</Text>
-                <Text style={styles.toplamMaliyetDeger}>{item.payload.priceCoins.toLocaleString('tr-TR')} coin</Text>
+                <Text style={styles.toplamMaliyetDeger}>{item.payload.priceCoins.toLocaleString('tr-TR')} points</Text>
               </View>
             ) : null}
             {item.payload?.totalCoinsCost ? (
               <View style={[styles.toplamMaliyetKutu, { marginTop: 8 }]}>
                 <Text style={styles.toplamMaliyetEtiket}>Kadro Şartlarının Toplamı</Text>
-                <Text style={styles.toplamMaliyetDeger}>{item.payload.totalCoinsCost.toLocaleString('tr-TR')} coin</Text>
+                <Text style={styles.toplamMaliyetDeger}>{item.payload.totalCoinsCost.toLocaleString('tr-TR')} points</Text>
               </View>
             ) : null}
 
-            {item.sourceUrl ? (
-              <Text style={styles.kaynakLink}>fut.gg'de görüntüle ↗</Text>
+            {item.payload?.rewardPlayerFuttgId ? (
+              <Pressable
+                onPress={() => router.push({
+                  pathname: `/oyuncular/${item.payload.rewardPlayerFuttgId}`,
+                  params: item.payload.rewardPlayerSourceUrl ? { src: item.payload.rewardPlayerSourceUrl } : {},
+                })}
+                style={({ pressed }) => [styles.oyuncuKartiButon, pressed && { opacity: 0.85 }]}
+              >
+                <Text style={styles.oyuncuKartiMetin}>👤 Ödül Oyuncusunun Profilini Gör</Text>
+                <Text style={styles.oyuncuKartiOk}>›</Text>
+              </Pressable>
             ) : null}
+
           </View>
         }
         ListEmptyComponent={
@@ -167,7 +244,7 @@ export default function SbcDetayEkrani() {
           <View style={[ORTAK_STIL.kart, { marginBottom: 12 }]}>
             <View style={styles.kadroBaslikSatiri}>
               <Text style={styles.kadroBaslik}>{c.title || `Kadro ${index + 1}`}</Text>
-              {c.costCoins ? <Text style={styles.kadroMaliyet}>{c.costCoins.toLocaleString('tr-TR')} coin</Text> : null}
+              {c.costCoins ? <Text style={styles.kadroMaliyet}>{c.costCoins.toLocaleString('tr-TR')} points</Text> : null}
             </View>
             {(c.requirements || []).map((req, i) => (
               <View key={i} style={styles.sartSatiri}>
@@ -221,6 +298,8 @@ export default function SbcDetayEkrani() {
 }
 
 function Istatistik({ etiket, deger }) {
+  const RENKLER = useRenkler();
+  const styles = olusturStyles(RENKLER);
   return (
     <View style={styles.istatistikKutu}>
       <Text style={styles.istatistikEtiket}>{etiket}</Text>
@@ -229,7 +308,18 @@ function Istatistik({ etiket, deger }) {
   );
 }
 
-const styles = StyleSheet.create({
+function PaylasIstatistik({ etiket, deger, RENKLER }) {
+  const styles = olusturStyles(RENKLER);
+  return (
+    <View style={styles.paylasIstatistikKutu}>
+      <Text style={styles.paylasIstatistikEtiket}>{etiket}</Text>
+      <Text style={styles.paylasIstatistikDeger} numberOfLines={1}>{String(deger)}</Text>
+    </View>
+  );
+}
+
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   ustBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -262,6 +352,12 @@ const styles = StyleSheet.create({
   oyDoluBar: { height: 5, backgroundColor: RENKLER.basari },
   oyMetin: { fontSize: 11, color: RENKLER.metinUcuncul, textAlign: 'center' },
   kaynakLink: { fontSize: 11.5, color: RENKLER.vurgu2, marginTop: 12, fontWeight: '600' },
+  oyuncuKartiButon: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14,
+    backgroundColor: RENKLER.vurgu, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 20, width: '100%',
+  },
+  oyuncuKartiMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 13 },
+  oyuncuKartiOk: { color: RENKLER.bg, fontSize: 18, fontWeight: '300' },
   yorumBaslik: { fontSize: 16, fontWeight: '800', color: RENKLER.metin, marginBottom: 10 },
   yorumYazmaKutusu: { flexDirection: 'row', gap: 8, alignItems: 'flex-end', marginBottom: 16 },
   yorumInput: {
@@ -277,4 +373,21 @@ const styles = StyleSheet.create({
   yorumZaman: { fontSize: 11, color: RENKLER.metinUcuncul },
   yorumMetinGovde: { fontSize: 13, color: RENKLER.metin, marginTop: 4 },
   yorumSilMetin: { fontSize: 11, color: RENKLER.hata, fontWeight: '700' },
-});
+  paylasGorsel: { width: 130, height: 130, marginTop: 18 },
+  paylasBaslik: { fontSize: 19, fontWeight: '900', color: RENKLER.metin, textAlign: 'center', marginTop: 10 },
+  paylasAciklama: { fontSize: 12, color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 6, paddingHorizontal: 8 },
+  paylasIstatistikSatiri: { flexDirection: 'row', gap: 8, marginTop: 18 },
+  paylasIstatistikKutu: { flex: 1, backgroundColor: RENKLER.bg2, borderRadius: 10, paddingVertical: 9, alignItems: 'center' },
+  paylasIstatistikEtiket: { fontSize: 8.5, fontWeight: '700', color: RENKLER.metinUcuncul, textTransform: 'uppercase' },
+  paylasIstatistikDeger: { fontSize: 12, fontWeight: '800', color: RENKLER.metin, marginTop: 2 },
+  paylasFiyatSatiri: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  paylasFiyatKutu: { flex: 1, backgroundColor: RENKLER.bg2, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+  paylasFiyatEtiket: { fontSize: 9, fontWeight: '800', color: RENKLER.metinUcuncul, letterSpacing: 0.5 },
+  paylasFiyatDeger: { fontSize: 15, fontWeight: '900', marginTop: 3 },
+  paylasKadroKart: { backgroundColor: RENKLER.bg2, borderRadius: 12, padding: 12 },
+  paylasKadroBaslikSatiri: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  paylasKadroBaslik: { fontSize: 13, fontWeight: '800', color: RENKLER.metin, flex: 1 },
+  paylasKadroMaliyet: { fontSize: 11.5, fontWeight: '800' },
+  paylasSartMetin: { fontSize: 11, color: RENKLER.metinIkincil, marginTop: 2, lineHeight: 15 },
+  });
+}

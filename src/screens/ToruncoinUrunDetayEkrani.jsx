@@ -5,11 +5,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { telegramSatinAlLinki } from '../constants/contact';
 import { useAuthStore } from '../store/authStore';
-import { RENKLER, ORTAK_STIL } from '../constants/theme';
+import { useRenkler, useOrtakStil } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
 
 const PLATFORM_BASLIK = { pc: 'PC', 'ps-xbox': 'PS-Xbox' };
 
 export default function ToruncoinUrunDetayEkrani() {
+  const RENKLER = useRenkler();
+  const ORTAK_STIL = useOrtakStil();
+  const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
@@ -67,7 +71,9 @@ export default function ToruncoinUrunDetayEkrani() {
   };
 
   return (
-    <ScrollView style={ORTAK_STIL.ekran} contentContainerStyle={{ paddingBottom: 40 }}>
+    <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>
@@ -123,11 +129,13 @@ export default function ToruncoinUrunDetayEkrani() {
         </Pressable>
         <Text style={styles.telegramNot}>Telegram üzerinden ekibimizle bağlantıya geçersin, ödeme ve teslimat orada yapılır.</Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
+function olusturStyles(RENKLER) {
+  return StyleSheet.create({
   ustBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingTop: 24, paddingBottom: 12,
@@ -148,6 +156,7 @@ const styles = StyleSheet.create({
   kodButonMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 13 },
   kodHata: { color: RENKLER.hata, fontSize: 12.5, marginTop: 8 },
   vipNot: { color: RENKLER.vurgu2, fontSize: 12, marginTop: 8 },
-  satinAlMetin: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  satinAlMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 16 },
   telegramNot: { fontSize: 11.5, color: RENKLER.metinUcuncul, textAlign: 'center', marginTop: 10, paddingHorizontal: 8 },
-});
+  });
+}
