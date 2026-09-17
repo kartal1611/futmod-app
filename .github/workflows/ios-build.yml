@@ -1,0 +1,48 @@
+name: iOS local build (bypasses EAS cloud build quota)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Local iOS build
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform ios --profile production --local --non-interactive --output futmod.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: futmod-ipa
+          path: futmod.ipa
+
+      # eas.json's ascApiKeyPath is the absolute server path
+      # (/opt/torunfc/server/AuthKey_3PN2KTL8W2.p8) — recreated here so the
+      # runner has a file at that exact path, without changing eas.json
+      # (which would also affect submits run directly on the server).
+      - name: Restore App Store Connect API key
+        env:
+          ASC_API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+        run: |
+          sudo mkdir -p /opt/torunfc/server
+          sudo chown "$USER" /opt/torunfc/server
+          echo "$ASC_API_KEY_BASE64" | base64 --decode > /opt/torunfc/server/AuthKey_3PN2KTL8W2.p8
+
+      - name: Submit to TestFlight
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas submit --platform ios --profile production --path futmod.ipa --non-interactive
