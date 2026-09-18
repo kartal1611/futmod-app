@@ -137,7 +137,7 @@ export default function OyuncularListEkrani() {
           renderItem={({ item }) => (
             <Pressable onPress={() => router.push(`/oyuncular/${item.futggId}`)} style={({ pressed }) => [ORTAK_STIL.kart, { marginBottom: 10, flexDirection: 'row', gap: 12, alignItems: 'center' }, pressed && { opacity: 0.85 }]}>
               {item.imageUrl && item.cardFrameUrl ? (
-                <OyuncuKarti yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={52} />
+                <OyuncuKarti duzGorselUrl={item.cardImageUrl} yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={52} />
               ) : item.imageUrl ? (
                 <Image source={{ uri: item.imageUrl }} style={styles.gorsel} resizeMode="contain" />
               ) : (

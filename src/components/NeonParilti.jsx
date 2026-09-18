@@ -31,19 +31,19 @@ function KoseCizgiler({ renk, ayna }) {
 export default function NeonParilti() {
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      {/* Taban katman: tüm viewport'u sabit, güçlü bir yeşille kaplar — bu sayede
-          hiçbir bölge (üst/alt gradyanların değmediği orta kesim dahil) düz
-          siyaha dönmez. */}
-      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: `${YESIL}30` }]} />
+      {/* Taban katman: tüm viewport'u sabit, GERÇEKTEN doygun bir yeşille
+          kaplar (önceki ~%19'luk deneme fark edilmeyecek kadar soluktu) —
+          hiçbir bölge düz siyaha dönmez. */}
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: `${YESIL}55` }]} />
       <LinearGradient
-        colors={[`${YESIL}80`, `${YESIL}45`, `${YESIL}20`]}
+        colors={[`${YESIL}B0`, `${YESIL}70`, `${YESIL}35`]}
         locations={[0, 0.5, 1]}
         start={{ x: 0.2, y: 0 }}
         end={{ x: 0.5, y: 0.65 }}
         style={StyleSheet.absoluteFillObject}
       />
       <LinearGradient
-        colors={[`${KOYU_YESIL}20`, `${KOYU_YESIL}45`, `${KOYU_YESIL}80`]}
+        colors={[`${KOYU_YESIL}35`, `${KOYU_YESIL}70`, `${KOYU_YESIL}B0`]}
         locations={[0, 0.5, 1]}
         start={{ x: 0.5, y: 0.35 }}
         end={{ x: 0.8, y: 1 }}

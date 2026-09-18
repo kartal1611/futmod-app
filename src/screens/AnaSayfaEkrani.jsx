@@ -44,7 +44,7 @@ export default function AnaSayfaEkrani() {
   const [yeniGelenler, setYeniGelenler] = useState({ sbcs: [], evolutions: [], players: [] });
 
   useEffect(() => {
-    api.players({ sortBy: 'rating', sortDir: 'desc', limit: 8 }).then((data) => {
+    api.playerTrend(8).then((data) => {
       setTrendOyuncular(data.items || []);
     }).catch(() => {});
     api.services().then((data) => setHizmetler(data.items || [])).catch(() => {});
@@ -204,7 +204,7 @@ export default function AnaSayfaEkrani() {
             keyExtractor={(item) => item.futggId}
             renderItem={({ item }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${item.futggId}`)} style={styles.oyuncuKart}>
-                <OyuncuKarti yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={70} />
+                <OyuncuKarti duzGorselUrl={item.cardImageUrl} yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={70} />
                 <Text style={styles.oyuncuIsim} numberOfLines={1}>{item.name}</Text>
                 <View style={{ flexDirection: 'row', gap: 4 }}>
                   {item.position ? <Text style={styles.oyuncuPozisyon}>{item.position}</Text> : null}

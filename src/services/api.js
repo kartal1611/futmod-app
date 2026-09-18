@@ -142,6 +142,7 @@ export const api = {
   playerItem: (futggId, src) => apiFetch(`/players/${futggId}${src ? `?src=${encodeURIComponent(src)}` : ''}`),
   playerFilterOptions: () => apiFetch('/players/filter-options'),
   playerVersions: (futggId) => apiFetch(`/players/${futggId}/versions`),
+  playerTrend: (limit = 8) => apiFetch(`/players/trend?limit=${limit}`),
 
   coins: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
