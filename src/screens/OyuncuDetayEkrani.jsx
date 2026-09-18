@@ -239,7 +239,7 @@ export default function OyuncuDetayEkrani() {
           </View>
 
           {((d.priceCoins || player.priceCoins) || d.gradingScore) ? (
-            <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               {(d.priceCoins || player.priceCoins) ? (
                 <View style={styles.fiyatKutu}>
                   <Text style={styles.fiyatEtiket}>🪙 Fiyat</Text>
@@ -269,7 +269,7 @@ export default function OyuncuDetayEkrani() {
             renderItem={({ item: v }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${v.futggId}`)} style={styles.versKart}>
                 {v.cardFrameUrl ? (
-                  <OyuncuKarti yuzUrl={v.imageUrl} cerceveUrl={v.cardFrameUrl} genislik={72} />
+                  <OyuncuKarti duzGorselUrl={v.cardImageUrl} yuzUrl={v.imageUrl} cerceveUrl={v.cardFrameUrl} genislik={72} />
                 ) : v.imageUrl ? (
                   <Image source={{ uri: v.imageUrl }} style={styles.versGorsel} resizeMode="contain" />
                 ) : null}
