@@ -5,6 +5,7 @@ import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { useRenkler } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
 import { AnaSayfaIkonu, SbcIkonu, CoinIkonu, PuanlarimIkonu, ForumIkonu, IletisimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
 import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
@@ -95,11 +96,21 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: RENKLER.bg }}>
       <StatusBar barStyle="light-content" />
+      {/* Sekmelerin (Tabs) DIŞINDA, en üst seviyede TEK bir sabit katman —
+          önceki tasarımda her ekranın kendi ScrollView'ından önce ayrı ayrı
+          eklenmişti, ama gerçek cihazda içerikle birlikte kayıyordu
+          (ekran görüntüsüyle doğrulandı: sayfa aşağı kaydırılınca köşe
+          süsü de aşağı inip HIZLI ERİŞİM bölümünün üstünde kalıyordu).
+          Burada, Tabs navigator'ının render ettiği hiçbir iç ScrollView'a
+          hiç girmediği için artık kesinlikle sabit kalır. */}
+      <NeonParilti />
       <Tabs
+        style={{ flex: 1 }}
         screenOptions={{
           headerShown: false,
+          sceneStyle: { backgroundColor: 'transparent' },
           tabBarStyle: {
             backgroundColor: RENKLER.bg,
             borderTopColor: RENKLER.ayrici,
@@ -124,6 +135,6 @@ export default function RootLayout() {
         <Tabs.Screen name="oyuncular" options={{ href: null }} />
         <Tabs.Screen name="trade" options={{ href: null }} />
       </Tabs>
-    </>
+    </View>
   );
 }

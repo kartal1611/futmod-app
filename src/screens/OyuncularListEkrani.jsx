@@ -1,4 +1,3 @@
-import NeonParilti from '../components/NeonParilti';
 import OyuncuKarti from '../components/OyuncuKarti';
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Image, Pressable, ActivityIndicator, TextInput, Modal, ScrollView, StyleSheet } from 'react-native';
@@ -101,7 +100,6 @@ export default function OyuncularListEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>

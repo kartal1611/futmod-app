@@ -1,4 +1,3 @@
-import NeonParilti from '../components/NeonParilti';
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, Pressable, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -29,7 +28,6 @@ export default function ToruncoinUrunlerEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>

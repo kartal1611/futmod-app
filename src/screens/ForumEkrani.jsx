@@ -1,4 +1,3 @@
-import NeonParilti from '../components/NeonParilti';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Image, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, RefreshControl, Modal, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -29,7 +28,6 @@ export default function ForumEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.baslik}>Forum</Text>
         <Text style={styles.altBaslik}>Tüm üyelerle sohbet et, kadronu paylaş</Text>

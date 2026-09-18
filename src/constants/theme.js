@@ -13,7 +13,12 @@ export function useRenkler() {
 
 export function olusturOrtakStil(RENKLER) {
   return StyleSheet.create({
-    ekran: { flex: 1, backgroundColor: RENKLER.bg },
+    // Şeffaf: RootLayout artık NeonParilti'yi TEK bir global katman olarak
+    // Tabs navigator'ının arkasına (dışına) koyuyor — her ekranın kendi kökü
+    // bunu örtmesin diye buradaki eski opak arkaplan kaldırıldı. Tabs
+    // dışında (Login/AdminLogin gibi) render edilen ekranlar kendi opak
+    // arkaplanlarını ayrıca inline olarak belirtiyor.
+    ekran: { flex: 1, backgroundColor: 'transparent' },
     kart: {
       backgroundColor: RENKLER.bg2,
       borderRadius: 16,

@@ -1,7 +1,6 @@
 import { View, Text, ScrollView, Pressable, Linking, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TELEGRAM_URL } from '../constants/contact';
-import NeonParilti from '../components/NeonParilti';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 
 const KANALLAR = [
@@ -17,7 +16,6 @@ export default function IletisimEkrani() {
   const insets = useSafeAreaInsets();
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
       <Text style={styles.baslik}>İletişim ✉️</Text>
       <Text style={styles.altBaslik}>Aklında ne varsa bize ulaştır, seni dinliyoruz</Text>

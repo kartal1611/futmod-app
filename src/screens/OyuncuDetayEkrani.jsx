@@ -5,7 +5,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
-import NeonParilti from '../components/NeonParilti';
 import { getPlaystyleIcon } from '../constants/playstyleIcons';
 import OyuncuKarti from '../components/OyuncuKarti';
 import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
@@ -111,7 +110,6 @@ export default function OyuncuDetayEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
       <UstBar
         router={router}

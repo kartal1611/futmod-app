@@ -6,7 +6,6 @@ import { api } from '../services/api';
 import { telegramSatinAlLinki } from '../constants/contact';
 import { useAuthStore } from '../store/authStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
-import NeonParilti from '../components/NeonParilti';
 
 const PLATFORM_BASLIK = { pc: 'PC', 'ps-xbox': 'PS-Xbox' };
 
@@ -72,7 +71,6 @@ export default function ToruncoinUrunDetayEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>

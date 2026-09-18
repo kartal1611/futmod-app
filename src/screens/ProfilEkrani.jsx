@@ -5,7 +5,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { api } from '../services/api';
-import NeonParilti from '../components/NeonParilti';
 import { useRenkler, useOrtakStil, TEMALAR } from '../constants/theme';
 
 const KATEGORILER = [
@@ -78,7 +77,6 @@ export default function ProfilEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
       <Text style={styles.baslik}>Profil 👤</Text>
 

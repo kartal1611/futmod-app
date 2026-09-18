@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePointsStore } from '../store/pointsStore';
 import { useAuthStore } from '../store/authStore';
 import { api } from '../services/api';
-import NeonParilti from '../components/NeonParilti';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 
 function kalanSureHesapla(hedefIso) {
@@ -100,7 +99,6 @@ export default function PuanlarimEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
       <Text style={styles.baslik}>Puanlarım 🏆</Text>
 

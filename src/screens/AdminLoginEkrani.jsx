@@ -23,7 +23,7 @@ export default function AdminLoginEkrani({ onGeri }) {
   };
 
   return (
-    <KeyboardAvoidingView style={ORTAK_STIL.ekran} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[ORTAK_STIL.ekran, { backgroundColor: RENKLER.bg }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.icerik} keyboardShouldPersistTaps="handled">
         <Text style={styles.logo}>🛠️ Yönetici Girişi</Text>
         <Text style={styles.altBaslik}>Sadece yetkili hesaplar girebilir</Text>

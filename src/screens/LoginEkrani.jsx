@@ -32,7 +32,7 @@ export default function LoginEkrani({ onAdminGiris }) {
 
   return (
     <KeyboardAvoidingView
-      style={ORTAK_STIL.ekran}
+      style={[ORTAK_STIL.ekran, { backgroundColor: RENKLER.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <NeonParilti />

@@ -1,4 +1,3 @@
-import NeonParilti from '../components/NeonParilti';
 import { useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, Image, Pressable, ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -49,7 +48,6 @@ export default function SbcListEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
-      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>

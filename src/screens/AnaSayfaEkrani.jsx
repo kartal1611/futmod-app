@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, Image, FlatList, Alert, Linking, StyleSheet } from 'react-native';
-import NeonParilti from '../components/NeonParilti';
 import OyuncuKarti from '../components/OyuncuKarti';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -60,7 +59,6 @@ export default function AnaSayfaEkrani() {
 
   return (
     <View style={{ flex: 1, backgroundColor: RENKLER.bg }}>
-      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 40 }}>
       <View style={styles.ustSatir}>
         <Text style={styles.logo}>FutMod</Text>
