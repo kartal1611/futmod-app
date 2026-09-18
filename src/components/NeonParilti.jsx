@@ -2,11 +2,15 @@ import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle } from 'react-native-svg';
 
-// FutMod'un yeşil-beyaz-siyah marka kimliğine göre: üstte parlak neon yeşil,
-// altta koyu zümrüt/teal tonu — logoya birebir uyumlu. Eskiden mor/pembe
-// çiftiydi (kullanıcının ilk referans görseline göre); marka logosu
-// netleşince (yeşil "F" amblemi) buna geçildi.
-const YESIL = '#39FF6E'; // vurgu rengiyle birebir aynı (themeStore.js)
+// FutMod'un yeşil-beyaz-siyah marka kimliği. Kullanıcı, aynı ekranın
+// üzerine güçlü bir yeşil filtre bindirilmiş bir referans görseli
+// paylaştı ("2. görseldeki gibi olacak") — o görselde arkaplan sadece
+// köşelerde değil, TÜM sayfada belirgin, doygun bir yeşil ton taşıyor.
+// Önceki versiyon (köşelerden başlayıp ortada neredeyse sıfırlanan iki
+// gradyan) hâlâ çok soluktu; burada tüm viewport'u kaplayan SABİT,
+// yüksek-opaklıklı bir taban katman + üstte/altta biraz daha da
+// yoğunlaşan iki gradyan var, böylece hiçbir nokta "düz siyah" kalmıyor.
+const YESIL = '#39FF6E';
 const KOYU_YESIL = '#0d8a4a';
 const KOSE_BOYUT = 220;
 
@@ -24,29 +28,24 @@ function KoseCizgiler({ renk, ayna }) {
   );
 }
 
-/**
- * Ekranın tamamını (görünen viewport) kaplayan iki dikey LinearGradient:
- * üstte parlak yeşil, aşağı indikçe soluklaşıyor ama HİÇBİR NOKTADA
- * tamamen şeffaflaşmıyor (min ~%10-12 opaklık) — önceki denemede orta
- * bölüm neredeyse %0'a inip "simsiyah" izlenimi veriyordu, kullanıcı
- * defalarca bunu bildirdi. Alttan da simetrik olarak koyu yeşil/teal bir
- * ikinci katman geliyor, ortada ikisi üst üste binip her zaman hafif bir
- * renk tonu kalıyor.
- */
 export default function NeonParilti() {
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      {/* Taban katman: tüm viewport'u sabit, güçlü bir yeşille kaplar — bu sayede
+          hiçbir bölge (üst/alt gradyanların değmediği orta kesim dahil) düz
+          siyaha dönmez. */}
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: `${YESIL}30` }]} />
       <LinearGradient
-        colors={[`${YESIL}75`, `${YESIL}35`, `${YESIL}18`]}
+        colors={[`${YESIL}80`, `${YESIL}45`, `${YESIL}20`]}
         locations={[0, 0.5, 1]}
         start={{ x: 0.2, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
+        end={{ x: 0.5, y: 0.65 }}
         style={StyleSheet.absoluteFillObject}
       />
       <LinearGradient
-        colors={[`${KOYU_YESIL}18`, `${KOYU_YESIL}35`, `${KOYU_YESIL}70`]}
+        colors={[`${KOYU_YESIL}20`, `${KOYU_YESIL}45`, `${KOYU_YESIL}80`]}
         locations={[0, 0.5, 1]}
-        start={{ x: 0.5, y: 0 }}
+        start={{ x: 0.5, y: 0.35 }}
         end={{ x: 0.8, y: 1 }}
         style={StyleSheet.absoluteFillObject}
       />
