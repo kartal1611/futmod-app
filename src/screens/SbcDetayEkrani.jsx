@@ -9,6 +9,7 @@ import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
 import PaylasButonu from '../components/share/PaylasButonu';
 import PaylasAkisiModal from '../components/share/PaylasAkisiModal';
 import PaylasimKarti from '../components/share/PaylasimKarti';
+import NeonParilti from '../components/NeonParilti';
 
 function zamanFormatla(iso) {
   if (!iso) return '';
@@ -115,6 +116,7 @@ export default function SbcDetayEkrani() {
 
   return (
     <KeyboardAvoidingView style={ORTAK_STIL.ekran} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={insets.top}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>

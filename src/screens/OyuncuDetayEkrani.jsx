@@ -11,6 +11,7 @@ import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
 import PaylasButonu from '../components/share/PaylasButonu';
 import PaylasAkisiModal from '../components/share/PaylasAkisiModal';
 import PaylasimKarti from '../components/share/PaylasimKarti';
+import NeonParilti from '../components/NeonParilti';
 
 const KATEGORI_ETIKET = { pace: 'HIZ', shooting: 'ŞUT', passing: 'PAS', dribbling: 'DRİBLİNG', defending: 'DEFANS', physical: 'FİZİK' };
 const ALT_ETIKET = {
@@ -110,6 +111,7 @@ export default function OyuncuDetayEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
       <UstBar
         router={router}

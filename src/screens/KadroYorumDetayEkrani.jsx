@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api, getServerRootUrl } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
 
 function tamGorselUrl(url) {
   if (!url) return null;
@@ -114,6 +115,7 @@ export default function KadroYorumDetayEkrani() {
 
   return (
     <KeyboardAvoidingView style={ORTAK_STIL.ekran} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={insets.top}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Text style={styles.geriOk}>‹</Text></Pressable>
         <Text style={styles.baslik} numberOfLines={1}>{post.authorName}'nin Kadrosu</Text>

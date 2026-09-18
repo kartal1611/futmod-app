@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
 
 export default function EvoDetayEkrani() {
   const RENKLER = useRenkler();
@@ -55,6 +56,7 @@ export default function EvoDetayEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Text style={styles.geriOk}>‹</Text>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, ThemeProvider, DarkTheme } from 'expo-router';
 import { View, Text, ActivityIndicator, StatusBar } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '../store/authStore';
@@ -95,7 +95,19 @@ export default function RootLayout() {
     );
   }
 
+  // React Navigation'ın kendi varsayılan teması hiç özelleştirilmemişti —
+  // bu da NavigationContainer'ın en alt seviyesinde (her ekranın kendi
+  // içeriğinden BİLE önce boyanan) sabit BEYAZ bir arkaplan demekti.
+  // ORTAK_STIL.ekran şeffaf yapılınca (global NeonParilti'nin görünmesi
+  // için) bu beyaz taban ortaya çıktı — özellikle iç içe Stack
+  // navigator'lardaki (SBC/Oyuncular/Trade/Evrimler detay sayfaları) push
+  // edilen ekranlarda net şekilde görüldü. Çözüm: navigasyon temasının
+  // `colors.background`'unu buradan RENKLER.bg'ye sabitlemek — artık en
+  // altta hiçbir zaman beyaz yok, olsa olsa koyu lacivert taban var.
+  const navTemasi = { ...DarkTheme, colors: { ...DarkTheme.colors, background: RENKLER.bg, card: RENKLER.bg } };
+
   return (
+    <ThemeProvider value={navTemasi}>
     <View style={{ flex: 1, backgroundColor: RENKLER.bg }}>
       <StatusBar barStyle="light-content" />
       {/* Sekmelerin (Tabs) DIŞINDA, en üst seviyede TEK bir sabit katman —
@@ -136,5 +148,6 @@ export default function RootLayout() {
         <Tabs.Screen name="trade" options={{ href: null }} />
       </Tabs>
     </View>
+    </ThemeProvider>
   );
 }

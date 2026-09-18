@@ -2,6 +2,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRenkler, useOrtakStil } from '../constants/theme';
+import NeonParilti from '../components/NeonParilti';
 
 const KATEGORILER = [
   { key: 'pc', baslik: 'PC Coin', aciklama: 'Origin / PC platformu için coin paketleri', emoji: '🖥️' },
@@ -17,6 +18,7 @@ export default function ToruncoinKategoriEkrani() {
 
   return (
     <View style={ORTAK_STIL.ekran}>
+      <NeonParilti />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 24, paddingBottom: 40 }}>
       <Text style={styles.baslik}>Toruncoin 🪙</Text>
       <Text style={styles.altBaslik}>Platformunu seç, güncel fiyatları gör</Text>
