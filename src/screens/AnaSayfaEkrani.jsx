@@ -157,6 +157,7 @@ export default function AnaSayfaEkrani() {
                 veriler={yeniGelenler.players}
                 gorselAl={(o) => o.imageUrl}
                 cerceveAl={(o) => o.cardFrameUrl}
+                duzAl={(o) => o.flatCardUrl}
                 baslikAl={(o) => o.name}
                 altAl={(o) => (o.rating ? `${o.rating} OVR` : null)}
                 onPress={(o) => router.push(`/oyuncular/${o.futggId}`)}
@@ -202,7 +203,7 @@ export default function AnaSayfaEkrani() {
             keyExtractor={(item) => item.futggId}
             renderItem={({ item }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${item.futggId}`)} style={styles.oyuncuKart}>
-                <OyuncuKarti duzGorselUrl={item.cardImageUrl} yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={70} />
+                <OyuncuKarti duzGorselUrl={item.flatCardUrl || item.cardImageUrl} yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={70} />
                 <Text style={styles.oyuncuIsim} numberOfLines={1}>{item.name}</Text>
                 <View style={{ flexDirection: 'row', gap: 4 }}>
                   {item.position ? <Text style={styles.oyuncuPozisyon}>{item.position}</Text> : null}
@@ -274,7 +275,7 @@ function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, RENKLER }) {
   );
 }
 
-function YeniBolum({ baslik, veriler, gorselAl, cerceveAl, baslikAl, altAl, onPress }) {
+function YeniBolum({ baslik, veriler, gorselAl, cerceveAl, duzAl, baslikAl, altAl, onPress }) {
   const RENKLER = useRenkler();
   const styles = olusturStyles(RENKLER);
   return (
@@ -288,8 +289,8 @@ function YeniBolum({ baslik, veriler, gorselAl, cerceveAl, baslikAl, altAl, onPr
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Pressable onPress={() => onPress(item)} style={styles.yeniOgeKart}>
-            {cerceveAl && cerceveAl(item) ? (
-              <OyuncuKarti yuzUrl={gorselAl(item)} cerceveUrl={cerceveAl(item)} genislik={60} />
+            {(duzAl && duzAl(item)) || (cerceveAl && cerceveAl(item)) ? (
+              <OyuncuKarti duzGorselUrl={duzAl ? duzAl(item) : null} yuzUrl={gorselAl(item)} cerceveUrl={cerceveAl ? cerceveAl(item) : null} genislik={60} />
             ) : gorselAl(item) ? (
               <Image source={{ uri: gorselAl(item) }} style={styles.yeniOgeGorsel} resizeMode="contain" />
             ) : null}

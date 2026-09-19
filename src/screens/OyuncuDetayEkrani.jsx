@@ -105,7 +105,7 @@ export default function OyuncuDetayEkrani() {
   // the bare face cutout (imageUrl) and the rarity frame separately
   // (cardFrameUrl). Always composite the two instead of treating the list-
   // level `imageUrl` as already-flattened (it isn't, for any player now).
-  const duzGorselUrl = d.cardImageUrl || null;
+  const duzGorselUrl = d.cardImageUrl || player.flatCardUrl || null;
   const yuzUrl = d.imageUrl || player.imageUrl || null;
   const cerceveUrl = d.cardFrameUrl || null;
 
@@ -269,7 +269,7 @@ export default function OyuncuDetayEkrani() {
             renderItem={({ item: v }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${v.futggId}`)} style={styles.versKart}>
                 {v.cardFrameUrl ? (
-                  <OyuncuKarti duzGorselUrl={v.cardImageUrl} yuzUrl={v.imageUrl} cerceveUrl={v.cardFrameUrl} genislik={72} />
+                  <OyuncuKarti duzGorselUrl={v.flatCardUrl || v.cardImageUrl} yuzUrl={v.imageUrl} cerceveUrl={v.cardFrameUrl} genislik={72} />
                 ) : v.imageUrl ? (
                   <Image source={{ uri: v.imageUrl }} style={styles.versGorsel} resizeMode="contain" />
                 ) : null}

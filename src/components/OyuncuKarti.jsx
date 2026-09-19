@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 // fut.gg composites its player card client-side via CSS: a rarity/tier
@@ -14,6 +15,17 @@ const STAT_SIRASI = [
   ['pace', 'PAC'], ['shooting', 'SHO'], ['passing', 'PAS'],
   ['dribbling', 'DRI'], ['defending', 'DEF'], ['physicality', 'PHY'],
 ];
+
+// easysbc'nin hazır kartı (…/playercards/small/<id>.png) orijinalde 644px /
+// ~640KB; sunucu `?width=N` ile yeniden boyutlandırıyor (160px ≈ 60KB). Liste
+// küçük resimlerinde 40'ar kart yüklendiği için, ekranda çizilen genişliğin
+// ~3 katı (retina) kadar iste — gereksiz büyük dosya indirilmesin. fut.gg
+// URL'lerinin genişliği zaten yolunda gömülü, onlara dokunma.
+function boyutluUrl(url, genislik) {
+  if (!url || !url.includes('assets.easysbc.io') || !url.includes('/playercards/')) return url;
+  const w = Math.min(644, Math.max(120, Math.ceil((genislik * 3) / 40) * 40));
+  return `${url}?width=${w}`;
+}
 
 const KOYU = '#1a1400';
 const KOYU_SOLUK = '#4a3f10';
@@ -37,8 +49,18 @@ export default function OyuncuKarti({
   duzGorselUrl, yuzUrl, cerceveUrl, rating, pozisyon, attrs,
   isim, nationIconUrl, leagueIconUrl, weakFoot, skillMoves, genislik, style,
 }) {
-  if (duzGorselUrl) {
-    return <Image source={{ uri: duzGorselUrl }} style={[{ width: genislik, aspectRatio: KART_ORAN }, style]} resizeMode="contain" />;
+  // Hazır kart görseli yüklenemezse (ör. henüz render edilmemiş çok yeni bir
+  // kart) sessizce boş kalmak yerine aşağıdaki yüz+çerçeve birleştirmesine düş.
+  const [duzHata, setDuzHata] = useState(false);
+  if (duzGorselUrl && !duzHata) {
+    return (
+      <Image
+        source={{ uri: boyutluUrl(duzGorselUrl, genislik) }}
+        style={[{ width: genislik, aspectRatio: KART_ORAN }, style]}
+        resizeMode="contain"
+        onError={() => setDuzHata(true)}
+      />
+    );
   }
   if (yuzUrl && cerceveUrl) {
     const olcek = genislik / 168; // font/spacing tuned at genislik=168, scaled for smaller thumbnail/share-card uses
