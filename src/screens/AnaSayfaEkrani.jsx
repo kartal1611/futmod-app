@@ -82,7 +82,7 @@ export default function AnaSayfaEkrani() {
         <View ref={ozetRef} collapsable={false}>
           <PaylasimKarti baslik="Yeni Gelenler" vurguRenk={RENKLER.vurgu}>
             {!yeniGelenlerVarMi ? (
-              <Text style={styles.paylasBosMetin}>Bugün henüz yeni içerik eklenmedi.</Text>
+              <Text style={styles.paylasBosMetin}>Yeni içerik henüz eklenmedi.</Text>
             ) : (
               <>
                 {yeniGelenler.sbcs.length > 0 ? (
@@ -128,7 +128,7 @@ export default function AnaSayfaEkrani() {
         </View>
 
         {!yeniGelenlerVarMi ? (
-          <Text style={styles.yeniBos}>Bugün henüz yeni içerik eklenmedi — genelde 20:00'den sonra güncelleniyor, biraz sonra tekrar bak.</Text>
+          <Text style={styles.yeniBos}>Yeni içerik henüz eklenmedi — yeni SBC ve oyuncular genelde 20:00'den sonra geliyor.</Text>
         ) : (
           <>
             {yeniGelenler.sbcs.length > 0 ? (

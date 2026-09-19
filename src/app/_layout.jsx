@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Tabs, useRouter, ThemeProvider, DarkTheme } from 'expo-router';
-import { View, Text, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '../store/authStore';
+import { api } from '../services/api';
 import { useThemeStore } from '../store/themeStore';
 import { useRenkler } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
@@ -54,6 +55,22 @@ export default function RootLayout() {
     const zamanAsimi = setTimeout(() => { bitti = true; setReady(true); }, 10000);
     return () => clearTimeout(zamanAsimi);
   }, []);
+
+  // Giriş yapılınca bildirim izni iste + push token'ı sunucuya kaydet. Eskiden
+  // token yalnızca Profil ekranı açılınca kaydediliyordu → FutMod uygulamasına
+  // hiç bildirim gitmiyordu (tek token Expo Go'dan kalmaydı).
+  useEffect(() => {
+    if (!user || panelMode === 'admin') return;
+    (async () => {
+      try {
+        let { status } = await Notifications.getPermissionsAsync();
+        if (status !== 'granted') ({ status } = await Notifications.requestPermissionsAsync());
+        if (status !== 'granted') return;
+        const tokenResp = await Notifications.getExpoPushTokenAsync();
+        await api.registerPushToken(tokenResp.data, Platform.OS);
+      } catch { /* bildirim en iyi çaba — uygulamayı asla bozmasın */ }
+    })();
+  }, [user?.id]);
 
   // Tapping a "trade" notification opens that specific trade card directly;
   // tapping a "sbc" (new content) notification opens the SBC list.
