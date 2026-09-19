@@ -105,7 +105,8 @@ export default function OyuncuDetayEkrani() {
   // the bare face cutout (imageUrl) and the rarity frame separately
   // (cardFrameUrl). Always composite the two instead of treating the list-
   // level `imageUrl` as already-flattened (it isn't, for any player now).
-  const duzGorselUrl = d.cardImageUrl || player.flatCardUrl || null;
+  // Önce kendi çizdiğimiz kart (fut.gg düzeni, statlı, her nadirlikte doğru); fut.gg'nin kayıtlı render'ı yalnızca yedek.
+  const duzGorselUrl = player.flatCardUrl || d.cardImageUrl || null;
   const yuzUrl = d.imageUrl || player.imageUrl || null;
   const cerceveUrl = d.cardFrameUrl || null;
 

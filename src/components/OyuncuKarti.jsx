@@ -22,9 +22,11 @@ const STAT_SIRASI = [
 // ~3 katı (retina) kadar iste — gereksiz büyük dosya indirilmesin. fut.gg
 // URL'lerinin genişliği zaten yolunda gömülü, onlara dokunma.
 function boyutluUrl(url, genislik) {
-  if (!url || !url.includes('assets.easysbc.io') || !url.includes('/playercards/')) return url;
-  const w = Math.min(644, Math.max(120, Math.ceil((genislik * 3) / 40) * 40));
-  return `${url}?width=${w}`;
+  // Kendi sunucumuzun çizdiği kart (…/cards/<id>.png) ya da easysbc'nin hazır kartı.
+  if (!url || !(url.includes('/cards/') || (url.includes('assets.easysbc.io') && url.includes('/playercards/')))) return url;
+  if (url.includes('game-assets.fut.gg')) return url;
+  const w = Math.min(516, Math.max(120, Math.ceil((genislik * 3) / 40) * 40));
+  return `${url}${url.includes('?') ? '&' : '?'}width=${w}`;
 }
 
 const KOYU = '#1a1400';
