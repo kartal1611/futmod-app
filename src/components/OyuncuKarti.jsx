@@ -124,5 +124,11 @@ export default function OyuncuKarti({
   if (yuzUrl) {
     return <Image source={{ uri: yuzUrl }} style={[{ width: genislik, aspectRatio: 1 }, style]} resizeMode="contain" />;
   }
-  return null;
+  // Hiçbir kaynak yoksa (çok eski/hayalet kayıt — easysbc'de artık 404): koyu
+  // arkaplanda tamamen kaybolan boş/siyah bir alan yerine görünür bir kutu.
+  return (
+    <View style={[{ width: genislik, aspectRatio: KART_ORAN, borderRadius: 10, borderWidth: 1.5, borderColor: '#ffffff22', backgroundColor: '#ffffff0d', alignItems: 'center', justifyContent: 'center' }, style]}>
+      <Text style={{ fontSize: 22 * (genislik / 168) }}>⚽</Text>
+    </View>
+  );
 }
