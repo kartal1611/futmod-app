@@ -12,6 +12,21 @@ import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
 import AdminPanelEkrani from '../screens/AdminPanelEkrani';
 
+// Varsayılan davranışta expo-notifications, uygulama ÖN PLANDAYKEN gelen
+// bildirimi tamamen sessizce yutar — hiç banner/ses göstermez (arka planda
+// veya kapalıyken normal görünür). Kullanıcı app'i açık tutup test ederken
+// "bildirim gelmedi" sanmasının asıl nedeni muhtemelen buydu; bildirim
+// aslında gelmiş ama gösterilmemişti. Bu handler modül yüklenirken (import
+// zamanında) bir kez ayarlanır — component render'ından önce olması şart.
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 function TabIcon({ Ikon, label, focused, RENKLER }) {
   const renk = focused ? RENKLER.vurgu : RENKLER.metinUcuncul;
   return (
