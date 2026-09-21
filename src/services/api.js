@@ -191,7 +191,12 @@ export const api = {
   kadroUploadImage: async (fileUri, fileName) => {
     const { accessToken } = await getTokens();
     const form = new FormData();
-    form.append('image', { uri: fileUri, name: fileName || 'kadro.jpg', type: 'image/jpeg' });
+    // RN'in Yeni Mimarisi (Fabric/bridgeless — bu proje RN 0.86, zorunlu) eski
+    // `{ uri, name, type }` nesne şeklini FormData parçası olarak tanımıyor ve
+    // "Unsupported FormDataPart implementation" hatasıyla patlıyor. Dosyayı
+    // önce gerçek bir Blob'a çevirip onu eklemek gerekiyor.
+    const blob = await (await fetch(fileUri)).blob();
+    form.append('image', blob, fileName || 'kadro.jpg');
     const res = await fetch(`${getBaseUrl()}/squad/upload-image`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -222,7 +227,9 @@ export const api = {
   adminUploadTradeImage: async (fileUri, fileName) => {
     const { accessToken } = await getTokens();
     const form = new FormData();
-    form.append('image', { uri: fileUri, name: fileName || 'trade.jpg', type: 'image/jpeg' });
+    // Aynı Yeni Mimari FormData sorunu (bkz. kadroUploadImage) — Blob'a çevir.
+    const blob = await (await fetch(fileUri)).blob();
+    form.append('image', blob, fileName || 'trade.jpg');
     const res = await fetch(`${getBaseUrl()}/admin/trade/upload-image`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
