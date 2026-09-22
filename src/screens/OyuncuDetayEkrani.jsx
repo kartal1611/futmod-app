@@ -59,6 +59,8 @@ export default function OyuncuDetayEkrani() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [versiyonlar, setVersiyonlar] = useState([]);
+  const [fiyatTakip, setFiyatTakip] = useState(null); // null: bilinmiyor/yükleniyor, undefined: takipte değil, obje: takipte
+  const [fiyatTakipIslemde, setFiyatTakipIslemde] = useState(false);
   const fiyatRef = useRef(null);
   const statsRef = useRef(null);
   const paylasAkisi = usePaylasAkisi({
@@ -77,8 +79,26 @@ export default function OyuncuDetayEkrani() {
     api.playerVersions(futggId)
       .then((data) => { if (!iptal) setVersiyonlar(data.items || []); })
       .catch(() => {});
+    api.playerPriceWatch(futggId)
+      .then((data) => { if (!iptal) setFiyatTakip(data.watch || undefined); })
+      .catch(() => {});
     return () => { iptal = true; };
   }, [futggId]);
+
+  const fiyatTakibiDegistir = async () => {
+    if (fiyatTakipIslemde) return;
+    setFiyatTakipIslemde(true);
+    try {
+      if (fiyatTakip) {
+        await api.playerPriceWatchRemove(futggId);
+        setFiyatTakip(undefined);
+      } else {
+        const data = await api.playerPriceWatchAdd(futggId);
+        setFiyatTakip(data.watch);
+      }
+    } catch { /* sessizce yoksay — kritik değil */ }
+    setFiyatTakipIslemde(false);
+  };
 
   if (loading) {
     return (
@@ -255,6 +275,22 @@ export default function OyuncuDetayEkrani() {
               ) : null}
             </View>
           ) : null}
+
+          {(d.priceCoins || player.priceCoins) ? (
+            <Pressable
+              onPress={fiyatTakibiDegistir}
+              disabled={fiyatTakipIslemde}
+              style={[styles.fiyatTakipButon, fiyatTakip ? styles.fiyatTakipButonAktif : null]}
+            >
+              {fiyatTakipIslemde ? (
+                <ActivityIndicator size="small" color={fiyatTakip ? RENKLER.bg : RENKLER.vurgu} />
+              ) : (
+                <Text style={[styles.fiyatTakipMetin, fiyatTakip ? { color: RENKLER.bg } : null]}>
+                  {fiyatTakip ? '🔔 Fiyat takipte' : '🔕 Fiyat takibi ekle'}
+                </Text>
+              )}
+            </Pressable>
+          ) : null}
         </View>
       </View>
 
@@ -418,6 +454,9 @@ function olusturStyles(RENKLER) {
   ozellikEtiket: { fontSize: 8.5, fontWeight: '700', color: RENKLER.metinUcuncul, textTransform: 'uppercase' },
   ozellikDeger: { fontSize: 12, fontWeight: '800', color: RENKLER.metin, marginTop: 2 },
   fiyatKutu: { marginTop: 12, alignItems: 'flex-start', backgroundColor: RENKLER.bg2, borderRadius: 12, paddingVertical: 9, paddingHorizontal: 16, borderWidth: 1, borderColor: RENKLER.ayrici, alignSelf: 'flex-start' },
+  fiyatTakipButon: { marginTop: 8, alignSelf: 'flex-start', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: RENKLER.vurgu },
+  fiyatTakipButonAktif: { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu },
+  fiyatTakipMetin: { fontSize: 11.5, fontWeight: '700', color: RENKLER.vurgu },
   fiyatEtiket: { fontSize: 9.5, color: RENKLER.metinUcuncul, textTransform: 'uppercase', letterSpacing: 0.5 },
   fiyatDeger: { fontSize: 17, color: RENKLER.uyari, fontWeight: '800', marginTop: 2 },
   bolumBaslik: { fontSize: 16, fontWeight: '800', color: RENKLER.metin, marginBottom: 10 },

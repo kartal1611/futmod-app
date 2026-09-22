@@ -143,6 +143,9 @@ export const api = {
   playerFilterOptions: () => apiFetch('/players/filter-options'),
   playerVersions: (futggId) => apiFetch(`/players/${futggId}/versions`),
   playerTrend: (limit = 8) => apiFetch(`/players/trend?limit=${limit}`),
+  playerPriceWatch: (futggId) => apiFetch(`/players/${futggId}/price-watch`),
+  playerPriceWatchAdd: (futggId) => apiFetch(`/players/${futggId}/price-watch`, { method: 'POST' }),
+  playerPriceWatchRemove: (futggId) => apiFetch(`/players/${futggId}/price-watch`, { method: 'DELETE' }),
 
   coins: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
