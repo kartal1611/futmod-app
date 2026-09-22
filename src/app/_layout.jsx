@@ -89,16 +89,30 @@ export default function RootLayout() {
 
   // Tapping a "trade" notification opens that specific trade card directly;
   // tapping a "sbc" (new content) notification opens the SBC list.
+  const bildirimYonlendir = (data) => {
+    if (!data) return;
+    if (data.type === 'trade' && data.tradeId) {
+      router.push(`/trade/${data.tradeId}`);
+    } else if (data.type === 'sbc') {
+      router.push('/sbc');
+    }
+  };
+
   useEffect(() => {
-    const abone = Notifications.addNotificationResponseReceivedListener((response) => {
-      const data = response.notification.request.content.data;
-      if (data?.type === 'trade' && data?.tradeId) {
-        router.push(`/trade/${data.tradeId}`);
-      } else if (data?.type === 'sbc') {
-        router.push('/sbc');
-      }
+    // addNotificationResponseReceivedListener SADECE bu listener kayıtlı
+    // OLDUKTAN SONRA gelen dokunuşları yakalar. Uygulama tamamen kapalıyken
+    // bildirime dokunulup açılan "cold start"ta, dokunma olayı listener
+    // henüz bağlanmadan önce zaten geçmiş oluyor — bu yüzden hiçbir şey
+    // olmuyordu. getLastNotificationResponseAsync() o son dokunuşu ilk
+    // render'da geriye dönük okur.
+    let iptal = false;
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (!iptal && response) bildirimYonlendir(response.notification.request.content.data);
     });
-    return () => abone.remove();
+    const abone = Notifications.addNotificationResponseReceivedListener((response) => {
+      bildirimYonlendir(response.notification.request.content.data);
+    });
+    return () => { iptal = true; abone.remove(); };
   }, []);
 
   if (!ready) {
