@@ -5,7 +5,7 @@ import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 const URUNLER = [
   { key: 'membership_99', label: 'Üyelik (99 ₺)' },
-  { key: 'vip_trade_149', label: 'VIP Trade Açma (149 ₺)' },
+  { key: 'vip_trade_149', label: 'VIP Trade Açma (399 ₺)' },
 ];
 
 const DURUM_METIN = { pending: 'Bekliyor', paid: 'Onaylandı', failed: 'Başarısız' };

@@ -36,7 +36,7 @@ export default function AdminPanelEkrani() {
         </Pressable>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sekmeSatiri}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0 }} contentContainerStyle={styles.sekmeSatiri}>
         {SEKMELER.map((s) => (
           <Pressable key={s.key} onPress={() => setAktifSekme(s.key)} style={[styles.sekme, aktifSekme === s.key && styles.sekmeSecili]}>
             <Text style={styles.sekmeEmoji}>{s.emoji}</Text>

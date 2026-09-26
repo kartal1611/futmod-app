@@ -82,6 +82,18 @@ async function tryRefresh() {
 /**
  * Fetch wrapper: attaches JWT, retries once on 401 after a token refresh.
  */
+/** Yükleme yanıtını güvenle okur: sunucu (ör. nginx 413) JSON yerine HTML döndürürse "Unexpected character: <" yerine anlaşılır hata verir. */
+async function yuklemeYaniti(res, varsayilanHata) {
+  let data = null;
+  try { data = await res.json(); } catch { /* JSON değil (HTML hata sayfası olabilir) */ }
+  if (!res.ok) {
+    const mesaj = data?.error || (res.status === 413 ? 'Görsel çok büyük (en fazla 15 MB).' : `${varsayilanHata} (sunucu yanıtı ${res.status})`);
+    throw new Error(mesaj);
+  }
+  if (!data) throw new Error(`${varsayilanHata} (sunucu geçersiz yanıt verdi)`);
+  return data;
+}
+
 export async function apiFetch(path, { method = 'GET', body, auth = true, retry = true } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (auth) {
@@ -205,9 +217,7 @@ export const api = {
       headers: { Authorization: `Bearer ${accessToken}` },
       body: form,
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Görsel yüklenemedi');
-    return data;
+    return yuklemeYaniti(res, 'Görsel yüklenemedi');
   },
 
   forumMessages: (params = {}) => {
@@ -238,9 +248,7 @@ export const api = {
       headers: { Authorization: `Bearer ${accessToken}` },
       body: form,
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Görsel yüklenemedi');
-    return data;
+    return yuklemeYaniti(res, 'Görsel yüklenemedi');
   },
   adminSendNotification: (payload) => apiFetch('/admin/notifications/send', { method: 'POST', body: payload }),
   adminCreateRedeemCode: (payload) => apiFetch('/admin/redeem-codes', { method: 'POST', body: payload }),
