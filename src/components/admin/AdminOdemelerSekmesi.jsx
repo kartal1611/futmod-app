@@ -4,8 +4,7 @@ import { api } from '../../services/api';
 import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 const URUNLER = [
-  { key: 'membership_99', label: 'Üyelik (99 ₺)' },
-  { key: 'vip_trade_149', label: 'VIP Trade Açma (399 ₺)' },
+  { key: 'membership', label: 'Üyelik (399 ₺, VIP Trade dahil)' },
 ];
 
 const DURUM_METIN = { pending: 'Bekliyor', paid: 'Onaylandı', failed: 'Başarısız' };
@@ -18,7 +17,7 @@ export default function AdminOdemelerSekmesi() {
   const [liste, setListe] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [email, setEmail] = useState('');
-  const [urun, setUrun] = useState('membership_99');
+  const [urun, setUrun] = useState('membership');
   const [not, setNot] = useState('');
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [mesaj, setMesaj] = useState(null);
@@ -52,7 +51,7 @@ export default function AdminOdemelerSekmesi() {
     const link = inviteLinkTaslak[item.id] || '';
     Alert.alert(
       'Ödemeyi onayla',
-      `${item.amount} ₺ (${item.product}) ödemesini onaylıyor musun? ${item.product === 'vip_trade_149' ? 'Kullanıcı otomatik VIP olacak.' : ''}`,
+      `${item.amount} ₺ (${item.product}) ödemesini onaylıyor musun? Kullanıcı otomatik VIP (Trade dahil) olacak.`,
       [
         { text: 'Vazgeç', style: 'cancel' },
         {

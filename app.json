@@ -57,7 +57,8 @@
         }
       ],
       "expo-sharing",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-iap"
     ],
     "experiments": {
       "typedRoutes": false

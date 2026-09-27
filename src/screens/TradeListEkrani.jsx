@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Image, Pressable, ActivityIndicator, FlatList, Linking, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, ActivityIndicator, FlatList, Linking, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api, getServerRootUrl } from '../services/api';
 import { TELEGRAM_URL } from '../constants/contact';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
+import { useUyelikSatinAlma } from '../hooks/useUyelikSatinAlma';
 
 export default function TradeListEkrani() {
   const RENKLER = useRenkler();
@@ -15,10 +16,12 @@ export default function TradeListEkrani() {
   const insets = useSafeAreaInsets();
   const [trade, setTrade] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { urun, satinAl, satinAliniyor, satinAlimlariGeriYukle, geriYukleniyor, hata } = useUyelikSatinAlma();
 
-  useEffect(() => {
-    api.trade().then(setTrade).finally(() => setLoading(false));
-  }, []);
+  const tradeYenile = () => api.trade().then(setTrade).finally(() => setLoading(false));
+  useEffect(() => { tradeYenile(); }, []);
+  // Satın alma/geri yükleme VIP'i açtıysa listeyi tazele (trade.vip sunucudan tekrar sorulur).
+  useEffect(() => { if (!satinAliniyor && !geriYukleniyor) tradeYenile(); }, [satinAliniyor, geriYukleniyor]);
 
   const bilgiAl = () => {
     const mesaj = encodeURIComponent('Trade hakkında bilgi almak istiyorum');
@@ -48,6 +51,27 @@ export default function TradeListEkrani() {
               <View style={[ORTAK_STIL.kart, { alignItems: 'center', marginBottom: 16 }]}>
                 <Text style={styles.kilitEmoji}>🔒</Text>
                 <Text style={styles.teaserMetin}>{trade?.teaser}</Text>
+                {Platform.OS === 'ios' ? (
+                  <>
+                    <Pressable
+                      style={[styles.satinAlButon, satinAliniyor && { opacity: 0.6 }]}
+                      onPress={satinAl}
+                      disabled={satinAliniyor}
+                    >
+                      {satinAliniyor ? (
+                        <ActivityIndicator color={RENKLER.bg} />
+                      ) : (
+                        <Text style={styles.satinAlMetin}>
+                          Üyelik Satın Al{urun?.displayPrice ? ` (${urun.displayPrice}/ay)` : ' (399 ₺/ay)'}
+                        </Text>
+                      )}
+                    </Pressable>
+                    <Pressable onPress={satinAlimlariGeriYukle} disabled={geriYukleniyor} style={{ marginTop: 10 }}>
+                      <Text style={styles.geriYukleMetin}>{geriYukleniyor ? 'Kontrol ediliyor…' : 'Satın Alımları Geri Yükle'}</Text>
+                    </Pressable>
+                    {hata ? <Text style={styles.hataMetin}>{hata}</Text> : null}
+                  </>
+                ) : null}
               </View>
             ) : null
           }
@@ -89,6 +113,13 @@ function olusturStyles(RENKLER) {
   baslik: { fontSize: 18, fontWeight: '800', color: RENKLER.metin, flex: 1, textAlign: 'center' },
   kilitEmoji: { fontSize: 36, marginBottom: 8 },
   teaserMetin: { fontSize: 13.5, color: RENKLER.metinIkincil, textAlign: 'center', lineHeight: 20 },
+  satinAlButon: {
+    marginTop: 14, backgroundColor: RENKLER.vurgu, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 22,
+    alignItems: 'center', justifyContent: 'center', minWidth: 220,
+  },
+  satinAlMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 14 },
+  geriYukleMetin: { color: RENKLER.metinIkincil, fontSize: 12.5, fontWeight: '600', textDecorationLine: 'underline' },
+  hataMetin: { color: RENKLER.hata, fontSize: 12, textAlign: 'center', marginTop: 10 },
   bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 30 },
   gorsel: { width: 64, height: 64, borderRadius: 10 },
   kartMetin: { fontSize: 13.5, color: RENKLER.metin, lineHeight: 19 },

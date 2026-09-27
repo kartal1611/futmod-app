@@ -220,6 +220,9 @@ export const api = {
     return yuklemeYaniti(res, 'Görsel yüklenemedi');
   },
 
+  iapAccountToken: () => apiFetch('/iap/apple/account-token'),
+  iapVerify: (transactionJWS) => apiFetch('/iap/apple/verify', { method: 'POST', body: { transactionJWS } }),
+
   forumMessages: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
     return apiFetch(`/forum${qs ? `?${qs}` : ''}`);
