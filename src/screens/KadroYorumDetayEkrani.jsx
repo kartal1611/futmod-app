@@ -4,6 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api, getServerRootUrl } from '../services/api';
 import { useAuthStore } from '../store/authStore';
+import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
+import { useModerationStore } from '../store/moderationStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
 
@@ -26,6 +28,7 @@ export default function KadroYorumDetayEkrani() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
+  const blockedIds = useModerationStore((s) => s.blockedIds);
   const [post, setPost] = useState(null);
   const [yorumlar, setYorumlar] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +75,28 @@ export default function KadroYorumDetayEkrani() {
         },
       },
     ]);
+  };
+
+  const yorumMenuAc = (yorum) => {
+    icerikMenusuAc({
+      hedefUserId: yorum.userId,
+      hedefAd: yorum.authorName,
+      contentType: 'squad_comment',
+      contentId: yorum.id,
+      benimUserId: user?.id,
+      afterBlock: () => setYorumlar((prev) => prev.filter((y) => y.userId !== yorum.userId)),
+    });
+  };
+
+  const postMenuAc = () => {
+    icerikMenusuAc({
+      hedefUserId: post.userId,
+      hedefAd: post.authorName,
+      contentType: 'squad_post',
+      contentId: post.id,
+      benimUserId: user?.id,
+      afterBlock: () => router.back(),
+    });
   };
 
   const postSil = () => {
@@ -125,14 +150,16 @@ export default function KadroYorumDetayEkrani() {
       </View>
 
       <FlatList
-        data={yorumlar}
+        data={yorumlar.filter((y) => !blockedIds.includes(y.userId))}
         keyExtractor={(y) => String(y.id)}
         contentContainerStyle={{ padding: 16, paddingBottom: 8 }}
         ListHeaderComponent={
           <View style={{ marginBottom: 18 }}>
             <Image source={{ uri: tamGorselUrl(post.imageUrl) }} style={styles.postGorsel} resizeMode="contain" />
             <View style={styles.postUstSatir}>
-              <Text style={[styles.postYazar, post.isAdmin && { color: RENKLER.uyari }]}>{post.isAdmin ? '🛡️ ' : ''}{post.authorName}</Text>
+              <Pressable onPress={postMenuAc} disabled={silYetkisi}>
+                <Text style={[styles.postYazar, post.isAdmin && { color: RENKLER.uyari }]}>{post.isAdmin ? '🛡️ ' : ''}{post.authorName}{!silYetkisi ? ' •••' : ''}</Text>
+              </Pressable>
               <Text style={styles.postZaman}>{zamanFormatla(post.createdAt)}</Text>
             </View>
             {post.caption ? <Text style={styles.postCaption}>{post.caption}</Text> : null}
@@ -151,7 +178,11 @@ export default function KadroYorumDetayEkrani() {
               <Pressable onPress={() => yorumSil(y.id)} style={{ alignSelf: 'flex-end', marginTop: 4 }}>
                 <Text style={styles.yorumSilMetin}>Sil</Text>
               </Pressable>
-            ) : null}
+            ) : (
+              <Pressable onPress={() => yorumMenuAc(y)} style={{ alignSelf: 'flex-end', marginTop: 4 }}>
+                <Text style={styles.yorumSilMetin}>•••</Text>
+              </Pressable>
+            )}
           </View>
         )}
       />

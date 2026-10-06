@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from '../store/authStore';
+import { useModerationStore } from '../store/moderationStore';
+import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
 import { api, getServerRootUrl } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 
@@ -51,6 +53,7 @@ export default function ForumEkrani() {
 
 function GenelSohbetIcerik({ RENKLER, styles, insets }) {
   const { user } = useAuthStore();
+  const blockedIds = useModerationStore((s) => s.blockedIds);
   const [mesajlar, setMesajlar] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [metin, setMetin] = useState('');
@@ -104,6 +107,19 @@ function GenelSohbetIcerik({ RENKLER, styles, insets }) {
     ]);
   };
 
+  const menuAc = (mesaj) => {
+    const benimMi = mesaj.userId === user?.id;
+    if (benimMi || user?.isAdmin) { sil(mesaj); return; }
+    icerikMenusuAc({
+      hedefUserId: mesaj.userId,
+      hedefAd: mesaj.nickname,
+      contentType: 'forum',
+      contentId: mesaj.id,
+      benimUserId: user?.id,
+      afterBlock: () => setMesajlar((prev) => prev.filter((m) => m.userId !== mesaj.userId)),
+    });
+  };
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={insets.top + 90}>
       {yukleniyor ? (
@@ -111,7 +127,7 @@ function GenelSohbetIcerik({ RENKLER, styles, insets }) {
       ) : (
         <FlatList
           ref={listRef}
-          data={mesajlar}
+          data={mesajlar.filter((m) => !blockedIds.includes(m.userId))}
           keyExtractor={(m) => String(m.id)}
           contentContainerStyle={{ padding: 16, paddingBottom: 8, gap: 10 }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
@@ -120,7 +136,7 @@ function GenelSohbetIcerik({ RENKLER, styles, insets }) {
             const benimMi = m.userId === user?.id;
             return (
               <Pressable
-                onLongPress={() => (benimMi || user?.isAdmin) && sil(m)}
+                onLongPress={() => menuAc(m)}
                 style={[styles.mesajKutu, benimMi && styles.mesajKutuBenim]}
               >
                 <View style={styles.mesajUstSatir}>

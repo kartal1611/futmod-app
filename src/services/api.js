@@ -220,6 +220,16 @@ export const api = {
     return yuklemeYaniti(res, 'Görsel yüklenemedi');
   },
 
+  acceptTerms: () => apiFetch('/auth/accept-terms', { method: 'POST' }),
+
+  blockedUsers: () => apiFetch('/moderation/blocked'),
+  blockUser: (userId, context = {}) => apiFetch('/moderation/block', { method: 'POST', body: { userId, ...context } }),
+  unblockUser: (userId) => apiFetch(`/moderation/block/${userId}`, { method: 'DELETE' }),
+  reportContent: (payload) => apiFetch('/moderation/report', { method: 'POST', body: payload }),
+
+  adminListReports: (status = 'pending') => apiFetch(`/admin/reports?status=${status}`),
+  adminResolveReport: (id, payload) => apiFetch(`/admin/reports/${id}/resolve`, { method: 'POST', body: payload }),
+
   iapAccountToken: () => apiFetch('/iap/apple/account-token'),
   iapVerify: (transactionJWS) => apiFetch('/iap/apple/verify', { method: 'POST', body: { transactionJWS } }),
 

@@ -11,6 +11,7 @@ import { AnaSayfaIkonu, SbcIkonu, CoinIkonu, PuanlarimIkonu, ForumIkonu, Iletisi
 import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
 import AdminPanelEkrani from '../screens/AdminPanelEkrani';
+import KurallarOnayEkrani from '../screens/KurallarOnayEkrani';
 
 // Varsayılan davranışta expo-notifications, uygulama ÖN PLANDAYKEN gelen
 // bildirimi tamamen sessizce yutar — hiç banner/ses göstermez (arka planda
@@ -130,6 +131,15 @@ export default function RootLayout() {
       return <AdminLoginEkrani onGeri={() => setOturumOncesiEkran('login')} />;
     }
     return <LoginEkrani onAdminGiris={() => setOturumOncesiEkran('adminLogin')} />;
+  }
+
+  if (panelMode !== 'admin' && !user.termsAcceptedAt) {
+    return (
+      <>
+        <StatusBar barStyle="light-content" />
+        <KurallarOnayEkrani />
+      </>
+    );
   }
 
   if (panelMode === 'admin' && user.isAdmin) {

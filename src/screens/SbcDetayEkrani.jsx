@@ -4,6 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useAuthStore } from '../store/authStore';
+import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
+import { useModerationStore } from '../store/moderationStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
 import PaylasButonu from '../components/share/PaylasButonu';
@@ -29,6 +31,7 @@ export default function SbcDetayEkrani() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
+  const blockedIds = useModerationStore((s) => s.blockedIds);
   const { id } = useLocalSearchParams();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -87,6 +90,17 @@ export default function SbcDetayEkrani() {
         },
       },
     ]);
+  };
+
+  const yorumMenuAc = (yorum) => {
+    icerikMenusuAc({
+      hedefUserId: yorum.userId,
+      hedefAd: yorum.authorName,
+      contentType: 'sbc_comment',
+      contentId: yorum.id,
+      benimUserId: user?.id,
+      afterBlock: () => setYorumlar((onceki) => onceki.filter((y) => y.userId !== yorum.userId)),
+    });
   };
 
   if (loading) {
@@ -275,7 +289,7 @@ export default function SbcDetayEkrani() {
             {yorumlar.length === 0 ? (
               <Text style={styles.yorumBos}>Henüz yorum yok. İlk yorumu sen yaz!</Text>
             ) : (
-              yorumlar.map((y) => (
+              yorumlar.filter((y) => !blockedIds.includes(y.userId)).map((y) => (
                 <View key={y.id} style={styles.yorumKarti}>
                   <View style={styles.yorumUstSatir}>
                     <Text style={styles.yorumYazar}>{y.authorName}</Text>
@@ -286,7 +300,11 @@ export default function SbcDetayEkrani() {
                     <Pressable onPress={() => yorumSil(y.id)} style={{ alignSelf: 'flex-end', marginTop: 4 }}>
                       <Text style={styles.yorumSilMetin}>Sil</Text>
                     </Pressable>
-                  ) : null}
+                  ) : (
+                    <Pressable onPress={() => yorumMenuAc(y)} style={{ alignSelf: 'flex-end', marginTop: 4 }}>
+                      <Text style={styles.yorumSilMetin}>•••</Text>
+                    </Pressable>
+                  )}
                 </View>
               ))
             )}

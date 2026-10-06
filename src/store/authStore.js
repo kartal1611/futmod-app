@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../services/api';
 import { getTokens, setTokens, clearTokens, getPanelMode, setPanelMode } from '../services/api';
+import { useModerationStore } from './moderationStore';
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -25,18 +26,20 @@ export const useAuthStore = create((set, get) => ({
         getPanelMode(),
       ]);
       set({ user: data.user, panelMode, loading: false });
+      useModerationStore.getState().load();
     } catch {
       set({ user: null, loading: false });
     }
   },
 
-  register: async ({ email, password, displayName, referralCode }) => {
+  register: async ({ email, password, displayName, referralCode, termsAccepted }) => {
     set({ error: null });
     try {
-      const data = await api.register({ email, password, displayName, referralCode });
+      const data = await api.register({ email, password, displayName, referralCode, termsAccepted });
       await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
       await setPanelMode('member');
       set({ user: data.user, panelMode: 'member' });
+      useModerationStore.getState().load();
       return true;
     } catch (err) {
       set({ error: err.message });
@@ -51,6 +54,7 @@ export const useAuthStore = create((set, get) => ({
       await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
       await setPanelMode('member');
       set({ user: data.user, panelMode: 'member' });
+      useModerationStore.getState().load();
       return true;
     } catch (err) {
       set({ error: err.message });
@@ -76,6 +80,7 @@ export const useAuthStore = create((set, get) => ({
     await clearTokens();
     await setPanelMode('member');
     set({ user: null, panelMode: 'member' });
+    useModerationStore.getState().reset();
   },
 
   // Re-fetches the user so VIP/streak discount fields reflect a just-earned

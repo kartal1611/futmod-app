@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Linking,
 } from 'react-native';
 import NeonParilti from '../components/NeonParilti';
 import { useAuthStore } from '../store/authStore';
@@ -17,13 +17,15 @@ export default function LoginEkrani({ onAdminGiris }) {
   const [sifre, setSifre] = useState('');
   const [ad, setAd] = useState('');
   const [referansKodu, setReferansKodu] = useState('');
+  const [sartlarKabul, setSartlarKabul] = useState(false);
   const [gonderiliyor, setGonderiliyor] = useState(false);
 
   const gonder = async () => {
     if (!email || !sifre) return;
+    if (kayitModu && !sartlarKabul) return;
     setGonderiliyor(true);
     if (kayitModu) {
-      await register({ email, password: sifre, displayName: ad, referralCode: referansKodu });
+      await register({ email, password: sifre, displayName: ad, referralCode: referansKodu, termsAccepted: sartlarKabul });
     } else {
       await login({ email, password: sifre });
     }
@@ -82,9 +84,27 @@ export default function LoginEkrani({ onAdminGiris }) {
             />
           )}
 
+          {kayitModu && (
+            <TouchableOpacity style={styles.sartSatiri} onPress={() => setSartlarKabul((v) => !v)}>
+              <View style={[styles.kutucuk, sartlarKabul && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}>
+                {sartlarKabul ? <Text style={{ color: RENKLER.bg, fontSize: 12, fontWeight: '800' }}>✓</Text> : null}
+              </View>
+              <Text style={styles.sartMetin}>
+                <Text onPress={() => Linking.openURL('https://fc26.efendiler.net/torunfc/kurallar.html')} style={styles.sartLink}>
+                  Kullanım Şartları ve Topluluk Kurallarını
+                </Text>
+                {' '}okudum, kabul ediyorum. Taciz, uygunsuz içerik ve kötüye kullanıma sıfır toleransımız var.
+              </Text>
+            </TouchableOpacity>
+          )}
+
           {error ? <Text style={styles.hata}>{error}</Text> : null}
 
-          <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 16 }]} onPress={gonder} disabled={gonderiliyor}>
+          <TouchableOpacity
+            style={[ORTAK_STIL.buyukButon, { marginTop: 16 }, kayitModu && !sartlarKabul && { opacity: 0.5 }]}
+            onPress={gonder}
+            disabled={gonderiliyor || (kayitModu && !sartlarKabul)}
+          >
             {gonderiliyor ? (
               <ActivityIndicator color={RENKLER.bg} />
             ) : (
@@ -129,6 +149,10 @@ function olusturStyles(RENKLER) {
   buttonMetin: { color: RENKLER.bg, fontWeight: '700', fontSize: 16 },
   gecis: { color: RENKLER.vurgu2, textAlign: 'center' },
   hata: { color: RENKLER.hata, marginBottom: 8 },
+  sartSatiri: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 4, marginBottom: 4 },
+  kutucuk: { width: 20, height: 20, borderRadius: 5, borderWidth: 1.5, borderColor: RENKLER.ayrici, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  sartMetin: { flex: 1, fontSize: 12, color: RENKLER.metinIkincil, lineHeight: 17 },
+  sartLink: { color: RENKLER.vurgu2, fontWeight: '700' },
   yoneticiLink: { color: RENKLER.metinUcuncul, fontSize: 12.5, textDecorationLine: 'underline' },
   });
 }

@@ -8,6 +8,7 @@ import AdminTradeSekmesi from '../components/admin/AdminTradeSekmesi';
 import AdminBildirimSekmesi from '../components/admin/AdminBildirimSekmesi';
 import AdminHizmetlerSekmesi from '../components/admin/AdminHizmetlerSekmesi';
 import AdminOdemelerSekmesi from '../components/admin/AdminOdemelerSekmesi';
+import AdminSikayetlerSekmesi from '../components/admin/AdminSikayetlerSekmesi';
 
 const SEKMELER = [
   { key: 'vip', baslik: 'VIP', emoji: '⭐' },
@@ -15,6 +16,7 @@ const SEKMELER = [
   { key: 'hizmetler', baslik: 'Hizmetler', emoji: '🧰' },
   { key: 'odemeler', baslik: 'Ödemeler', emoji: '💳' },
   { key: 'bildirim', baslik: 'Bildirim', emoji: '🔔' },
+  { key: 'sikayetler', baslik: 'Şikayetler', emoji: '🚩' },
 ];
 
 export default function AdminPanelEkrani() {
@@ -51,6 +53,7 @@ export default function AdminPanelEkrani() {
         {aktifSekme === 'hizmetler' ? <AdminHizmetlerSekmesi /> : null}
         {aktifSekme === 'odemeler' ? <AdminOdemelerSekmesi /> : null}
         {aktifSekme === 'bildirim' ? <AdminBildirimSekmesi /> : null}
+        {aktifSekme === 'sikayetler' ? <AdminSikayetlerSekmesi /> : null}
       </View>
     </View>
   );

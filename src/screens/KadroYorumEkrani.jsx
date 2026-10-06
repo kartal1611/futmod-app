@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { api, getServerRootUrl } from '../services/api';
+import { useModerationStore } from '../store/moderationStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 
 function tamGorselUrl(url) {
@@ -28,6 +29,7 @@ export default function KadroYorumEkrani() {
   const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const blockedIds = useModerationStore((s) => s.blockedIds);
   const [postlar, setPostlar] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [yenileniyor, setYenileniyor] = useState(false);
@@ -109,7 +111,7 @@ export default function KadroYorumEkrani() {
         <ActivityIndicator style={{ marginTop: 40 }} color={RENKLER.vurgu} />
       ) : (
         <FlatList
-          data={postlar}
+          data={postlar.filter((p) => !blockedIds.includes(p.userId))}
           keyExtractor={(p) => String(p.id)}
           contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}
           refreshControl={<RefreshControl refreshing={yenileniyor} onRefresh={yenile} tintColor={RENKLER.vurgu} />}
