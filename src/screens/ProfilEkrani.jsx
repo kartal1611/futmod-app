@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Pressable, ScrollView, StyleSheet, Switch, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView, StyleSheet, Switch, Alert, Platform, ActivityIndicator } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
@@ -19,11 +19,15 @@ export default function ProfilEkrani() {
   const ORTAK_STIL = useOrtakStil();
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
-  const { user, logout } = useAuthStore();
+  const { user, logout, deleteAccount } = useAuthStore();
   const { temaAdi, temaSec } = useThemeStore();
   const [bildirimAcik, setBildirimAcik] = useState(false);
   const [islemde, setIslemde] = useState(false);
   const [tercihler, setTercihler] = useState(null);
+  const [silmeAcik, setSilmeAcik] = useState(false);
+  const [silmeSifre, setSilmeSifre] = useState('');
+  const [silmeYukleniyor, setSilmeYukleniyor] = useState(false);
+  const [silmeHata, setSilmeHata] = useState(null);
 
   useEffect(() => {
     api.notificationPreferences().then((data) => setTercihler(data.preferences)).catch(() => {});
@@ -64,6 +68,34 @@ export default function ProfilEkrani() {
     } finally {
       setIslemde(false);
     }
+  };
+
+  const hesabiSilOnayla = () => {
+    if (!silmeSifre) {
+      setSilmeHata('Şifreni gir');
+      return;
+    }
+    Alert.alert(
+      'Hesabı sil',
+      'Hesabın ve kişisel bilgilerin kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misin?',
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        {
+          text: 'Hesabımı Sil',
+          style: 'destructive',
+          onPress: async () => {
+            setSilmeYukleniyor(true);
+            setSilmeHata(null);
+            try {
+              await deleteAccount(silmeSifre);
+            } catch (err) {
+              setSilmeHata(err.message || 'Hesap silinemedi');
+              setSilmeYukleniyor(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const kategoriDegistir = async (key, value) => {
@@ -147,6 +179,45 @@ export default function ProfilEkrani() {
       <TouchableOpacity style={[styles.cikisButon, { marginTop: 24 }]} onPress={logout}>
         <Text style={styles.cikisMetin}>Çıkış Yap</Text>
       </TouchableOpacity>
+
+      {!silmeAcik ? (
+        <Pressable onPress={() => setSilmeAcik(true)} style={{ marginTop: 20 }}>
+          <Text style={styles.hesapSilLink}>Hesabımı Sil</Text>
+        </Pressable>
+      ) : (
+        <View style={[ORTAK_STIL.kart, { marginTop: 20, borderColor: RENKLER.hata, borderWidth: 1 }]}>
+          <Text style={styles.bolumBaslik}>Hesabı Sil</Text>
+          <Text style={styles.aciklama}>
+            Hesabın, e-postan ve kişisel bilgilerin kalıcı olarak silinir, tekrar giriş yapamazsın.
+            Onaylamak için şifreni gir.
+          </Text>
+          <TextInput
+            value={silmeSifre}
+            onChangeText={(v) => { setSilmeSifre(v); setSilmeHata(null); }}
+            placeholder="Şifren"
+            placeholderTextColor={RENKLER.metinUcuncul}
+            secureTextEntry
+            style={styles.silmeInput}
+          />
+          {silmeHata ? <Text style={styles.silmeHataMetin}>{silmeHata}</Text> : null}
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
+            <TouchableOpacity
+              style={[styles.silmeButon, { backgroundColor: RENKLER.bg3, flex: 1 }]}
+              onPress={() => { setSilmeAcik(false); setSilmeSifre(''); setSilmeHata(null); }}
+              disabled={silmeYukleniyor}
+            >
+              <Text style={[styles.cikisMetin, { color: RENKLER.metin }]}>Vazgeç</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.silmeButon, { backgroundColor: RENKLER.hata, flex: 1 }]}
+              onPress={hesabiSilOnayla}
+              disabled={silmeYukleniyor}
+            >
+              {silmeYukleniyor ? <ActivityIndicator color="#fff" /> : <Text style={styles.cikisMetin}>Hesabı Sil</Text>}
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
       </ScrollView>
     </View>
   );
@@ -171,6 +242,13 @@ function olusturStyles(RENKLER) {
   kategoriBaslik: { fontSize: 13.5, fontWeight: '700', color: RENKLER.metin },
   cikisButon: { backgroundColor: RENKLER.hata, borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
   cikisMetin: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  hesapSilLink: { color: RENKLER.metinUcuncul, fontSize: 12.5, textAlign: 'center', textDecorationLine: 'underline' },
+  silmeInput: {
+    marginTop: 12, borderWidth: 1, borderColor: RENKLER.ayrici, borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 10, color: RENKLER.metin, fontSize: 14,
+  },
+  silmeHataMetin: { color: RENKLER.hata, fontSize: 12, marginTop: 8 },
+  silmeButon: { borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
   temaSatiri: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 14 },
   temaSecenek: { alignItems: 'center', gap: 6 },
   temaDaire: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'transparent' },

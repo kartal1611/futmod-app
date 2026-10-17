@@ -221,6 +221,7 @@ export const api = {
   },
 
   acceptTerms: () => apiFetch('/auth/accept-terms', { method: 'POST' }),
+  deleteAccount: (password) => apiFetch('/auth/delete-account', { method: 'POST', body: { password } }),
 
   blockedUsers: () => apiFetch('/moderation/blocked'),
   blockUser: (userId, context = {}) => apiFetch('/moderation/block', { method: 'POST', body: { userId, ...context } }),

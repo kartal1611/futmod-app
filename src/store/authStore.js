@@ -83,6 +83,14 @@ export const useAuthStore = create((set, get) => ({
     useModerationStore.getState().reset();
   },
 
+  deleteAccount: async (password) => {
+    await api.deleteAccount(password);
+    await clearTokens();
+    await setPanelMode('member');
+    set({ user: null, panelMode: 'member' });
+    useModerationStore.getState().reset();
+  },
+
   // Re-fetches the user so VIP/streak discount fields reflect a just-earned
   // reward (e.g. right after a wheel spin) without needing to log out/in.
   refreshUser: async () => {
