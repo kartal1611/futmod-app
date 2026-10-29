@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
+import IcerikIkon from '../components/IcerikIkon';
 
 export default function EvoDetayEkrani() {
   const RENKLER = useRenkler();
@@ -71,7 +72,7 @@ export default function EvoDetayEkrani() {
         contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         ListHeaderComponent={
           <View style={{ marginBottom: 16, alignItems: 'center' }}>
-            {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.detayGorsel} resizeMode="contain" /> : null}
+            <IcerikIkon kategori="evo" boyut={120} style={styles.detayGorsel} />
             {p.description ? <Text style={styles.detayAciklama}>{p.description}</Text> : null}
 
             <View style={styles.istatistikSatiri}>

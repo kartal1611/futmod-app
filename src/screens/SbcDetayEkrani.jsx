@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, FlatList, Image, Pressable, ActivityIndicator, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, ActivityIndicator, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
@@ -12,6 +12,7 @@ import PaylasButonu from '../components/share/PaylasButonu';
 import PaylasAkisiModal from '../components/share/PaylasAkisiModal';
 import PaylasimKarti from '../components/share/PaylasimKarti';
 import NeonParilti from '../components/NeonParilti';
+import IcerikIkon from '../components/IcerikIkon';
 
 function zamanFormatla(iso) {
   if (!iso) return '';
@@ -145,7 +146,7 @@ export default function SbcDetayEkrani() {
         <View ref={sbcRef} collapsable={false}>
           <PaylasimKarti baslik="SBC" vurguRenk={RENKLER.vurgu}>
             <View style={{ alignItems: 'center' }}>
-              {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.paylasGorsel} resizeMode="contain" /> : null}
+              <IcerikIkon kategori="challenges" boyut={130} style={styles.paylasGorsel} />
               <Text style={styles.paylasBaslik} numberOfLines={2}>{item.title}</Text>
               {item.payload?.description ? <Text style={styles.paylasAciklama}>{item.payload.description}</Text> : null}
             </View>
@@ -199,9 +200,7 @@ export default function SbcDetayEkrani() {
         contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         ListHeaderComponent={
           <View style={{ marginBottom: 16, alignItems: 'center' }}>
-            {item.imageUrl ? (
-              <Image source={{ uri: item.imageUrl }} style={styles.detayGorsel} resizeMode="contain" />
-            ) : null}
+            <IcerikIkon kategori="challenges" boyut={120} style={styles.detayGorsel} />
             {item.payload?.isNew ? <Text style={styles.yeniEtiket}>YENİ</Text> : null}
             {item.payload?.description ? (
               <Text style={styles.detayAciklama}>{item.payload.description}</Text>

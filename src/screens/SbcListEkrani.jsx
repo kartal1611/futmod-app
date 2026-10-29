@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { View, Text, FlatList, Image, Pressable, ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, FlatList, Pressable, ActivityIndicator, RefreshControl, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useContentStore, useContentItems } from '../store/contentStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
+import IcerikIkon from '../components/IcerikIkon';
 
 const KATEGORI_ETIKET = {
   players: 'Oyuncu',
@@ -82,16 +83,13 @@ export default function SbcListEkrani() {
           renderItem={({ item }) => {
             const p = item.payload || {};
             const kategori = kategoriAl(p.slug);
+            const katAnahtar = (p.slug || '').split('/')[0];
             const up = p.communityUpvotePct;
             const down = p.communityDownvotePct;
             return (
               <Pressable onPress={() => router.push(`/sbc/${item.id}`)} style={({ pressed }) => [ORTAK_STIL.kart, { marginBottom: 14 }, pressed && { opacity: 0.85 }]}>
                 <View style={{ flexDirection: 'row', gap: 12 }}>
-                  {item.imageUrl ? (
-                    <Image source={{ uri: item.imageUrl }} style={styles.gorsel} resizeMode="contain" />
-                  ) : (
-                    <View style={[styles.gorsel, { backgroundColor: RENKLER.bg3 }]} />
-                  )}
+                  <IcerikIkon kategori={katAnahtar} boyut={56} style={styles.gorsel} />
                   <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
                       {p.isNew ? <Text style={styles.yeniEtiket}>YENİ</Text> : null}

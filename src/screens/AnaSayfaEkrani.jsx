@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, Image, FlatList, Alert, Linking, StyleSheet } from 'react-native';
 import OyuncuKarti from '../components/OyuncuKarti';
+import IcerikIkon from '../components/IcerikIkon';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
@@ -86,10 +87,10 @@ export default function AnaSayfaEkrani() {
             ) : (
               <>
                 {yeniGelenler.sbcs.length > 0 ? (
-                  <PaylasYeniBolum baslik={`🛡️ Yeni SBC'ler (${yeniGelenler.sbcs.length})`} veriler={yeniGelenler.sbcs} baslikAl={(o) => o.title} gorselAl={(o) => o.imageUrl} RENKLER={RENKLER} />
+                  <PaylasYeniBolum baslik={`🛡️ Yeni SBC'ler (${yeniGelenler.sbcs.length})`} veriler={yeniGelenler.sbcs} baslikAl={(o) => o.title} kategori="challenges" RENKLER={RENKLER} />
                 ) : null}
                 {yeniGelenler.evolutions.length > 0 ? (
-                  <PaylasYeniBolum baslik={`🧬 Yeni Evrimler (${yeniGelenler.evolutions.length})`} veriler={yeniGelenler.evolutions} baslikAl={(o) => o.title} gorselAl={(o) => o.imageUrl} RENKLER={RENKLER} />
+                  <PaylasYeniBolum baslik={`🧬 Yeni Evrimler (${yeniGelenler.evolutions.length})`} veriler={yeniGelenler.evolutions} baslikAl={(o) => o.title} kategori="evo" RENKLER={RENKLER} />
                 ) : null}
                 {yeniGelenler.players.length > 0 ? (
                   <PaylasYeniBolum baslik={`⚽ Yeni Oyuncular (${yeniGelenler.players.length})`} veriler={yeniGelenler.players} baslikAl={(o) => `${o.name} · ${o.rating} OVR`} gorselAl={(o) => o.imageUrl} RENKLER={RENKLER} />
@@ -135,7 +136,7 @@ export default function AnaSayfaEkrani() {
               <YeniBolum
                 baslik={`🛡️ Yeni SBC'ler (${yeniGelenler.sbcs.length})`}
                 veriler={yeniGelenler.sbcs}
-                gorselAl={(o) => o.imageUrl}
+                kategori="challenges"
                 baslikAl={(o) => o.title}
                 altAl={(o) => o.payload?.expires}
                 onPress={(o) => router.push(`/sbc/${o.id}`)}
@@ -145,7 +146,7 @@ export default function AnaSayfaEkrani() {
               <YeniBolum
                 baslik={`🧬 Yeni Evrimler (${yeniGelenler.evolutions.length})`}
                 veriler={yeniGelenler.evolutions}
-                gorselAl={(o) => o.imageUrl}
+                kategori="evo"
                 baslikAl={(o) => o.title}
                 altAl={(o) => o.payload?.expiry}
                 onPress={(o) => router.push(`/evrimler/${o.id}`)}
@@ -156,8 +157,6 @@ export default function AnaSayfaEkrani() {
                 baslik={`⚽ Yeni Oyuncular (${yeniGelenler.players.length})`}
                 veriler={yeniGelenler.players}
                 gorselAl={(o) => o.imageUrl}
-                cerceveAl={(o) => o.cardFrameUrl}
-                duzAl={(o) => o.flatCardUrl}
                 baslikAl={(o) => o.name}
                 altAl={(o) => (o.rating ? `${o.rating} OVR` : null)}
                 onPress={(o) => router.push(`/oyuncular/${o.futggId}`)}
@@ -253,7 +252,7 @@ export default function AnaSayfaEkrani() {
 }
 
 /** Compact wrap-grid list for the "Yeni Gelenler" share card — no scrolling like the on-screen version, everything fits in one captured image. */
-function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, RENKLER }) {
+function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, kategori, RENKLER }) {
   const styles = olusturStyles(RENKLER);
   const GOSTERILECEK = 6;
   const gosterilenler = veriler.slice(0, GOSTERILECEK);
@@ -265,7 +264,11 @@ function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, RENKLER }) {
         const gorsel = gorselAl ? gorselAl(o) : null;
         return (
           <View key={i} style={styles.paylasYeniSatirKutu}>
-            {gorsel ? <Image source={{ uri: gorsel }} style={styles.paylasYeniGorsel} resizeMode="contain" /> : null}
+            {kategori ? (
+              <IcerikIkon kategori={kategori} boyut={28} style={styles.paylasYeniGorsel} />
+            ) : gorsel ? (
+              <Image source={{ uri: gorsel }} style={styles.paylasYeniGorsel} resizeMode="contain" />
+            ) : null}
             <Text style={styles.paylasYeniSatir} numberOfLines={1}>{baslikAl(o)}</Text>
           </View>
         );
@@ -275,7 +278,7 @@ function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, RENKLER }) {
   );
 }
 
-function YeniBolum({ baslik, veriler, gorselAl, cerceveAl, duzAl, baslikAl, altAl, onPress }) {
+function YeniBolum({ baslik, veriler, gorselAl, baslikAl, altAl, onPress, kategori }) {
   const RENKLER = useRenkler();
   const styles = olusturStyles(RENKLER);
   return (
@@ -289,11 +292,11 @@ function YeniBolum({ baslik, veriler, gorselAl, cerceveAl, duzAl, baslikAl, altA
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Pressable onPress={() => onPress(item)} style={styles.yeniOgeKart}>
-            {(duzAl && duzAl(item)) || (cerceveAl && cerceveAl(item)) ? (
-              <OyuncuKarti duzGorselUrl={duzAl ? duzAl(item) : null} yuzUrl={gorselAl(item)} cerceveUrl={cerceveAl ? cerceveAl(item) : null} genislik={60} />
-            ) : gorselAl(item) ? (
-              <Image source={{ uri: gorselAl(item) }} style={styles.yeniOgeGorsel} resizeMode="contain" />
-            ) : null}
+            {kategori ? (
+              <IcerikIkon kategori={kategori} boyut={60} style={styles.yeniOgeGorsel} />
+            ) : (
+              <OyuncuKarti yuzUrl={gorselAl(item)} rating={item.rating} pozisyon={item.position} genislik={60} />
+            )}
             <Text style={styles.yeniOgeBaslik} numberOfLines={1}>{baslikAl(item)}</Text>
             {altAl(item) ? <Text style={styles.yeniOgeAlt} numberOfLines={1}>{altAl(item)}</Text> : null}
           </Pressable>
