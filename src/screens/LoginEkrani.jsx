@@ -16,7 +16,6 @@ export default function LoginEkrani({ onAdminGiris }) {
   const [email, setEmail] = useState('');
   const [sifre, setSifre] = useState('');
   const [ad, setAd] = useState('');
-  const [referansKodu, setReferansKodu] = useState('');
   const [sartlarKabul, setSartlarKabul] = useState(false);
   const [gonderiliyor, setGonderiliyor] = useState(false);
 
@@ -25,7 +24,7 @@ export default function LoginEkrani({ onAdminGiris }) {
     if (kayitModu && !sartlarKabul) return;
     setGonderiliyor(true);
     if (kayitModu) {
-      await register({ email, password: sifre, displayName: ad, referralCode: referansKodu, termsAccepted: sartlarKabul });
+      await register({ email, password: sifre, displayName: ad, termsAccepted: sartlarKabul });
     } else {
       await login({ email, password: sifre });
     }
@@ -72,17 +71,6 @@ export default function LoginEkrani({ onAdminGiris }) {
             value={sifre}
             onChangeText={setSifre}
           />
-
-          {kayitModu && (
-            <TextInput
-              style={styles.input}
-              placeholder="Referans kodu (opsiyonel)"
-              placeholderTextColor={RENKLER.metinUcuncul}
-              autoCapitalize="characters"
-              value={referansKodu}
-              onChangeText={setReferansKodu}
-            />
-          )}
 
           {kayitModu && (
             <TouchableOpacity style={styles.sartSatiri} onPress={() => setSartlarKabul((v) => !v)}>

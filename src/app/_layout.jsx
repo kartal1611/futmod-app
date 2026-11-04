@@ -7,7 +7,7 @@ import { api } from '../services/api';
 import { useThemeStore } from '../store/themeStore';
 import { useRenkler } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
-import { AnaSayfaIkonu, SbcIkonu, CoinIkonu, PuanlarimIkonu, ForumIkonu, IletisimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
+import { AnaSayfaIkonu, SbcIkonu, ForumIkonu, IletisimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
 import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
 import AdminPanelEkrani from '../screens/AdminPanelEkrani';
@@ -88,12 +88,12 @@ export default function RootLayout() {
     })();
   }, [user?.id]);
 
-  // Tapping a "trade" notification opens that specific trade card directly;
+  // Tapping a "forum" (new reply) notification opens that thread directly;
   // tapping a "sbc" (new content) notification opens the SBC list.
   const bildirimYonlendir = (data) => {
     if (!data) return;
-    if (data.type === 'trade' && data.tradeId) {
-      router.push(`/trade/${data.tradeId}`);
+    if (data.type === 'forum' && data.threadId) {
+      router.push(`/forum/${data.threadId}`);
     } else if (data.type === 'sbc') {
       router.push('/sbc');
     }
@@ -156,7 +156,7 @@ export default function RootLayout() {
   // içeriğinden BİLE önce boyanan) sabit BEYAZ bir arkaplan demekti.
   // ORTAK_STIL.ekran şeffaf yapılınca (global NeonParilti'nin görünmesi
   // için) bu beyaz taban ortaya çıktı — özellikle iç içe Stack
-  // navigator'lardaki (SBC/Oyuncular/Trade/Evrimler detay sayfaları) push
+  // navigator'lardaki (SBC/Oyuncular/Evrimler detay sayfaları) push
   // edilen ekranlarda net şekilde görüldü. Çözüm: navigasyon temasının
   // `colors.background`'unu buradan RENKLER.bg'ye sabitlemek — artık en
   // altta hiçbir zaman beyaz yok, olsa olsa koyu lacivert taban var.
@@ -191,17 +191,11 @@ export default function RootLayout() {
       >
         <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={AnaSayfaIkonu} label="Ana Sayfa" focused={focused} RENKLER={RENKLER} /> }} />
         <Tabs.Screen name="sbc" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={SbcIkonu} label="SBC" focused={focused} RENKLER={RENKLER} /> }} />
-        <Tabs.Screen name="toruncoin" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={CoinIkonu} label="Coin" focused={focused} RENKLER={RENKLER} /> }} />
-        <Tabs.Screen name="puanlarim" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={PuanlarimIkonu} label="Puanlarım" focused={focused} RENKLER={RENKLER} /> }} />
         <Tabs.Screen name="forum" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ForumIkonu} label="Forum" focused={focused} RENKLER={RENKLER} /> }} />
-        {/* Kadro Yorumlama artık Forum sekmesi içinde bir kategori — ayrı sekme değil, ama
-            /kadro-yorumlama/[id] detay rotası hâlâ o kategoriden push edilerek kullanılıyor. */}
-        <Tabs.Screen name="kadro-yorumlama" options={{ href: null }} />
         <Tabs.Screen name="iletisim" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={IletisimIkonu} label="İletişim" focused={focused} RENKLER={RENKLER} /> }} />
         <Tabs.Screen name="profil" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ProfilIkonu} label="Profil" focused={focused} RENKLER={RENKLER} /> }} />
         <Tabs.Screen name="evrimler" options={{ href: null }} />
         <Tabs.Screen name="oyuncular" options={{ href: null }} />
-        <Tabs.Screen name="trade" options={{ href: null }} />
       </Tabs>
     </View>
     </ThemeProvider>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, FlatList, Alert, Linking, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, Image, FlatList, Alert, StyleSheet } from 'react-native';
 import OyuncuKarti from '../components/OyuncuKarti';
 import IcerikIkon from '../components/IcerikIkon';
 import { useRouter } from 'expo-router';
@@ -7,7 +7,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { api } from '../services/api';
 import { useRenkler } from '../constants/theme';
-import { telegramHizmetLinki } from '../constants/contact';
 import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
 import PaylasButonu from '../components/share/PaylasButonu';
 import PaylasAkisiModal from '../components/share/PaylasAkisiModal';
@@ -17,13 +16,13 @@ const HIZLI_ERISIM = [
   { key: 'sbc', baslik: 'SBC', aciklama: 'Tüm görevler ve çözümler', emoji: '📋', route: '/sbc', hazir: true },
   { key: 'oyuncular', baslik: 'Oyuncular', aciklama: 'Oyuncu arama ve istatistikler', emoji: '⚽', route: '/oyuncular', hazir: true },
   { key: 'evrimler', baslik: 'Evrimler', aciklama: 'Evrim yolları ve gereksinimler', emoji: '🧬', route: '/evrimler', hazir: true },
-  { key: 'trade', baslik: 'Trade', aciklama: 'Trader kartlar — detaylar VIP\'e özel', emoji: '📈', route: '/trade', hazir: true },
+  { key: 'forum', baslik: 'Forum', aciklama: 'Sohbet et, kadronu paylaş', emoji: '💬', route: '/forum', hazir: true },
 ];
 
 const SEKMELER = [
   { key: 'sbc', label: 'SBC', route: '/sbc', hazir: true },
   { key: 'oyuncular', label: 'Oyuncular', route: '/oyuncular', hazir: true },
-  { key: 'trade', label: 'Trade', route: '/trade', hazir: true },
+  { key: 'evrimler', label: 'Evrimler', route: '/evrimler', hazir: true },
 ];
 
 function yakindaUyar() {
@@ -37,7 +36,6 @@ export default function AnaSayfaEkrani() {
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const [trendOyuncular, setTrendOyuncular] = useState([]);
-  const [hizmetler, setHizmetler] = useState([]);
   // Everything first captured today (Europe/Istanbul) — fut.gg drops new
   // content at ~20:00, so this is empty most of the day and fills in after
   // that sync runs.
@@ -47,7 +45,6 @@ export default function AnaSayfaEkrani() {
     api.playerTrend(8).then((data) => {
       setTrendOyuncular(data.items || []);
     }).catch(() => {});
-    api.services().then((data) => setHizmetler(data.items || [])).catch(() => {});
     api.contentNewToday().then(setYeniGelenler).catch(() => {});
   }, []);
 
@@ -212,27 +209,6 @@ export default function AnaSayfaEkrani() {
               </Pressable>
             )}
           />
-        </View>
-      ) : null}
-
-      {hizmetler.length > 0 ? (
-        <View style={{ marginTop: 24 }}>
-          <View style={styles.bolumBaslikSatiri}>
-            <Text style={styles.bolumBaslik}>DİĞER HİZMETLER</Text>
-          </View>
-          <View style={styles.gridKonteyner}>
-            {hizmetler.map((h) => (
-              <Pressable
-                key={h.id}
-                onPress={() => Linking.openURL(telegramHizmetLinki(h.title))}
-                style={({ pressed }) => [styles.gridKart, pressed && { opacity: 0.85 }]}
-              >
-                <Text style={styles.gridEmoji}>{h.emoji}</Text>
-                <Text style={styles.gridBaslik}>{h.title}</Text>
-                {h.description ? <Text style={styles.gridAciklama} numberOfLines={2}>{h.description}</Text> : null}
-              </Pressable>
-            ))}
-          </View>
         </View>
       ) : null}
 

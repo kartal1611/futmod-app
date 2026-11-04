@@ -3,18 +3,10 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useRenkler } from '../constants/theme';
-import AdminVipSekmesi from '../components/admin/AdminVipSekmesi';
-import AdminTradeSekmesi from '../components/admin/AdminTradeSekmesi';
 import AdminBildirimSekmesi from '../components/admin/AdminBildirimSekmesi';
-import AdminHizmetlerSekmesi from '../components/admin/AdminHizmetlerSekmesi';
-import AdminOdemelerSekmesi from '../components/admin/AdminOdemelerSekmesi';
 import AdminSikayetlerSekmesi from '../components/admin/AdminSikayetlerSekmesi';
 
 const SEKMELER = [
-  { key: 'vip', baslik: 'VIP', emoji: '⭐' },
-  { key: 'trade', baslik: 'Trade', emoji: '📈' },
-  { key: 'hizmetler', baslik: 'Hizmetler', emoji: '🧰' },
-  { key: 'odemeler', baslik: 'Ödemeler', emoji: '💳' },
   { key: 'bildirim', baslik: 'Bildirim', emoji: '🔔' },
   { key: 'sikayetler', baslik: 'Şikayetler', emoji: '🚩' },
 ];
@@ -24,7 +16,7 @@ export default function AdminPanelEkrani() {
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuthStore();
-  const [aktifSekme, setAktifSekme] = useState('vip');
+  const [aktifSekme, setAktifSekme] = useState('bildirim');
 
   return (
     <View style={{ flex: 1, backgroundColor: RENKLER.bg }}>
@@ -48,10 +40,6 @@ export default function AdminPanelEkrani() {
       </ScrollView>
 
       <View style={{ flex: 1 }}>
-        {aktifSekme === 'vip' ? <AdminVipSekmesi /> : null}
-        {aktifSekme === 'trade' ? <AdminTradeSekmesi /> : null}
-        {aktifSekme === 'hizmetler' ? <AdminHizmetlerSekmesi /> : null}
-        {aktifSekme === 'odemeler' ? <AdminOdemelerSekmesi /> : null}
         {aktifSekme === 'bildirim' ? <AdminBildirimSekmesi /> : null}
         {aktifSekme === 'sikayetler' ? <AdminSikayetlerSekmesi /> : null}
       </View>

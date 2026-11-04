@@ -8,7 +8,7 @@ import { api } from '../services/api';
 import { useRenkler, useOrtakStil, TEMALAR } from '../constants/theme';
 
 const KATEGORILER = [
-  { key: 'trade', label: 'Trade Bildirimi', aciklama: 'Sadece VIP üyelere anlamlıdır' },
+  { key: 'forum', label: 'Forum Bildirimi', aciklama: 'Takip ettiğin başlıklara yanıt gelince haber ver' },
   { key: 'sbc', label: 'SBC Bildirimi', aciklama: 'Yeni içerik geldiğinde haber ver' },
   { key: 'yayin', label: 'Yayın Bildirimi', aciklama: 'Canlı yayın duyuruları' },
   { key: 'haberler', label: 'Haberler Bildirimi', aciklama: 'Genel duyuru ve haberler' },
@@ -123,16 +123,8 @@ export default function ProfilEkrani() {
         ) : null}
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
           {user?.isAdmin ? <Text style={styles.adminRozet}>Yönetici</Text> : null}
-          {user?.isVip ? <Text style={styles.vipRozet}>⭐ VIP{user.vipUntil ? ` · ${new Date(user.vipUntil).toLocaleDateString('tr-TR')}'e kadar` : ' · Sınırsız'}</Text> : null}
         </View>
       </View>
-
-      {user?.isVip ? (
-        <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
-          <Text style={styles.bolumBaslik}>⭐ VIP Ayrıcalıkların</Text>
-          <Text style={styles.aciklama}>Coin alımlarında otomatik %{user.vipDiscountPercent} indirim</Text>
-        </View>
-      ) : null}
 
       <View style={[ORTAK_STIL.kart, { marginTop: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
         <View style={{ flex: 1 }}>
@@ -233,10 +225,6 @@ function olusturStyles(RENKLER) {
   adminRozet: {
     alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu,
     color: '#fff', fontWeight: '700', fontSize: 11, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
-  },
-  vipRozet: {
-    alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu2,
-    color: RENKLER.bg, fontWeight: '800', fontSize: 11, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
   },
   kategoriSatiri: { flexDirection: 'row', alignItems: 'center', marginTop: 14 },
   kategoriBaslik: { fontSize: 13.5, fontWeight: '700', color: RENKLER.metin },

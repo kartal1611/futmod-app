@@ -5,6 +5,8 @@ import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 const TIP_ADI = {
   forum: 'Forum mesajı',
+  forum_thread: 'Forum başlığı',
+  forum_comment: 'Forum yorumu',
   sbc_comment: 'SBC yorumu',
   squad_post: 'Kadro paylaşımı',
   squad_comment: 'Kadro yorumu',
@@ -67,6 +69,7 @@ export default function AdminSikayetlerSekmesi() {
             <Text style={styles.tip}>{TIP_ADI[r.contentType] || r.contentType}{r.contentId ? ` · #${r.contentId}` : ''}</Text>
             <Text style={styles.satir}>Şikayet eden: {r.reporterEmail || r.reporterUserId}</Text>
             <Text style={styles.satir}>İçerik sahibi: {r.ownerEmail || r.contentOwnerUserId || '—'}{r.ownerIsBanned ? ' (askıya alındı)' : ''}</Text>
+            {r.contentPreview ? <Text style={styles.satir}>İçerik: {r.contentPreview}</Text> : null}
             {r.reason ? <Text style={styles.sebep}>"{r.reason}"</Text> : null}
             <Text style={styles.tarih}>{new Date(r.createdAt).toLocaleString('tr-TR')}</Text>
             {durum === 'pending' && (

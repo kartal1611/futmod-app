@@ -27,26 +27,6 @@ export function SbcIkonu({ renk, boyut = 24 }) {
   );
 }
 
-export function CoinIkonu({ renk, boyut = 24 }) {
-  return (
-    <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
-      <Circle cx="12" cy="12" r="8.7" stroke={renk} strokeWidth={1.6} />
-      <Circle cx="12" cy="12" r="6.9" stroke={renk} strokeWidth={0.9} opacity={0.55} />
-      <SvgText x="12" y="15.2" fontSize="7.2" fontWeight="900" fontStyle="italic" fill={renk} textAnchor="middle">FC</SvgText>
-    </Svg>
-  );
-}
-
-export function PuanlarimIkonu({ renk, boyut = 24 }) {
-  return (
-    <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
-      <Path d="M12 2.4l8.2 4.7v9.8L12 21.6l-8.2-4.7V7.1L12 2.4Z" stroke={renk} strokeWidth={1.6} strokeLinejoin="round" />
-      <Path d="M12 6.6l1.1 2.2 2.45.35-1.77 1.73.42 2.44L12 12.15l-2.2 1.17.42-2.44-1.77-1.73 2.45-.35L12 6.6Z" fill={renk} />
-      <SvgText x="12" y="18.6" fontSize="5" fontWeight="800" fill={renk} textAnchor="middle">XP</SvgText>
-    </Svg>
-  );
-}
-
 export function ForumIkonu({ renk, boyut = 24 }) {
   return (
     <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">

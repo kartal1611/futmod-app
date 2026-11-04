@@ -32,10 +32,10 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  register: async ({ email, password, displayName, referralCode, termsAccepted }) => {
+  register: async ({ email, password, displayName, termsAccepted }) => {
     set({ error: null });
     try {
-      const data = await api.register({ email, password, displayName, referralCode, termsAccepted });
+      const data = await api.register({ email, password, displayName, termsAccepted });
       await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
       await setPanelMode('member');
       set({ user: data.user, panelMode: 'member' });
@@ -91,8 +91,8 @@ export const useAuthStore = create((set, get) => ({
     useModerationStore.getState().reset();
   },
 
-  // Re-fetches the user so VIP/streak discount fields reflect a just-earned
-  // reward (e.g. right after a wheel spin) without needing to log out/in.
+  // Re-fetches the user so server-side changes (e.g. accepted terms) apply
+  // without needing to log out/in.
   refreshUser: async () => {
     try {
       const data = await api.me();

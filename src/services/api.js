@@ -132,9 +132,6 @@ export const api = {
   adminLogin: (payload) => apiFetch('/auth/admin-login', { method: 'POST', body: payload, auth: false }),
   me: () => apiFetch('/auth/me'),
 
-  trade: () => apiFetch('/trade'),
-  tradeItem: (id) => apiFetch(`/trade/${id}`),
-
   notificationPreferences: () => apiFetch('/notification-preferences'),
   updateNotificationPreferences: (prefs) => apiFetch('/notification-preferences', { method: 'PUT', body: prefs }),
 
@@ -159,23 +156,6 @@ export const api = {
   playerPriceWatchAdd: (futggId) => apiFetch(`/players/${futggId}/price-watch`, { method: 'POST' }),
   playerPriceWatchRemove: (futggId) => apiFetch(`/players/${futggId}/price-watch`, { method: 'DELETE' }),
 
-  coins: (params = {}) => {
-    const qs = new URLSearchParams(params).toString();
-    return apiFetch(`/coin${qs ? `?${qs}` : ''}`);
-  },
-  coinItem: (id) => apiFetch(`/coin/${id}`),
-  validateCoinDiscount: (code) => apiFetch('/coin/discount/validate', { method: 'POST', body: { code } }),
-
-  pointsBalance: () => apiFetch('/points'),
-  pointsHistory: () => apiFetch('/points/history'),
-
-  wheelStatus: () => apiFetch('/wheel/status'),
-  wheelSpin: () => apiFetch('/wheel/spin', { method: 'POST' }),
-
-  redeemCode: (code) => apiFetch('/redeem', { method: 'POST', body: { code } }),
-
-  affiliateMe: () => apiFetch('/affiliate/me'),
-
   comments: (contentId) => apiFetch(`/comments/${contentId}`),
   addComment: (contentId, body) => apiFetch(`/comments/${contentId}`, { method: 'POST', body: { body } }),
   deleteComment: (commentId) => apiFetch(`/comments/${commentId}`, { method: 'DELETE' }),
@@ -186,23 +166,7 @@ export const api = {
   // Admin panel
   adminFindUser: (email) => apiFetch(`/admin/users/${encodeURIComponent(email)}`),
   adminSetNote: (email, note) => apiFetch(`/admin/users/${encodeURIComponent(email)}/note`, { method: 'PUT', body: { note } }),
-  adminSetVip: (payload) => apiFetch('/admin/vip', { method: 'POST', body: payload }),
-  adminRemoveVip: (email) => apiFetch(`/admin/vip/${encodeURIComponent(email)}`, { method: 'DELETE' }),
-  adminListVip: () => apiFetch('/admin/vip'),
-  adminListTrade: () => apiFetch('/admin/trade'),
-  adminCreateTrade: (payload) => apiFetch('/admin/trade', { method: 'POST', body: payload }),
-  adminUpdateTrade: (id, payload) => apiFetch(`/admin/trade/${id}`, { method: 'PUT', body: payload }),
-  adminDeleteTrade: (id) => apiFetch(`/admin/trade/${id}`, { method: 'DELETE' }),
 
-  kadroPosts: (params = {}) => {
-    const qs = new URLSearchParams(params).toString();
-    return apiFetch(`/squad${qs ? `?${qs}` : ''}`);
-  },
-  kadroPostItem: (id) => apiFetch(`/squad/${id}`),
-  kadroCreatePost: (payload) => apiFetch('/squad', { method: 'POST', body: payload }),
-  kadroDeletePost: (id) => apiFetch(`/squad/${id}`, { method: 'DELETE' }),
-  kadroAddComment: (id, body) => apiFetch(`/squad/${id}/comments`, { method: 'POST', body: { body } }),
-  kadroDeleteComment: (id) => apiFetch(`/squad/comments/${id}`, { method: 'DELETE' }),
   kadroUploadImage: async (fileUri, fileName) => {
     const { accessToken } = await getTokens();
     const form = new FormData();
@@ -231,42 +195,18 @@ export const api = {
   adminListReports: (status = 'pending') => apiFetch(`/admin/reports?status=${status}`),
   adminResolveReport: (id, payload) => apiFetch(`/admin/reports/${id}/resolve`, { method: 'POST', body: payload }),
 
-  iapAccountToken: () => apiFetch('/iap/apple/account-token'),
-  iapVerify: (transactionJWS) => apiFetch('/iap/apple/verify', { method: 'POST', body: { transactionJWS } }),
-
-  forumMessages: (params = {}) => {
+  forumThreads: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
-    return apiFetch(`/forum${qs ? `?${qs}` : ''}`);
+    return apiFetch(`/forum/threads${qs ? `?${qs}` : ''}`);
   },
-  forumSend: (body) => apiFetch('/forum', { method: 'POST', body: { body } }),
-  forumDelete: (id) => apiFetch(`/forum/${id}`, { method: 'DELETE' }),
+  forumThread: (id) => apiFetch(`/forum/threads/${id}`),
+  forumCreateThread: (payload) => apiFetch('/forum/threads', { method: 'POST', body: payload }),
+  forumDeleteThread: (id) => apiFetch(`/forum/threads/${id}`, { method: 'DELETE' }),
+  forumVote: (id) => apiFetch(`/forum/threads/${id}/vote`, { method: 'POST' }),
+  forumFollow: (id, following) => apiFetch(`/forum/threads/${id}/follow`, { method: 'PUT', body: { following } }),
+  forumAddComment: (id, payload) => apiFetch(`/forum/threads/${id}/comments`, { method: 'POST', body: payload }),
+  forumDeleteComment: (id) => apiFetch(`/forum/threads/comments/${id}`, { method: 'DELETE' }),
 
-  services: () => apiFetch('/services'),
-  adminListServices: () => apiFetch('/admin/services'),
-  adminCreateService: (payload) => apiFetch('/admin/services', { method: 'POST', body: payload }),
-  adminUpdateService: (id, payload) => apiFetch(`/admin/services/${id}`, { method: 'PUT', body: payload }),
-  adminDeleteService: (id) => apiFetch(`/admin/services/${id}`, { method: 'DELETE' }),
-
-  adminListPayments: (status) => apiFetch(`/admin/payments${status ? `?status=${status}` : ''}`),
-  adminCreatePayment: (payload) => apiFetch('/admin/payments', { method: 'POST', body: payload }),
-  adminMarkPaymentPaid: (id, payload) => apiFetch(`/admin/payments/${id}/mark-paid`, { method: 'POST', body: payload }),
-  adminMarkPaymentFailed: (id) => apiFetch(`/admin/payments/${id}/mark-failed`, { method: 'POST' }),
-  adminUploadTradeImage: async (fileUri, fileName) => {
-    const { accessToken } = await getTokens();
-    const form = new FormData();
-    // Aynı Yeni Mimari FormData sorunu (bkz. kadroUploadImage) — Blob'a çevir.
-    const blob = await (await fetch(fileUri)).blob();
-    form.append('image', blob, fileName || 'trade.jpg');
-    const res = await fetch(`${getBaseUrl()}/admin/trade/upload-image`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${accessToken}` },
-      body: form,
-    });
-    return yuklemeYaniti(res, 'Görsel yüklenemedi');
-  },
   adminSendNotification: (payload) => apiFetch('/admin/notifications/send', { method: 'POST', body: payload }),
-  adminCreateRedeemCode: (payload) => apiFetch('/admin/redeem-codes', { method: 'POST', body: payload }),
-  adminCreateCoinDiscount: (payload) => apiFetch('/admin/coin-discount-codes', { method: 'POST', body: payload }),
   adminSyncFutgg: () => apiFetch('/admin/sync-futgg', { method: 'POST' }),
-  adminSyncToruncoin: () => apiFetch('/admin/sync-toruncoin', { method: 'POST' }),
 };
