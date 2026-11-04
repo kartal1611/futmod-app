@@ -1,4 +1,3 @@
-import OyuncuKarti from '../components/OyuncuKarti';
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Pressable, ActivityIndicator, TextInput, Modal, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -136,7 +135,6 @@ export default function OyuncularListEkrani() {
           ListEmptyComponent={<Text style={styles.bos}>Oyuncu bulunamadı.</Text>}
           renderItem={({ item }) => (
             <Pressable onPress={() => router.push(`/oyuncular/${item.futggId}`)} style={({ pressed }) => [ORTAK_STIL.kart, { marginBottom: 10, flexDirection: 'row', gap: 12, alignItems: 'center' }, pressed && { opacity: 0.85 }]}>
-              <OyuncuKarti yuzUrl={item.imageUrl} rating={item.rating} pozisyon={item.position} genislik={52} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.isim}>{item.name}</Text>
                 <View style={{ flexDirection: 'row', gap: 6, marginTop: 3 }}>

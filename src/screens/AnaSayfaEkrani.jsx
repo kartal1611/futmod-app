@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, FlatList, Alert, StyleSheet } from 'react-native';
-import OyuncuKarti from '../components/OyuncuKarti';
+import { View, Text, ScrollView, Pressable, FlatList, Alert, StyleSheet } from 'react-native';
 import IcerikIkon from '../components/IcerikIkon';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -90,7 +89,7 @@ export default function AnaSayfaEkrani() {
                   <PaylasYeniBolum baslik={`🧬 Yeni Evrimler (${yeniGelenler.evolutions.length})`} veriler={yeniGelenler.evolutions} baslikAl={(o) => o.title} kategori="evo" RENKLER={RENKLER} />
                 ) : null}
                 {yeniGelenler.players.length > 0 ? (
-                  <PaylasYeniBolum baslik={`⚽ Yeni Oyuncular (${yeniGelenler.players.length})`} veriler={yeniGelenler.players} baslikAl={(o) => `${o.name} · ${o.rating} OVR`} gorselAl={(o) => o.imageUrl} RENKLER={RENKLER} />
+                  <PaylasYeniBolum baslik={`⚽ Yeni Oyuncular (${yeniGelenler.players.length})`} veriler={yeniGelenler.players} baslikAl={(o) => `${o.name} · ${o.rating} OVR`} RENKLER={RENKLER} />
                 ) : null}
               </>
             )}
@@ -153,7 +152,6 @@ export default function AnaSayfaEkrani() {
               <YeniBolum
                 baslik={`⚽ Yeni Oyuncular (${yeniGelenler.players.length})`}
                 veriler={yeniGelenler.players}
-                gorselAl={(o) => o.imageUrl}
                 baslikAl={(o) => o.name}
                 altAl={(o) => (o.rating ? `${o.rating} OVR` : null)}
                 onPress={(o) => router.push(`/oyuncular/${o.futggId}`)}
@@ -199,7 +197,6 @@ export default function AnaSayfaEkrani() {
             keyExtractor={(item) => item.futggId}
             renderItem={({ item }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${item.futggId}`)} style={styles.oyuncuKart}>
-                <OyuncuKarti duzGorselUrl={item.flatCardUrl || item.cardImageUrl} yuzUrl={item.imageUrl} cerceveUrl={item.cardFrameUrl} genislik={70} />
                 <Text style={styles.oyuncuIsim} numberOfLines={1}>{item.name}</Text>
                 <View style={{ flexDirection: 'row', gap: 4 }}>
                   {item.position ? <Text style={styles.oyuncuPozisyon}>{item.position}</Text> : null}
@@ -228,7 +225,7 @@ export default function AnaSayfaEkrani() {
 }
 
 /** Compact wrap-grid list for the "Yeni Gelenler" share card — no scrolling like the on-screen version, everything fits in one captured image. */
-function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, kategori, RENKLER }) {
+function PaylasYeniBolum({ baslik, veriler, baslikAl, kategori, RENKLER }) {
   const styles = olusturStyles(RENKLER);
   const GOSTERILECEK = 6;
   const gosterilenler = veriler.slice(0, GOSTERILECEK);
@@ -236,25 +233,18 @@ function PaylasYeniBolum({ baslik, veriler, baslikAl, gorselAl, kategori, RENKLE
   return (
     <View style={{ marginTop: 16 }}>
       <Text style={styles.paylasYeniBolumBaslik}>{baslik}</Text>
-      {gosterilenler.map((o, i) => {
-        const gorsel = gorselAl ? gorselAl(o) : null;
-        return (
-          <View key={i} style={styles.paylasYeniSatirKutu}>
-            {kategori ? (
-              <IcerikIkon kategori={kategori} boyut={28} style={styles.paylasYeniGorsel} />
-            ) : gorsel ? (
-              <Image source={{ uri: gorsel }} style={styles.paylasYeniGorsel} resizeMode="contain" />
-            ) : null}
-            <Text style={styles.paylasYeniSatir} numberOfLines={1}>{baslikAl(o)}</Text>
-          </View>
-        );
-      })}
+      {gosterilenler.map((o, i) => (
+        <View key={i} style={styles.paylasYeniSatirKutu}>
+          {kategori ? <IcerikIkon kategori={kategori} boyut={28} style={styles.paylasYeniGorsel} /> : null}
+          <Text style={styles.paylasYeniSatir} numberOfLines={1}>{baslikAl(o)}</Text>
+        </View>
+      ))}
       {kalan > 0 ? <Text style={styles.paylasYeniSatir}>+ {kalan} daha</Text> : null}
     </View>
   );
 }
 
-function YeniBolum({ baslik, veriler, gorselAl, baslikAl, altAl, onPress, kategori }) {
+function YeniBolum({ baslik, veriler, baslikAl, altAl, onPress, kategori }) {
   const RENKLER = useRenkler();
   const styles = olusturStyles(RENKLER);
   return (
@@ -268,11 +258,7 @@ function YeniBolum({ baslik, veriler, gorselAl, baslikAl, altAl, onPress, katego
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <Pressable onPress={() => onPress(item)} style={styles.yeniOgeKart}>
-            {kategori ? (
-              <IcerikIkon kategori={kategori} boyut={60} style={styles.yeniOgeGorsel} />
-            ) : (
-              <OyuncuKarti yuzUrl={gorselAl(item)} rating={item.rating} pozisyon={item.position} genislik={60} />
-            )}
+            {kategori ? <IcerikIkon kategori={kategori} boyut={60} style={styles.yeniOgeGorsel} /> : null}
             <Text style={styles.yeniOgeBaslik} numberOfLines={1}>{baslikAl(item)}</Text>
             {altAl(item) ? <Text style={styles.yeniOgeAlt} numberOfLines={1}>{altAl(item)}</Text> : null}
           </Pressable>

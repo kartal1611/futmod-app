@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import { getPlaystyleIcon } from '../constants/playstyleIcons';
-import OyuncuKarti from '../components/OyuncuKarti';
 import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
 import PaylasButonu from '../components/share/PaylasButonu';
 import PaylasAkisiModal from '../components/share/PaylasAkisiModal';
@@ -120,15 +119,6 @@ export default function OyuncuDetayEkrani() {
 
   const d = player.detail || {};
   const attrs = d.attributes || null;
-  // easysbc (our current source) never gives a pre-flattened "frame baked
-  // in" card image the way fut.gg's list scrape used to — it only exposes
-  // the bare face cutout (imageUrl) and the rarity frame separately
-  // (cardFrameUrl). Always composite the two instead of treating the list-
-  // level `imageUrl` as already-flattened (it isn't, for any player now).
-  // Önce kendi çizdiğimiz kart (fut.gg düzeni, statlı, her nadirlikte doğru); fut.gg'nin kayıtlı render'ı yalnızca yedek.
-  const duzGorselUrl = player.flatCardUrl || d.cardImageUrl || null;
-  const yuzUrl = d.imageUrl || player.imageUrl || null;
-  const cerceveUrl = d.cardFrameUrl || null;
 
   return (
     <View style={ORTAK_STIL.ekran}>
@@ -147,7 +137,6 @@ export default function OyuncuDetayEkrani() {
         <View ref={fiyatRef} collapsable={false}>
           <PaylasimKarti baslik="Market" vurguRenk={RENKLER.vurgu}>
             <View style={styles.paylasUstSatir}>
-              <OyuncuKarti duzGorselUrl={duzGorselUrl} yuzUrl={yuzUrl} cerceveUrl={cerceveUrl} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} nationIconUrl={d.nationIconUrl} leagueIconUrl={d.leagueIconUrl} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={110} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.paylasIsim} numberOfLines={2}>{d.name || player.name}</Text>
                 <View style={styles.paylasRozetSatiri}>
@@ -175,7 +164,6 @@ export default function OyuncuDetayEkrani() {
         <View ref={statsRef} collapsable={false}>
           <PaylasimKarti baslik="Stats" vurguRenk={RENKLER.vurgu}>
             <View style={styles.paylasUstSatir}>
-              <OyuncuKarti duzGorselUrl={duzGorselUrl} yuzUrl={yuzUrl} cerceveUrl={cerceveUrl} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} nationIconUrl={d.nationIconUrl} leagueIconUrl={d.leagueIconUrl} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={90} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.paylasIsim} numberOfLines={2}>{d.name || player.name}</Text>
                 <View style={styles.paylasRozetSatiri}>
@@ -224,14 +212,6 @@ export default function OyuncuDetayEkrani() {
       </View>
 
       <View style={styles.ustBolum}>
-        {/* player.imageUrl (list scrape) is fut.gg's flattened card render
-            — frame + player baked into one image, so prefer it. Not every
-            player has reached the list sync yet (e.g. a brand-new SBC
-            reward player) — for those, OyuncuKarti composites the detail
-            page's bare face cutout over its own rarity frame instead of
-            falling back to a frameless face crop. */}
-        <OyuncuKarti duzGorselUrl={duzGorselUrl} yuzUrl={yuzUrl} cerceveUrl={cerceveUrl} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} nationIconUrl={d.nationIconUrl} leagueIconUrl={d.leagueIconUrl} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={168} />
-
         <View style={styles.bilgiSutunu}>
           <View style={styles.rozetSatiri}>
             {(d.mainPosition || player.position) ? <Text style={styles.anaPozisyon}>{d.mainPosition || player.position}</Text> : null}
@@ -305,11 +285,6 @@ export default function OyuncuDetayEkrani() {
             keyExtractor={(v) => v.futggId}
             renderItem={({ item: v }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${v.futggId}`)} style={styles.versKart}>
-                {v.cardFrameUrl ? (
-                  <OyuncuKarti duzGorselUrl={v.flatCardUrl || v.cardImageUrl} yuzUrl={v.imageUrl} cerceveUrl={v.cardFrameUrl} genislik={72} />
-                ) : v.imageUrl ? (
-                  <Image source={{ uri: v.imageUrl }} style={styles.versGorsel} resizeMode="contain" />
-                ) : null}
                 <Text style={styles.versRating}>{v.rating} OVR</Text>
                 <Text style={styles.versRarity} numberOfLines={2}>{v.rarity || '-'}</Text>
               </Pressable>
@@ -488,7 +463,6 @@ function olusturStyles(RENKLER) {
   altEtiket: { fontSize: 11, color: RENKLER.metinIkincil, flex: 1 },
   altDeger: { fontSize: 12.5, fontWeight: '800', marginLeft: 6 },
   versKart: { width: 96, backgroundColor: RENKLER.bg2, borderRadius: 12, padding: 8, borderWidth: 1, borderColor: RENKLER.ayrici, alignItems: 'center' },
-  versGorsel: { width: 72, height: 100 },
   versRating: { fontSize: 12.5, fontWeight: '900', color: RENKLER.metin, marginTop: 4 },
   versRarity: { fontSize: 9, color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 2 },
   paylasUstSatir: { flexDirection: 'row', gap: 16, alignItems: 'center', marginTop: 18 },
