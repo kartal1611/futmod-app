@@ -39,7 +39,7 @@ export default function LoginEkrani({ onAdminGiris }) {
       <NeonParilti />
       <ScrollView contentContainerStyle={styles.icerik} keyboardShouldPersistTaps="handled">
         <Text style={styles.logo}>FutMod ⚽</Text>
-        <Text style={styles.altBaslik}>EAFC 27'de bir adım önde ol</Text>
+        <Text style={styles.altBaslik}>Türkiye'nin oyuncu topluluğu</Text>
 
         <View style={[ORTAK_STIL.kart, { marginTop: 32, width: '100%' }]}>
           <Text style={styles.formBaslik}>{kayitModu ? 'Kayıt Ol' : 'Giriş Yap'}</Text>

@@ -9,6 +9,8 @@ import { useRenkler, useOrtakStil } from '../constants/theme';
 import { FORUM_KATEGORILERI } from '../constants/forum';
 
 const MIN_BASLIK = 5;
+const MIN_SECENEK = 2;
+const MAX_SECENEK = 6;
 
 export default function ForumYeniBaslikEkrani() {
   const RENKLER = useRenkler();
@@ -22,8 +24,14 @@ export default function ForumYeniBaslikEkrani() {
   const [metin, setMetin] = useState('');
   const [gorsel, setGorsel] = useState(null);
   const [gonderiliyor, setGonderiliyor] = useState(false);
+  const [anketAcik, setAnketAcik] = useState(false);
+  const [secenekler, setSecenekler] = useState(['', '']);
 
-  const hazir = baslik.trim().length >= MIN_BASLIK && !gonderiliyor;
+  const doluSecenekler = secenekler.map((s) => s.trim()).filter(Boolean);
+  const anketHazir = !anketAcik || doluSecenekler.length >= MIN_SECENEK;
+  const hazir = baslik.trim().length >= MIN_BASLIK && anketHazir && !gonderiliyor;
+
+  const secenekYaz = (i, deger) => setSecenekler((prev) => prev.map((s, j) => (j === i ? deger : s)));
 
   const gorselSec = async () => {
     const izin = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -45,6 +53,7 @@ export default function ForumYeniBaslikEkrani() {
         title: baslik.trim(),
         body: metin.trim(),
         ...(yukleme ? { imageUrl: yukleme.imageUrl } : {}),
+        ...(anketAcik ? { pollOptions: doluSecenekler } : {}),
       });
       router.replace(`/forum/${data.item.id}`);
     } catch (err) {
@@ -106,6 +115,30 @@ export default function ForumYeniBaslikEkrani() {
           )}
         </Pressable>
 
+        <Pressable onPress={() => setAnketAcik((v) => !v)} style={[styles.anketButon, anketAcik && { borderColor: RENKLER.vurgu }]}>
+          <Text style={[styles.gorselMetin, anketAcik && { color: RENKLER.vurgu }]}>📊 {anketAcik ? 'Anketi kaldır' : 'Anket ekle'}</Text>
+        </Pressable>
+        {anketAcik ? (
+          <View style={{ gap: 8, marginTop: 10 }}>
+            {secenekler.map((s, i) => (
+              <TextInput
+                key={i}
+                style={styles.girdi}
+                placeholder={`Seçenek ${i + 1}`}
+                placeholderTextColor={RENKLER.metinUcuncul}
+                value={s}
+                onChangeText={(v) => secenekYaz(i, v)}
+                maxLength={60}
+              />
+            ))}
+            {secenekler.length < MAX_SECENEK ? (
+              <Pressable onPress={() => setSecenekler((prev) => [...prev, ''])} style={styles.secenekEkle}>
+                <Text style={[styles.gorselMetin, { color: RENKLER.vurgu }]}>+ Seçenek ekle</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
+
         <Pressable onPress={ac} disabled={!hazir} style={[ORTAK_STIL.buyukButon, { marginTop: 18 }, !hazir && { opacity: 0.5 }]}>
           {gonderiliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.acMetin}>Başlığı Aç</Text>}
         </Pressable>
@@ -133,6 +166,8 @@ function olusturStyles(RENKLER) {
       alignItems: 'center', justifyContent: 'center', backgroundColor: RENKLER.bg3, overflow: 'hidden',
     },
     onizleme: { width: '100%', height: '100%' },
+    anketButon: { marginTop: 12, minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2, alignItems: 'center', justifyContent: 'center' },
+    secenekEkle: { minHeight: 42, alignItems: 'center', justifyContent: 'center' },
     gorselMetin: { fontSize: 13, color: RENKLER.metinIkincil, fontWeight: '600' },
     acMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 15 },
   });

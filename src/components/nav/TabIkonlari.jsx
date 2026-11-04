@@ -1,31 +1,9 @@
-import Svg, { Path, Circle, Text as SvgText } from 'react-native-svg';
+import Svg, { Path, Circle } from 'react-native-svg';
 
 // Neon outline icon set for the bottom tab bar — thin single-color stroke,
-// no fills except the small accent marks (star, dots), matching the
-// reference look: line-art glyphs that glow via the wrapping TabIkonu's
-// shadow rather than any fill/gradient baked into the SVG itself.
-
-export function AnaSayfaIkonu({ renk, boyut = 24 }) {
-  return (
-    <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
-      <Path d="M3 15.2c0-3.4 4-6.1 9-6.1s9 2.7 9 6.1" stroke={renk} strokeWidth={1.6} strokeLinecap="round" />
-      <Path d="M3 15.2V17c0 1.9 4 3.4 9 3.4s9-1.5 9-3.4v-1.8" stroke={renk} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M12 9.1V4.6M7.2 10V6.3M16.8 10V6.3" stroke={renk} strokeWidth={1.4} strokeLinecap="round" />
-      <Path d="M12 4.6l2.4 1.4-2.4 1.3V4.6ZM7.2 6.3l2 1.2-2 1V6.3ZM16.8 6.3l2 1.2-2 1V6.3Z" fill={renk} />
-    </Svg>
-  );
-}
-
-export function SbcIkonu({ renk, boyut = 24 }) {
-  return (
-    <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
-      <Path d="M12 2.8l6.5 2.3v5c0 4.4-2.8 7.8-6.5 9.1-3.7-1.3-6.5-4.7-6.5-9.1v-5L12 2.8Z" stroke={renk} strokeWidth={1.6} strokeLinejoin="round" />
-      <SvgText x="12" y="12.3" fontSize="6.5" fontWeight="800" fill={renk} textAnchor="middle">UT</SvgText>
-      <Circle cx="16" cy="15.2" r="3" fill="#000" stroke={renk} strokeWidth={1.2} />
-      <Path d="M14.6 15.2l1 1 1.9-2.1" stroke={renk} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
+// no fills except the small accent marks (dots), matching the reference
+// look: line-art glyphs that glow via the wrapping TabIkonu's shadow rather
+// than any fill/gradient baked into the SVG itself.
 
 export function ForumIkonu({ renk, boyut = 24 }) {
   return (
@@ -39,22 +17,20 @@ export function ForumIkonu({ renk, boyut = 24 }) {
   );
 }
 
-export function IletisimIkonu({ renk, boyut = 24 }) {
+export function AraIkonu({ renk, boyut = 24 }) {
   return (
     <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
-      <Path d="M4.2 13.2v-1.4a7.8 7.8 0 0 1 15.6 0v1.4" stroke={renk} strokeWidth={1.6} strokeLinecap="round" />
-      <Path d="M3.2 13.6a1.6 1.6 0 0 1 1.6-1.6h.6a1.6 1.6 0 0 1 1.6 1.6v3.2a1.6 1.6 0 0 1-1.6 1.6h-.6a1.6 1.6 0 0 1-1.6-1.6v-3.2ZM17 13.6a1.6 1.6 0 0 1 1.6-1.6h.6a1.6 1.6 0 0 1 1.6 1.6v3.2a1.6 1.6 0 0 1-1.6 1.6h-.6A1.6 1.6 0 0 1 17 16.8v-3.2Z" stroke={renk} strokeWidth={1.5} />
-      <Path d="M19.2 18.4v.5a2.3 2.3 0 0 1-2.3 2.3h-2.2" stroke={renk} strokeWidth={1.5} strokeLinecap="round" />
+      <Circle cx="10.8" cy="10.8" r="6.6" stroke={renk} strokeWidth={1.6} />
+      <Path d="M15.8 15.8l4.4 4.4" stroke={renk} strokeWidth={1.6} strokeLinecap="round" />
     </Svg>
   );
 }
 
-export function KadroYorumIkonu({ renk, boyut = 24 }) {
+export function BildirimIkonu({ renk, boyut = 24 }) {
   return (
     <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
-      <Path d="M3.5 5.5A1.8 1.8 0 0 1 5.3 3.7h11.4A1.8 1.8 0 0 1 18.5 5.5v9A1.8 1.8 0 0 1 16.7 16.3H9.3l-3.6 2.6a.4.4 0 0 1-.64-.32v-2.28H5.3A1.8 1.8 0 0 1 3.5 14.5v-9Z" stroke={renk} strokeWidth={1.5} strokeLinejoin="round" />
-      <Circle cx="7.6" cy="8.7" r="1.15" stroke={renk} strokeWidth={1.2} />
-      <Path d="M4.6 13l3.2-3 2.3 2.1 2.9-3.4 3.9 4.3" stroke={renk} strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M6 10a6 6 0 0 1 12 0c0 6 2.5 7 2.5 7h-17S6 16 6 10Z" stroke={renk} strokeWidth={1.6} strokeLinejoin="round" />
+      <Path d="M10 20.5a2.2 2.2 0 0 0 4 0" stroke={renk} strokeWidth={1.6} strokeLinecap="round" />
     </Svg>
   );
 }

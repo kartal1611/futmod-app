@@ -7,7 +7,8 @@ import { api } from '../services/api';
 import { useThemeStore } from '../store/themeStore';
 import { useRenkler } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
-import { AnaSayfaIkonu, SbcIkonu, ForumIkonu, IletisimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
+import { ForumIkonu, AraIkonu, BildirimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
+import { useBildirimStore } from '../store/bildirimStore';
 import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
 import AdminPanelEkrani from '../screens/AdminPanelEkrani';
@@ -28,7 +29,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
-function TabIcon({ Ikon, label, focused, RENKLER }) {
+const BILDIRIM_YENILEME_ARALIGI = 60000;
+
+function TabIcon({ Ikon, label, focused, RENKLER, rozet = 0 }) {
   const renk = focused ? RENKLER.vurgu : RENKLER.metinUcuncul;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 4 }}>
@@ -36,6 +39,14 @@ function TabIcon({ Ikon, label, focused, RENKLER }) {
         shadowColor: RENKLER.vurgu, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.9, shadowRadius: 6, elevation: 6,
       } : null}>
         <Ikon renk={renk} boyut={23} />
+        {rozet > 0 ? (
+          <View style={{
+            position: 'absolute', top: -4, right: -9, minWidth: 16, height: 16, borderRadius: 8, paddingHorizontal: 3,
+            alignItems: 'center', justifyContent: 'center', backgroundColor: RENKLER.hata,
+          }}>
+            <Text style={{ color: '#fff', fontSize: 10, fontWeight: '800' }}>{rozet > 99 ? '99+' : rozet}</Text>
+          </View>
+        ) : null}
       </View>
       <Text
         numberOfLines={1}
@@ -88,14 +99,20 @@ export default function RootLayout() {
     })();
   }, [user?.id]);
 
-  // Tapping a "forum" (new reply) notification opens that thread directly;
-  // tapping a "sbc" (new content) notification opens the SBC list.
+  // Rozet bildirim gelmeden de güncel kalsın; yalnızca üye modunda anlamlı.
+  const bildirimYenile = useBildirimStore((s) => s.yenile);
+  const okunmamis = useBildirimStore((s) => s.okunmamis);
+  useEffect(() => {
+    if (!user || panelMode === 'admin') return undefined;
+    bildirimYenile();
+    const zamanlayici = setInterval(bildirimYenile, BILDIRIM_YENILEME_ARALIGI);
+    return () => clearInterval(zamanlayici);
+  }, [user?.id, panelMode]);
+
+  // Tapping a "forum" (new reply) notification opens that thread directly.
   const bildirimYonlendir = (data) => {
-    if (!data) return;
-    if (data.type === 'forum' && data.threadId) {
+    if (data?.type === 'forum' && data.threadId) {
       router.push(`/forum/${data.threadId}`);
-    } else if (data.type === 'sbc') {
-      router.push('/sbc');
     }
   };
 
@@ -156,7 +173,7 @@ export default function RootLayout() {
   // içeriğinden BİLE önce boyanan) sabit BEYAZ bir arkaplan demekti.
   // ORTAK_STIL.ekran şeffaf yapılınca (global NeonParilti'nin görünmesi
   // için) bu beyaz taban ortaya çıktı — özellikle iç içe Stack
-  // navigator'lardaki (SBC/Oyuncular/Evrimler detay sayfaları) push
+  // navigator'lardaki (Forum detay sayfaları) push
   // edilen ekranlarda net şekilde görüldü. Çözüm: navigasyon temasının
   // `colors.background`'unu buradan RENKLER.bg'ye sabitlemek — artık en
   // altta hiçbir zaman beyaz yok, olsa olsa koyu lacivert taban var.
@@ -189,13 +206,11 @@ export default function RootLayout() {
           tabBarShowLabel: false,
         }}
       >
-        <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={AnaSayfaIkonu} label="Ana Sayfa" focused={focused} RENKLER={RENKLER} /> }} />
-        <Tabs.Screen name="sbc" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={SbcIkonu} label="SBC" focused={focused} RENKLER={RENKLER} /> }} />
+        <Tabs.Screen name="index" options={{ href: null }} />
         <Tabs.Screen name="forum" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ForumIkonu} label="Forum" focused={focused} RENKLER={RENKLER} /> }} />
-        <Tabs.Screen name="iletisim" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={IletisimIkonu} label="İletişim" focused={focused} RENKLER={RENKLER} /> }} />
+        <Tabs.Screen name="ara" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={AraIkonu} label="Ara" focused={focused} RENKLER={RENKLER} /> }} />
+        <Tabs.Screen name="bildirimler" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={BildirimIkonu} label="Bildirimler" focused={focused} RENKLER={RENKLER} rozet={okunmamis} /> }} />
         <Tabs.Screen name="profil" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ProfilIkonu} label="Profil" focused={focused} RENKLER={RENKLER} /> }} />
-        <Tabs.Screen name="evrimler" options={{ href: null }} />
-        <Tabs.Screen name="oyuncular" options={{ href: null }} />
       </Tabs>
     </View>
     </ThemeProvider>

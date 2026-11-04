@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useModerationStore } from '../store/moderationStore';
+import { useBildirimStore } from '../store/bildirimStore';
 import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
 import NeonParilti from '../components/NeonParilti';
 import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
@@ -30,6 +31,8 @@ export default function ForumBaslikEkrani() {
   const [metin, setMetin] = useState('');
   const [yanitlanan, setYanitlanan] = useState(null);
   const [gonderiliyor, setGonderiliyor] = useState(false);
+  const [yorumSirasi, setYorumSirasi] = useState('old');
+  const bildirimAyarla = useBildirimStore((s) => s.ayarla);
   const kartRef = useRef(null);
   const girdiRef = useRef(null);
   const paylasAkisi = usePaylasAkisi({
@@ -38,41 +41,62 @@ export default function ForumBaslikEkrani() {
 
   const yukle = useCallback(async () => {
     try {
-      const data = await api.forumThread(id);
+      const data = await api.forumThread(id, yorumSirasi);
       setBaslik(data.item);
       setYorumlar(data.comments || []);
       setHata(null);
     } catch (err) {
       setHata(err.message || 'Başlık yüklenemedi');
     }
-  }, [id]);
+  }, [id, yorumSirasi]);
 
   useEffect(() => {
     yukle().finally(() => setYukleniyor(false));
   }, [yukle]);
 
-  // Bildirimden soğuk açılışta geri gidilecek ekran olmayabilir.
-  const geri = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace('/forum');
+  // Başlığı açmak o başlığın bildirimlerini okundu sayar.
+  useEffect(() => {
+    api.forumMarkNotificationsRead(Number(id)).then((data) => bildirimAyarla(data.unread)).catch(() => {});
+  }, [id, bildirimAyarla]);
+
+  // Bu uçlar anketi döndürmez; ekrandaki anket korunur.
+  const baslikGuncelle = async (islem, hataMetni) => {
+    try {
+      const data = await islem();
+      setBaslik((prev) => ({ ...data.item, poll: prev.poll }));
+    } catch (err) {
+      Alert.alert('Hata', err.message || hataMetni);
+    }
   };
 
-  const oyla = async () => {
+  const oyla = () => baslikGuncelle(() => api.forumVote(baslik.id), 'Oy verilemedi');
+  const takipDegistir = () => baslikGuncelle(() => api.forumFollow(baslik.id, !baslik.following), 'Takip güncellenemedi');
+  const kaydet = () => baslikGuncelle(() => api.forumSave(baslik.id, !baslik.saved), 'Kaydedilemedi');
+  const sabitle = () => baslikGuncelle(() => api.forumPin(baslik.id, !baslik.isPinned), 'Sabitlenemedi');
+  const kilitle = () => baslikGuncelle(() => api.forumLock(baslik.id, !baslik.isLocked), 'Kilitlenemedi');
+
+  const anketOyla = async (secenekId) => {
     try {
-      const data = await api.forumVote(baslik.id);
-      setBaslik(data.item);
+      const data = await api.forumPollVote(baslik.id, secenekId);
+      setBaslik((prev) => ({ ...prev, poll: data.poll }));
     } catch (err) {
       Alert.alert('Hata', err.message || 'Oy verilemedi');
     }
   };
 
-  const takipDegistir = async () => {
+  const yorumOyla = async (yorum) => {
     try {
-      const data = await api.forumFollow(baslik.id, !baslik.following);
-      setBaslik(data.item);
+      const data = await api.forumCommentVote(yorum.id);
+      setYorumlar((prev) => prev.map((y) => (y.id === yorum.id ? { ...y, voteCount: data.voteCount, voted: data.voted } : y)));
     } catch (err) {
-      Alert.alert('Hata', err.message || 'Takip güncellenemedi');
+      Alert.alert('Hata', err.message || 'Oy verilemedi');
     }
+  };
+
+  // Bildirimden soğuk açılışta geri gidilecek ekran olmayabilir.
+  const geri = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/forum');
   };
 
   const gonder = async () => {
@@ -202,34 +226,77 @@ export default function ForumBaslikEkrani() {
         ListHeaderComponent={(
           <View style={{ marginBottom: 8 }}>
             <Text style={styles.baslikMetin}>{baslik.title}</Text>
-            <Text style={[styles.yazar, baslik.isAdmin && { color: RENKLER.uyari }]}>
-              {baslik.isAdmin ? '🛡️ ' : ''}{baslik.authorName} · {zamanFormatla(baslik.createdAt)}
-            </Text>
+            <Pressable onPress={() => router.push(`/forum/kullanici/${baslik.userId}`)} hitSlop={6}>
+              <Text style={[styles.yazar, baslik.isAdmin && { color: RENKLER.uyari }]}>
+                {baslik.isAdmin ? '🛡️ ' : ''}{baslik.authorName} · {zamanFormatla(baslik.createdAt)}
+              </Text>
+            </Pressable>
             {baslik.body ? <Text style={styles.govde}>{baslik.body}</Text> : null}
             {baslik.imageUrl ? <Image source={{ uri: tamGorselUrl(baslik.imageUrl) }} style={styles.gorsel} resizeMode="contain" /> : null}
+            {baslik.poll ? (
+              <View style={styles.anket}>
+                {baslik.poll.options.map((s) => {
+                  const oran = baslik.poll.totalVotes ? Math.round((s.voteCount / baslik.poll.totalVotes) * 100) : 0;
+                  const benim = baslik.poll.myOptionId === s.id;
+                  return (
+                    <Pressable key={s.id} onPress={() => anketOyla(s.id)} style={[styles.anketSecenek, benim && { borderColor: RENKLER.vurgu }]}>
+                      <View style={[styles.anketDolgu, { width: `${oran}%`, backgroundColor: `${RENKLER.vurgu}33` }]} />
+                      <Text style={styles.anketMetin} numberOfLines={2}>{benim ? '✓ ' : ''}{s.label}</Text>
+                      <Text style={styles.anketOran}>%{oran}</Text>
+                    </Pressable>
+                  );
+                })}
+                <Text style={styles.anketToplam}>{baslik.poll.totalVotes} oy</Text>
+              </View>
+            ) : null}
             <View style={styles.eylemSatiri}>
               <Pressable onPress={oyla} style={[styles.eylemButon, baslik.voted && { borderColor: RENKLER.vurgu }]}>
                 <Text style={[styles.eylemMetin, baslik.voted && { color: RENKLER.vurgu }]}>▲ {baslik.voteCount}</Text>
               </Pressable>
+              <Pressable onPress={kaydet} style={[styles.eylemButon, baslik.saved && { borderColor: RENKLER.vurgu2 }]}>
+                <Text style={[styles.eylemMetin, baslik.saved && { color: RENKLER.vurgu2 }]}>{baslik.saved ? '★ Kaydedildi' : '☆ Kaydet'}</Text>
+              </Pressable>
               <Pressable onPress={baslikMenusu} style={styles.eylemButon}>
                 <Text style={styles.eylemMetin}>{baslik.userId === user?.id || user?.isAdmin ? 'Sil' : 'Şikayet / Engelle'}</Text>
               </Pressable>
+              {user?.isAdmin ? (
+                <>
+                  <Pressable onPress={sabitle} style={styles.eylemButon}>
+                    <Text style={styles.eylemMetin}>{baslik.isPinned ? '📌 Sabiti kaldır' : '📌 Sabitle'}</Text>
+                  </Pressable>
+                  <Pressable onPress={kilitle} style={styles.eylemButon}>
+                    <Text style={styles.eylemMetin}>{baslik.isLocked ? '🔓 Kilidi aç' : '🔒 Kilitle'}</Text>
+                  </Pressable>
+                </>
+              ) : null}
             </View>
-            <Text style={styles.yorumBaslik}>Yorumlar ({baslik.commentCount})</Text>
+            <View style={styles.yorumBaslikSatiri}>
+              <Text style={styles.yorumBaslik}>Yorumlar ({baslik.commentCount})</Text>
+              <Pressable onPress={() => setYorumSirasi((s) => (s === 'old' ? 'best' : 'old'))} hitSlop={10}>
+                <Text style={[styles.yorumEylem, { color: RENKLER.vurgu }]}>{yorumSirasi === 'old' ? 'Sıra: Tarih' : 'Sıra: En iyi'}</Text>
+              </Pressable>
+            </View>
           </View>
         )}
         ListEmptyComponent={<Text style={styles.bos}>Henüz yorum yok. İlk yorumu sen yaz!</Text>}
         renderItem={({ item: y }) => (
           <Pressable onLongPress={() => yorumMenusu(y)} style={[styles.yorumKutu, y.parentId && styles.yanitKutu]}>
             <View style={styles.yorumUstSatir}>
-              <Text style={[styles.yorumYazar, y.isAdmin && { color: RENKLER.uyari }]} numberOfLines={1}>{y.isAdmin ? '🛡️ ' : ''}{y.authorName}</Text>
+              <Pressable onPress={() => router.push(`/forum/kullanici/${y.userId}`)} hitSlop={6} style={{ flex: 1 }}>
+                <Text style={[styles.yorumYazar, y.isAdmin && { color: RENKLER.uyari }]} numberOfLines={1}>{y.isAdmin ? '🛡️ ' : ''}{y.authorName}</Text>
+              </Pressable>
               <Text style={styles.yorumZaman}>{zamanFormatla(y.createdAt)}</Text>
             </View>
             <Text style={styles.yorumMetin}>{y.body}</Text>
             <View style={styles.yorumEylemler}>
-              <Pressable onPress={() => yanitla(y)} hitSlop={10}>
-                <Text style={[styles.yorumEylem, { color: RENKLER.vurgu }]}>Yanıtla</Text>
+              <Pressable onPress={() => yorumOyla(y)} hitSlop={10} accessibilityRole="button" accessibilityLabel="Yorumu oyla">
+                <Text style={[styles.yorumEylem, y.voted && { color: RENKLER.vurgu }]}>▲ {y.voteCount}</Text>
               </Pressable>
+              {!baslik.isLocked || user?.isAdmin ? (
+                <Pressable onPress={() => yanitla(y)} hitSlop={10}>
+                  <Text style={[styles.yorumEylem, { color: RENKLER.vurgu }]}>Yanıtla</Text>
+                </Pressable>
+              ) : null}
               {y.userId !== user?.id || user?.isAdmin ? (
                 <Pressable onPress={() => yorumMenusu(y)} hitSlop={10}>
                   <Text style={styles.yorumEylem}>{user?.isAdmin ? 'Sil' : 'Şikayet / Engelle'}</Text>
@@ -244,6 +311,11 @@ export default function ForumBaslikEkrani() {
         )}
       />
 
+      {baslik.isLocked && !user?.isAdmin ? (
+        <View style={styles.girdiAlani}>
+          <Text style={styles.kilitliMetin}>🔒 Bu başlık yorumlara kapalı</Text>
+        </View>
+      ) : (
       <View style={styles.girdiAlani}>
         {yanitlanan ? (
           <View style={styles.yanitSatiri}>
@@ -269,6 +341,7 @@ export default function ForumBaslikEkrani() {
           </Pressable>
         </View>
       </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -286,14 +359,22 @@ function olusturStyles(RENKLER) {
     yazar: { fontSize: 12, color: RENKLER.metinIkincil, marginTop: 6 },
     govde: { fontSize: 14.5, color: RENKLER.metin, lineHeight: 21, marginTop: 12 },
     gorsel: { width: '100%', height: 260, borderRadius: 12, marginTop: 12, backgroundColor: RENKLER.bg3 },
-    eylemSatiri: { flexDirection: 'row', gap: 8, marginTop: 14 },
+    anket: { gap: 8, marginTop: 14 },
+    anketSecenek: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 46, borderRadius: 11, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2, paddingHorizontal: 12, overflow: 'hidden' },
+    anketDolgu: { position: 'absolute', left: 0, top: 0, bottom: 0 },
+    anketMetin: { flex: 1, fontSize: 13.5, fontWeight: '600', color: RENKLER.metin },
+    anketOran: { fontSize: 13, fontWeight: '800', color: RENKLER.metin },
+    anketToplam: { fontSize: 12, color: RENKLER.metinIkincil },
+    kilitliMetin: { fontSize: 13, color: RENKLER.metinIkincil, textAlign: 'center', paddingVertical: 8 },
+    eylemSatiri: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
     eylemButon: { borderRadius: 11, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2, paddingHorizontal: 14, paddingVertical: 11 },
     eylemMetin: { fontSize: 13, fontWeight: '700', color: RENKLER.metin },
-    yorumBaslik: { fontSize: 14, fontWeight: '800', color: RENKLER.metin, marginTop: 20 },
+    yorumBaslikSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 },
+    yorumBaslik: { fontSize: 14, fontWeight: '800', color: RENKLER.metin },
     yorumKutu: { backgroundColor: RENKLER.bg2, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, padding: 11 },
     yanitKutu: { marginLeft: 22 },
     yorumUstSatir: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-    yorumYazar: { flex: 1, fontSize: 12, fontWeight: '800', color: RENKLER.vurgu2 },
+    yorumYazar: { fontSize: 12, fontWeight: '800', color: RENKLER.vurgu2 },
     yorumZaman: { fontSize: 10.5, color: RENKLER.metinUcuncul },
     yorumMetin: { fontSize: 13.5, color: RENKLER.metin, lineHeight: 19, marginTop: 4 },
     yorumEylemler: { flexDirection: 'row', gap: 18, marginTop: 8 },

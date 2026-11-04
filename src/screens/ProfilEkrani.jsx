@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView, StyleSheet, Switch, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView, StyleSheet, Switch, Alert, Platform, ActivityIndicator, Linking } from 'react-native';
+import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import { TELEGRAM_URL } from '../constants/contact';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
@@ -9,16 +11,18 @@ import { useRenkler, useOrtakStil, TEMALAR } from '../constants/theme';
 
 const KATEGORILER = [
   { key: 'forum', label: 'Forum Bildirimi', aciklama: 'Takip ettiğin başlıklara yanıt gelince haber ver' },
-  { key: 'sbc', label: 'SBC Bildirimi', aciklama: 'Yeni içerik geldiğinde haber ver' },
-  { key: 'yayin', label: 'Yayın Bildirimi', aciklama: 'Canlı yayın duyuruları' },
-  { key: 'haberler', label: 'Haberler Bildirimi', aciklama: 'Genel duyuru ve haberler' },
+  { key: 'haberler', label: 'Duyuru Bildirimi', aciklama: 'Yönetimden gelen genel duyurular' },
 ];
+
+const KURALLAR_URL = 'https://fc26.efendiler.net/torunfc/kurallar.html';
+const GIZLILIK_URL = 'https://fc26.efendiler.net/torunfc/gizlilik.html';
 
 export default function ProfilEkrani() {
   const RENKLER = useRenkler();
   const ORTAK_STIL = useOrtakStil();
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { user, logout, deleteAccount } = useAuthStore();
   const { temaAdi, temaSec } = useThemeStore();
   const [bildirimAcik, setBildirimAcik] = useState(false);
@@ -126,6 +130,21 @@ export default function ProfilEkrani() {
         </View>
       </View>
 
+      <View style={[ORTAK_STIL.kart, { marginTop: 16, paddingVertical: 4 }]}>
+        {[
+          { etiket: 'Profilim ve başlıklarım', onPress: () => router.push(`/forum/kullanici/${user?.id}`) },
+          { etiket: 'Kaydedilenler', onPress: () => router.push('/forum/kaydedilenler') },
+          { etiket: 'Destek (Telegram)', onPress: () => Linking.openURL(TELEGRAM_URL) },
+          { etiket: 'Kullanım Şartları', onPress: () => Linking.openURL(KURALLAR_URL) },
+          { etiket: 'Gizlilik Politikası', onPress: () => Linking.openURL(GIZLILIK_URL) },
+        ].map((m) => (
+          <Pressable key={m.etiket} onPress={m.onPress} style={styles.menuSatiri}>
+            <Text style={styles.menuMetin}>{m.etiket}</Text>
+            <Text style={styles.menuOk}>›</Text>
+          </Pressable>
+        ))}
+      </View>
+
       <View style={[ORTAK_STIL.kart, { marginTop: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
         <View style={{ flex: 1 }}>
           <Text style={styles.bolumBaslik}>Push Bildirimleri</Text>
@@ -226,6 +245,9 @@ function olusturStyles(RENKLER) {
     alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu,
     color: '#fff', fontWeight: '700', fontSize: 11, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
   },
+  menuSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 46 },
+  menuMetin: { fontSize: 14.5, fontWeight: '600', color: RENKLER.metin },
+  menuOk: { fontSize: 22, color: RENKLER.metinUcuncul },
   kategoriSatiri: { flexDirection: 'row', alignItems: 'center', marginTop: 14 },
   kategoriBaslik: { fontSize: 13.5, fontWeight: '700', color: RENKLER.metin },
   cikisButon: { backgroundColor: RENKLER.hata, borderRadius: 12, paddingVertical: 16, alignItems: 'center' },

@@ -1,19 +1,20 @@
 import { useCallback, useRef, useState } from 'react';
-import { View, Text, FlatList, Image, Pressable, ScrollView, ActivityIndicator, RefreshControl, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, ScrollView, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '../store/authStore';
 import { useModerationStore } from '../store/moderationStore';
-import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
+import { useBaslikIslemleri } from '../hooks/useBaslikIslemleri';
+import BaslikKarti from '../components/forum/BaslikKarti';
 import NeonParilti from '../components/NeonParilti';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
-import { FORUM_KATEGORILERI, kategoriAdi, tamGorselUrl, zamanFormatla } from '../constants/forum';
+import { FORUM_KATEGORILERI } from '../constants/forum';
 
 const SAYFA_BOYUTU = 30;
 const SIRALAMALAR = [
   { key: 'hot', label: 'Sıcak' },
   { key: 'new', label: 'Yeni' },
+  { key: 'top', label: 'En İyi' },
 ];
 
 export default function ForumEkrani() {
@@ -22,7 +23,6 @@ export default function ForumEkrani() {
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user } = useAuthStore();
   const blockedIds = useModerationStore((s) => s.blockedIds);
   const [kategori, setKategori] = useState(null);
   const [siralama, setSiralama] = useState('hot');
@@ -33,6 +33,7 @@ export default function ForumEkrani() {
   const [dahaVar, setDahaVar] = useState(false);
   // Hızlı filtre değişiminde geç gelen eski yanıt yeni listenin üstüne yazmasın.
   const istekNo = useRef(0);
+  const islemler = useBaslikIslemleri(setBasliklar);
 
   const parametreler = useCallback((offset) => ({
     sort: siralama,
@@ -51,13 +52,13 @@ export default function ForumEkrani() {
       setHata(null);
     } catch (err) {
       if (no === istekNo.current) setHata(err.message || 'Başlıklar yüklenemedi');
+    } finally {
+      if (no === istekNo.current) setYukleniyor(false);
     }
   }, [parametreler]);
 
   // Yeni başlık açıp, oylayıp veya yorum yazıp dönünce liste güncel görünsün.
-  useFocusEffect(useCallback(() => {
-    yukle().finally(() => setYukleniyor(false));
-  }, [yukle]));
+  useFocusEffect(useCallback(() => { yukle(); }, [yukle]));
 
   const yenile = async () => {
     setYenileniyor(true);
@@ -77,26 +78,6 @@ export default function ForumEkrani() {
     } catch { /* sonraki kaydırmada tekrar denenir */ }
   };
 
-  const oyla = async (baslik) => {
-    try {
-      const data = await api.forumVote(baslik.id);
-      setBasliklar((prev) => prev.map((b) => (b.id === baslik.id ? data.item : b)));
-    } catch (err) {
-      Alert.alert('Hata', err.message || 'Oy verilemedi');
-    }
-  };
-
-  const menuAc = (baslik) => {
-    icerikMenusuAc({
-      hedefUserId: baslik.userId,
-      hedefAd: baslik.authorName,
-      contentType: 'forum_thread',
-      contentId: baslik.id,
-      benimUserId: user?.id,
-      afterBlock: () => setBasliklar((prev) => prev.filter((b) => b.userId !== baslik.userId)),
-    });
-  };
-
   const secenekDegistir = (ayarla) => {
     setYukleniyor(true);
     setBasliklar([]);
@@ -111,7 +92,7 @@ export default function ForumEkrani() {
       <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
         <View style={styles.baslikSatiri}>
-          <Text style={styles.baslik}>Forum</Text>
+          <Text style={styles.baslik}>FutMod</Text>
           <View style={styles.siralamaKutu}>
             {SIRALAMALAR.map((s) => (
               <Pressable
@@ -148,30 +129,7 @@ export default function ForumEkrani() {
           onEndReached={dahaYukle}
           onEndReachedThreshold={0.4}
           ListEmptyComponent={<Text style={styles.bos}>{hata || 'Henüz başlık yok. İlk başlığı sen aç!'}</Text>}
-          renderItem={({ item: b }) => (
-            <View style={styles.kart}>
-              <Pressable onPress={() => oyla(b)} hitSlop={6} style={styles.oySutunu} accessibilityRole="button" accessibilityLabel="Yukarı oyla">
-                <Text style={[styles.oyOk, b.voted && { color: RENKLER.vurgu }]}>▲</Text>
-                <Text style={[styles.oySayi, b.voted && { color: RENKLER.vurgu }]}>{b.voteCount}</Text>
-              </Pressable>
-              <Pressable onPress={() => router.push(`/forum/${b.id}`)} onLongPress={() => menuAc(b)} style={styles.kartIcerik}>
-                <Text style={styles.kartKategori}>{kategoriAdi(b.category)}</Text>
-                <Text style={styles.kartBaslik} numberOfLines={3}>{b.title}</Text>
-                {b.imageUrl ? <Image source={{ uri: tamGorselUrl(b.imageUrl) }} style={styles.kartGorsel} resizeMode="cover" /> : null}
-                <View style={styles.kartAltSatir}>
-                  <Text style={[styles.kartYazar, b.isAdmin && { color: RENKLER.uyari }]} numberOfLines={1}>
-                    {b.isAdmin ? '🛡️ ' : ''}{b.authorName} · {zamanFormatla(b.createdAt)}
-                  </Text>
-                  <Text style={styles.kartYorum}>💬 {b.commentCount}</Text>
-                  {b.userId !== user?.id ? (
-                    <Pressable onPress={() => menuAc(b)} hitSlop={10} accessibilityRole="button" accessibilityLabel="Şikayet et veya engelle">
-                      <Text style={styles.kartMenu}>•••</Text>
-                    </Pressable>
-                  ) : null}
-                </View>
-              </Pressable>
-            </View>
-          )}
+          renderItem={({ item }) => <BaslikKarti baslik={item} islemler={islemler} />}
         />
       )}
 
@@ -189,27 +147,15 @@ export default function ForumEkrani() {
 function olusturStyles(RENKLER) {
   return StyleSheet.create({
     ustBar: { paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: RENKLER.ayrici },
-    baslikSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 },
+    baslikSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingHorizontal: 16 },
     baslik: { fontSize: 24, fontWeight: '900', color: RENKLER.metin },
     siralamaKutu: { flexDirection: 'row', backgroundColor: RENKLER.bg2, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, padding: 3 },
-    siralamaButon: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 9 },
+    siralamaButon: { paddingHorizontal: 11, paddingVertical: 8, borderRadius: 9 },
     siralamaMetin: { fontSize: 12.5, fontWeight: '700', color: RENKLER.metinIkincil },
     kategoriSatiri: { flexDirection: 'row', gap: 8, marginTop: 12, paddingHorizontal: 16 },
     kategoriButon: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2 },
     kategoriMetin: { fontSize: 12.5, fontWeight: '700', color: RENKLER.metinIkincil },
     bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 40 },
-    kart: { flexDirection: 'row', backgroundColor: RENKLER.bg2, borderRadius: 14, borderWidth: 1, borderColor: RENKLER.ayrici, overflow: 'hidden' },
-    oySutunu: { width: 48, alignItems: 'center', paddingTop: 14, backgroundColor: RENKLER.bg3 },
-    oyOk: { fontSize: 15, color: RENKLER.metinIkincil },
-    oySayi: { fontSize: 14, fontWeight: '800', color: RENKLER.metinIkincil, marginTop: 4 },
-    kartIcerik: { flex: 1, padding: 12 },
-    kartKategori: { fontSize: 11, fontWeight: '700', color: RENKLER.vurgu2 },
-    kartBaslik: { fontSize: 15.5, fontWeight: '800', color: RENKLER.metin, marginTop: 4, lineHeight: 20 },
-    kartGorsel: { width: '100%', height: 150, borderRadius: 10, marginTop: 10, backgroundColor: RENKLER.bg3 },
-    kartAltSatir: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
-    kartYazar: { flex: 1, fontSize: 11.5, color: RENKLER.metinIkincil },
-    kartYorum: { fontSize: 12, fontWeight: '700', color: RENKLER.metinIkincil },
-    kartMenu: { fontSize: 11, color: RENKLER.metinIkincil, letterSpacing: 1 },
     yeniButon: { position: 'absolute', right: 16, bottom: 16, borderRadius: 16, paddingHorizontal: 18, paddingVertical: 14 },
     yeniButonMetin: { fontWeight: '800', fontSize: 14 },
   });

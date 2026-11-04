@@ -4,16 +4,14 @@ import { api } from '../../services/api';
 import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 const KATEGORILER = [
-  { key: 'sbc', label: 'SBC', not: 'SBC bildirimini açan herkese gider' },
-  { key: 'yayin', label: 'Yayın', not: 'Yayın bildirimini açan herkese gider' },
-  { key: 'haberler', label: 'Haberler', not: 'Haber bildirimini açan herkese gider' },
+  { key: 'haberler', label: 'Duyuru', not: 'Duyuru bildirimini açan herkese gider' },
 ];
 
 export default function AdminBildirimSekmesi() {
   const RENKLER = useRenkler();
   const ORTAK_STIL = useOrtakStil();
   const styles = olusturStyles(RENKLER);
-  const [kategori, setKategori] = useState('sbc');
+  const [kategori, setKategori] = useState('haberler');
   const [baslik, setBaslik] = useState('');
   const [govde, setGovde] = useState('');
   const [gonderiliyor, setGonderiliyor] = useState(false);
