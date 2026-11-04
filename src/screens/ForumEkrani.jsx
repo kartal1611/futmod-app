@@ -11,6 +11,7 @@ import { useRenkler, useOrtakStil } from '../constants/theme';
 import { FORUM_KATEGORILERI } from '../constants/forum';
 
 const SAYFA_BOYUTU = 30;
+const TAKIP = 'takip';
 const SIRALAMALAR = [
   { key: 'hot', label: 'Sıcak' },
   { key: 'new', label: 'Yeni' },
@@ -39,7 +40,7 @@ export default function ForumEkrani() {
     sort: siralama,
     limit: SAYFA_BOYUTU,
     offset,
-    ...(kategori ? { category: kategori } : {}),
+    ...(kategori === TAKIP ? { followed: 1 } : kategori ? { category: kategori } : {}),
   }), [kategori, siralama]);
 
   const yukle = useCallback(async () => {
@@ -84,7 +85,7 @@ export default function ForumEkrani() {
     ayarla();
   };
 
-  const kategoriler = [{ key: null, label: 'Tümü' }, ...FORUM_KATEGORILERI];
+  const kategoriler = [{ key: null, label: 'Tümü' }, { key: TAKIP, label: 'Takip' }, ...FORUM_KATEGORILERI];
   const gorunenler = basliklar.filter((b) => !blockedIds.includes(b.userId));
 
   return (
@@ -128,13 +129,13 @@ export default function ForumEkrani() {
           refreshControl={<RefreshControl refreshing={yenileniyor} onRefresh={yenile} tintColor={RENKLER.vurgu} />}
           onEndReached={dahaYukle}
           onEndReachedThreshold={0.4}
-          ListEmptyComponent={<Text style={styles.bos}>{hata || 'Henüz başlık yok. İlk başlığı sen aç!'}</Text>}
+          ListEmptyComponent={<Text style={styles.bos}>{hata || (kategori === TAKIP ? 'Takip ettiğin kişilerin başlıkları burada görünür.' : 'Henüz başlık yok. İlk başlığı sen aç!')}</Text>}
           renderItem={({ item }) => <BaslikKarti baslik={item} islemler={islemler} />}
         />
       )}
 
       <Pressable
-        onPress={() => router.push(kategori ? `/forum/yeni?kategori=${kategori}` : '/forum/yeni')}
+        onPress={() => router.push(kategori && kategori !== TAKIP ? `/forum/yeni?kategori=${kategori}` : '/forum/yeni')}
         style={[styles.yeniButon, { backgroundColor: RENKLER.vurgu }]}
         accessibilityRole="button"
       >

@@ -140,9 +140,11 @@ export const api = {
 
   // Admin panel
   adminFindUser: (email) => apiFetch(`/admin/users/${encodeURIComponent(email)}`),
-  adminSetNote: (email, note) => apiFetch(`/admin/users/${encodeURIComponent(email)}/note`, { method: 'PUT', body: { note } }),
+  adminSetModerator: (id, isModerator) => apiFetch(`/admin/users/${id}/moderator`, { method: 'PUT', body: { isModerator } }),
+  adminBanUser: (id) => apiFetch(`/admin/users/${id}/ban`, { method: 'POST' }),
+  adminUnbanUser: (id) => apiFetch(`/admin/users/${id}/unban`, { method: 'POST' }),
 
-  kadroUploadImage: async (fileUri, fileName) => {
+  forumUploadImage: async (fileUri, fileName) => {
     const { accessToken } = await getTokens();
     const form = new FormData();
     // RN'in Yeni Mimarisi (Fabric/bridgeless — bu proje RN 0.86, zorunlu) eski
@@ -150,8 +152,8 @@ export const api = {
     // "Unsupported FormDataPart implementation" hatasıyla patlıyor. Dosyayı
     // önce gerçek bir Blob'a çevirip onu eklemek gerekiyor.
     const blob = await (await fetch(fileUri)).blob();
-    form.append('image', blob, fileName || 'kadro.jpg');
-    const res = await fetch(`${getBaseUrl()}/squad/upload-image`, {
+    form.append('image', blob, fileName || 'gorsel.jpg');
+    const res = await fetch(`${getBaseUrl()}/forum/threads/upload-image`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
       body: form,
@@ -159,6 +161,7 @@ export const api = {
     return yuklemeYaniti(res, 'Görsel yüklenemedi');
   },
 
+  updateDisplayName: (displayName) => apiFetch('/auth/display-name', { method: 'PUT', body: { displayName } }),
   acceptTerms: () => apiFetch('/auth/accept-terms', { method: 'POST' }),
   deleteAccount: (password) => apiFetch('/auth/delete-account', { method: 'POST', body: { password } }),
 
@@ -175,6 +178,10 @@ export const api = {
     return apiFetch(`/forum/threads${qs ? `?${qs}` : ''}`);
   },
   forumThread: (id, commentSort = 'old') => apiFetch(`/forum/threads/${id}?commentSort=${commentSort}`),
+  forumEditThread: (id, payload) => apiFetch(`/forum/threads/${id}`, { method: 'PATCH', body: payload }),
+  forumEditComment: (id, body) => apiFetch(`/forum/threads/comments/${id}`, { method: 'PATCH', body: { body } }),
+  forumFollowUser: (id, following) => apiFetch(`/forum/threads/users/${id}/follow`, { method: 'PUT', body: { following } }),
+  forumSearchUsers: (q) => apiFetch(`/forum/threads/users/search?q=${encodeURIComponent(q)}`),
   forumSave: (id, saved) => apiFetch(`/forum/threads/${id}/save`, { method: 'PUT', body: { saved } }),
   forumPollVote: (id, optionId) => apiFetch(`/forum/threads/${id}/poll`, { method: 'POST', body: { optionId } }),
   forumPin: (id, pinned) => apiFetch(`/forum/threads/${id}/pin`, { method: 'PUT', body: { pinned } }),

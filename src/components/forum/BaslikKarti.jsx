@@ -2,16 +2,18 @@ import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useRenkler } from '../../constants/theme';
 import { kategoriAdi, tamGorselUrl, zamanFormatla } from '../../constants/forum';
+import YazarSatiri from './YazarSatiri';
 
 export default function BaslikKarti({ baslik: b, islemler }) {
   const RENKLER = useRenkler();
   const styles = olusturStyles(RENKLER);
   const router = useRouter();
   const { oyla, kaydet, menuAc, benimId } = islemler;
+  const benim = b.userId === benimId;
 
   return (
     <View style={[styles.kart, b.isPinned && { borderColor: RENKLER.vurgu2 }]}>
-      <Pressable onPress={() => oyla(b)} style={styles.oySutunu} accessibilityRole="button" accessibilityLabel="Yukarı oyla">
+      <Pressable onPress={() => oyla(b)} disabled={benim} style={styles.oySutunu} accessibilityRole="button" accessibilityLabel="Yukarı oyla">
         <Text style={[styles.oyOk, b.voted && { color: RENKLER.vurgu }]}>▲</Text>
         <Text style={[styles.oySayi, b.voted && { color: RENKLER.vurgu }]}>{b.voteCount}</Text>
       </Pressable>
@@ -23,17 +25,24 @@ export default function BaslikKarti({ baslik: b, islemler }) {
           {b.hasPoll ? <Text style={styles.etiket}>📊 Anket</Text> : null}
         </View>
         <Text style={styles.baslik} numberOfLines={3}>{b.title}</Text>
-        {b.imageUrl ? <Image source={{ uri: tamGorselUrl(b.imageUrl) }} style={styles.gorsel} resizeMode="cover" /> : null}
+        {b.imageUrls.length > 0 ? (
+          <View>
+            <Image source={{ uri: tamGorselUrl(b.imageUrls[0]) }} style={styles.gorsel} resizeMode="cover" />
+            {b.imageUrls.length > 1 ? <Text style={styles.gorselSayi}>+{b.imageUrls.length - 1}</Text> : null}
+          </View>
+        ) : null}
+        <View style={styles.yazarSatiri}>
+          <YazarSatiri ad={b.authorName} isAdmin={b.isAdmin} isModerator={b.isModerator} rozet={b.badge} boyut={11.5} />
+          <Text style={styles.zaman} numberOfLines={1}>{zamanFormatla(b.createdAt)}</Text>
+        </View>
         <View style={styles.altSatir}>
-          <Text style={[styles.yazar, b.isAdmin && { color: RENKLER.uyari }]} numberOfLines={1}>
-            {b.isAdmin ? '🛡️ ' : ''}{b.authorName} · {zamanFormatla(b.createdAt)}
-          </Text>
           <Text style={styles.yorum}>💬 {b.commentCount}</Text>
-          <Pressable onPress={() => kaydet(b)} hitSlop={10} accessibilityRole="button" accessibilityLabel={b.saved ? 'Kaydı kaldır' : 'Kaydet'}>
+          <View style={{ flex: 1 }} />
+          <Pressable onPress={() => kaydet(b)} hitSlop={12} accessibilityRole="button" accessibilityLabel={b.saved ? 'Kaydı kaldır' : 'Kaydet'}>
             <Text style={[styles.kaydet, b.saved && { color: RENKLER.vurgu2 }]}>{b.saved ? '★' : '☆'}</Text>
           </Pressable>
-          {b.userId !== benimId ? (
-            <Pressable onPress={() => menuAc(b)} hitSlop={10} accessibilityRole="button" accessibilityLabel="Şikayet et veya engelle">
+          {!benim ? (
+            <Pressable onPress={() => menuAc(b)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Şikayet et veya engelle">
               <Text style={styles.menu}>•••</Text>
             </Pressable>
           ) : null}
@@ -55,8 +64,10 @@ function olusturStyles(RENKLER) {
     etiket: { fontSize: 11, fontWeight: '600', color: RENKLER.metinIkincil },
     baslik: { fontSize: 15.5, fontWeight: '800', color: RENKLER.metin, marginTop: 4, lineHeight: 20 },
     gorsel: { width: '100%', height: 150, borderRadius: 10, marginTop: 10, backgroundColor: RENKLER.bg3 },
-    altSatir: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 },
-    yazar: { flex: 1, fontSize: 11.5, color: RENKLER.metinIkincil },
+    gorselSayi: { position: 'absolute', right: 8, bottom: 8, color: '#fff', fontSize: 12, fontWeight: '800', backgroundColor: 'rgba(0,0,0,0.65)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, overflow: 'hidden' },
+    yazarSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 8 },
+    zaman: { fontSize: 11, color: RENKLER.metinIkincil },
+    altSatir: { flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 8 },
     yorum: { fontSize: 12, fontWeight: '700', color: RENKLER.metinIkincil },
     kaydet: { fontSize: 17, color: RENKLER.metinIkincil },
     menu: { fontSize: 11, color: RENKLER.metinIkincil, letterSpacing: 1 },

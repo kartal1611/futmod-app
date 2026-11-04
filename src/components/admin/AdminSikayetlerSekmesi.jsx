@@ -4,12 +4,9 @@ import { api } from '../../services/api';
 import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 const TIP_ADI = {
-  forum: 'Forum mesajı',
   forum_thread: 'Forum başlığı',
   forum_comment: 'Forum yorumu',
-  sbc_comment: 'SBC yorumu',
-  squad_post: 'Kadro paylaşımı',
-  squad_comment: 'Kadro yorumu',
+  user: 'Kullanıcı profili',
   user_block: 'Kullanıcı engellendi',
 };
 

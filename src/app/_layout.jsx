@@ -13,6 +13,8 @@ import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
 import AdminPanelEkrani from '../screens/AdminPanelEkrani';
 import KurallarOnayEkrani from '../screens/KurallarOnayEkrani';
+import TanitimEkrani from '../screens/TanitimEkrani';
+import * as SecureStore from 'expo-secure-store';
 
 // Varsayılan davranışta expo-notifications, uygulama ÖN PLANDAYKEN gelen
 // bildirimi tamamen sessizce yutar — hiç banner/ses göstermez (arka planda
@@ -30,6 +32,7 @@ Notifications.setNotificationHandler({
 });
 
 const BILDIRIM_YENILEME_ARALIGI = 60000;
+const TANITIM_KEY = 'futmod_tanitim_goruldu';
 
 function TabIcon({ Ikon, label, focused, RENKLER, rozet = 0 }) {
   const renk = focused ? RENKLER.vurgu : RENKLER.metinUcuncul;
@@ -73,10 +76,15 @@ export default function RootLayout() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [oturumOncesiEkran, setOturumOncesiEkran] = useState('login'); // 'login' | 'adminLogin'
+  const [tanitimGoster, setTanitimGoster] = useState(false);
 
   useEffect(() => {
     let bitti = false;
-    Promise.all([init(), temaInit()]).finally(() => { if (!bitti) setReady(true); });
+    Promise.all([
+      init(),
+      temaInit(),
+      SecureStore.getItemAsync(TANITIM_KEY).then((g) => setTanitimGoster(!g)).catch(() => {}),
+    ]).finally(() => { if (!bitti) setReady(true); });
     // Hard safety net: never let a slow/stuck network call keep the app on
     // the loading screen forever.
     const zamanAsimi = setTimeout(() => { bitti = true; setReady(true); }, 10000);
@@ -140,6 +148,17 @@ export default function RootLayout() {
         <ActivityIndicator size="large" color={RENKLER.vurgu} />
         <Text style={{ color: RENKLER.metinIkincil, marginTop: 12 }}>FutMod yükleniyor...</Text>
       </View>
+    );
+  }
+
+  if (!user && tanitimGoster) {
+    return (
+      <TanitimEkrani
+        onBitti={() => {
+          setTanitimGoster(false);
+          SecureStore.setItemAsync(TANITIM_KEY, '1').catch(() => {});
+        }}
+      />
     );
   }
 

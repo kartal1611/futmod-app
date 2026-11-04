@@ -23,7 +23,10 @@ export default function ProfilEkrani() {
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, logout, deleteAccount } = useAuthStore();
+  const { user, logout, deleteAccount, refreshUser } = useAuthStore();
+  const [yeniAd, setYeniAd] = useState(user?.displayName || '');
+  const [adHata, setAdHata] = useState(null);
+  const [adKaydediliyor, setAdKaydediliyor] = useState(false);
   const { temaAdi, temaSec } = useThemeStore();
   const [bildirimAcik, setBildirimAcik] = useState(false);
   const [islemde, setIslemde] = useState(false);
@@ -74,6 +77,19 @@ export default function ProfilEkrani() {
     }
   };
 
+  const adKaydet = async () => {
+    setAdKaydediliyor(true);
+    setAdHata(null);
+    try {
+      await api.updateDisplayName(yeniAd.trim());
+      await refreshUser();
+    } catch (err) {
+      setAdHata(err.message || 'Kullanıcı adı değiştirilemedi');
+    } finally {
+      setAdKaydediliyor(false);
+    }
+  };
+
   const hesabiSilOnayla = () => {
     if (!silmeSifre) {
       setSilmeHata('Şifreni gir');
@@ -119,14 +135,27 @@ export default function ProfilEkrani() {
       <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
         <Text style={styles.etiket}>E-posta</Text>
         <Text style={styles.deger}>{user?.email}</Text>
-        {user?.displayName ? (
-          <>
-            <Text style={[styles.etiket, { marginTop: 12 }]}>İsim</Text>
-            <Text style={styles.deger}>{user.displayName}</Text>
-          </>
-        ) : null}
+        <Text style={[styles.etiket, { marginTop: 12 }]}>Kullanıcı adı (forumda görünür)</Text>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+          <TextInput
+            value={yeniAd}
+            onChangeText={(v) => { setYeniAd(v); setAdHata(null); }}
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={20}
+            style={[styles.silmeInput, { flex: 1, marginTop: 0 }]}
+            accessibilityLabel="Kullanıcı adı"
+          />
+          {yeniAd.trim() !== (user?.displayName || '') ? (
+            <TouchableOpacity style={[styles.silmeButon, { backgroundColor: RENKLER.vurgu, paddingHorizontal: 16 }]} onPress={adKaydet} disabled={adKaydediliyor}>
+              {adKaydediliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={[styles.cikisMetin, { color: RENKLER.bg }]}>Kaydet</Text>}
+            </TouchableOpacity>
+          ) : null}
+        </View>
+        {adHata ? <Text style={styles.silmeHataMetin}>{adHata}</Text> : null}
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
           {user?.isAdmin ? <Text style={styles.adminRozet}>Yönetici</Text> : null}
+          {user?.isModerator && !user?.isAdmin ? <Text style={styles.adminRozet}>Moderatör</Text> : null}
         </View>
       </View>
 
@@ -134,6 +163,7 @@ export default function ProfilEkrani() {
         {[
           { etiket: 'Profilim ve başlıklarım', onPress: () => router.push(`/forum/kullanici/${user?.id}`) },
           { etiket: 'Kaydedilenler', onPress: () => router.push('/forum/kaydedilenler') },
+          { etiket: 'Engellenenler', onPress: () => router.push('/forum/engellenenler') },
           { etiket: 'Destek (Telegram)', onPress: () => Linking.openURL(TELEGRAM_URL) },
           { etiket: 'Kullanım Şartları', onPress: () => Linking.openURL(KURALLAR_URL) },
           { etiket: 'Gizlilik Politikası', onPress: () => Linking.openURL(GIZLILIK_URL) },

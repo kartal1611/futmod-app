@@ -47,7 +47,10 @@ export default function LoginEkrani({ onAdminGiris }) {
           {kayitModu && (
             <TextInput
               style={styles.input}
-              placeholder="Görünen isim (opsiyonel)"
+              placeholder="Kullanıcı adı (forumda görünür, boşluksuz)"
+              autoCapitalize="none"
+              autoCorrect={false}
+              maxLength={20}
               placeholderTextColor={RENKLER.metinUcuncul}
               value={ad}
               onChangeText={setAd}

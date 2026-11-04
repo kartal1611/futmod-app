@@ -25,8 +25,7 @@ export default function AdminBildirimSekmesi() {
     setGonderiliyor(true);
     setMesaj(null);
     try {
-      const payload = { category: kategori, title: baslik.trim(), body: govde.trim() };
-      const data = await api.adminSendNotification(payload);
+      const data = await api.adminSendNotification({ title: baslik.trim(), body: govde.trim() });
       setMesaj(`✅ ${data.sent} cihaza gönderildi.`);
       setBaslik('');
       setGovde('');

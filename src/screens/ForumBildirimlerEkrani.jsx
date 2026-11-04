@@ -8,6 +8,13 @@ import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 import { zamanFormatla } from '../constants/forum';
 
+const TUR_METNI = {
+  reply: ' yorumuna yanıt verdi: ',
+  mention: ' senden bahsetti: ',
+  thread: ' yeni başlık açtı: ',
+  comment: ' yorum yaptı: ',
+};
+
 export default function ForumBildirimlerEkrani() {
   const RENKLER = useRenkler();
   const ORTAK_STIL = useOrtakStil();
@@ -69,12 +76,12 @@ export default function ForumBildirimlerEkrani() {
           keyExtractor={(b) => String(b.id)}
           contentContainerStyle={{ padding: 16, gap: 8, paddingBottom: 32 }}
           refreshControl={<RefreshControl refreshing={yenileniyor} onRefresh={yenile} tintColor={RENKLER.vurgu} />}
-          ListEmptyComponent={<Text style={styles.bos}>{hata || 'Henüz bildirim yok. Başlıklara yanıt gelince burada görünür.'}</Text>}
+          ListEmptyComponent={<Text style={styles.bos}>{hata || 'Henüz bildirim yok. Yanıtlar, bahsetmeler ve takip ettiklerin burada görünür.'}</Text>}
           renderItem={({ item: b }) => (
             <Pressable onPress={() => router.push(`/forum/${b.threadId}`)} style={[styles.kart, !b.read && { borderColor: RENKLER.vurgu }]}>
               <Text style={styles.metin} numberOfLines={2}>
                 <Text style={styles.ad}>{b.actorName}</Text>
-                {b.isReply ? ' yorumuna yanıt verdi: ' : ' yorum yaptı: '}
+                {TUR_METNI[b.kind] || TUR_METNI.comment}
                 <Text style={styles.ad}>{b.threadTitle}</Text>
               </Text>
               {b.commentBody ? <Text style={styles.yorum} numberOfLines={2}>{b.commentBody}</Text> : null}

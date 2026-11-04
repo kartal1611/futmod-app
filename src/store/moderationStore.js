@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../services/api';
 
-// Blocked-user list: filters feeds (Forum, Kadro Yorumlama, SBC yorumları)
+// Blocked-user list: filters feeds (forum threads and comments)
 // client-side "instantly" per Apple Guideline 1.2 — block itself is recorded
 // server-side too, so it also survives reinstall/other devices.
 export const useModerationStore = create((set, get) => ({

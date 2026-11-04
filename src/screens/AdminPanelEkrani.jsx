@@ -4,11 +4,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useRenkler } from '../constants/theme';
 import AdminBildirimSekmesi from '../components/admin/AdminBildirimSekmesi';
+import AdminKullanicilarSekmesi from '../components/admin/AdminKullanicilarSekmesi';
 import AdminSikayetlerSekmesi from '../components/admin/AdminSikayetlerSekmesi';
 
 const SEKMELER = [
   { key: 'bildirim', baslik: 'Bildirim', emoji: '🔔' },
   { key: 'sikayetler', baslik: 'Şikayetler', emoji: '🚩' },
+  { key: 'kullanicilar', baslik: 'Kullanıcılar', emoji: '👥' },
 ];
 
 export default function AdminPanelEkrani() {
@@ -42,6 +44,7 @@ export default function AdminPanelEkrani() {
       <View style={{ flex: 1 }}>
         {aktifSekme === 'bildirim' ? <AdminBildirimSekmesi /> : null}
         {aktifSekme === 'sikayetler' ? <AdminSikayetlerSekmesi /> : null}
+        {aktifSekme === 'kullanicilar' ? <AdminKullanicilarSekmesi /> : null}
       </View>
     </View>
   );

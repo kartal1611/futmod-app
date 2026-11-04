@@ -1,5 +1,5 @@
-// Apple Guideline 1.2: her kullanıcı üretimi içerikte (forum mesajı, kadro
-// yorumu, SBC yorumu) uzun-basınca çıkan "Şikayet Et" / "Kullanıcıyı
+// Apple Guideline 1.2: her kullanıcı üretimi içerikte (forum başlığı, yorumu)
+// uzun-basınca çıkan "Şikayet Et" / "Kullanıcıyı
 // Engelle" menüsü. Tek yerden yönetilir, tüm ekranlarda aynı davranış.
 import { Alert } from 'react-native';
 import { api } from '../../services/api';

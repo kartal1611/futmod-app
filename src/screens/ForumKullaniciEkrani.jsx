@@ -3,6 +3,8 @@ import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from '
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBaslikIslemleri } from '../hooks/useBaslikIslemleri';
+import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
+import YazarSatiri from '../components/forum/YazarSatiri';
 import BaslikKarti from '../components/forum/BaslikKarti';
 import NeonParilti from '../components/NeonParilti';
 import { api } from '../services/api';
@@ -44,6 +46,24 @@ export default function ForumKullaniciEkrani() {
 
   useFocusEffect(useCallback(() => { yukle(); }, [yukle]));
 
+  const takipDegistir = async () => {
+    try {
+      const data = await api.forumFollowUser(profil.id, !profil.isFollowing);
+      setProfil(data.profile);
+    } catch (err) {
+      setHata(err.message || 'Takip güncellenemedi');
+    }
+  };
+
+  const menuAc = () => icerikMenusuAc({
+    hedefUserId: profil.id,
+    hedefAd: profil.name,
+    contentType: 'user',
+    contentId: null,
+    benimUserId: islemler.benimId,
+    afterBlock: yukle,
+  });
+
   return (
     <View style={ORTAK_STIL.ekran}>
       <NeonParilti />
@@ -64,13 +84,24 @@ export default function ForumKullaniciEkrani() {
           contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 32 }}
           ListHeaderComponent={(
             <View style={{ marginBottom: 8 }}>
-              <Text style={[styles.ad, profil.isAdmin && { color: RENKLER.uyari }]}>{profil.isAdmin ? '🛡️ ' : ''}{profil.name}</Text>
+              <YazarSatiri ad={profil.name} isAdmin={profil.isAdmin} isModerator={profil.isModerator} rozet={profil.badge} boyut={21} />
               <Text style={styles.katilim}>{katilimTarihi(profil.joinedAt)} tarihinde katıldı</Text>
               <View style={styles.sayilar}>
                 <Sayi deger={profil.reputation} etiket="İtibar" styles={styles} />
+                <Sayi deger={profil.followerCount} etiket="Takipçi" styles={styles} />
                 <Sayi deger={profil.threadCount} etiket="Başlık" styles={styles} />
                 <Sayi deger={profil.commentCount} etiket="Yorum" styles={styles} />
               </View>
+              {profil.id !== islemler.benimId ? (
+                <View style={styles.eylemler}>
+                  <Pressable onPress={takipDegistir} style={[styles.takipButon, !profil.isFollowing && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}>
+                    <Text style={[styles.takipMetin, !profil.isFollowing && { color: RENKLER.bg }]}>{profil.isFollowing ? 'Takipten Çık' : 'Takip Et'}</Text>
+                  </Pressable>
+                  <Pressable onPress={menuAc} style={styles.takipButon}>
+                    <Text style={styles.takipMetin}>Şikayet / Engelle</Text>
+                  </Pressable>
+                </View>
+              ) : null}
               <Text style={styles.bolum}>Başlıklar</Text>
             </View>
           )}
@@ -98,11 +129,13 @@ function olusturStyles(RENKLER) {
     geriMetin: { fontSize: 32, lineHeight: 34, color: RENKLER.metin },
     ustBaslik: { flex: 1, fontSize: 17, fontWeight: '800', color: RENKLER.metin },
     bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 24 },
-    ad: { fontSize: 23, fontWeight: '900', color: RENKLER.metin },
+    eylemler: { flexDirection: 'row', gap: 8, marginTop: 14 },
+    takipButon: { flex: 1, minHeight: 44, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, alignItems: 'center', justifyContent: 'center' },
+    takipMetin: { fontSize: 13, fontWeight: '800', color: RENKLER.metin },
     katilim: { fontSize: 12.5, color: RENKLER.metinIkincil, marginTop: 4 },
     sayilar: { flexDirection: 'row', gap: 8, marginTop: 14 },
     sayiKutu: { flex: 1, alignItems: 'center', backgroundColor: RENKLER.bg2, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, paddingVertical: 12 },
-    sayiDeger: { fontSize: 19, fontWeight: '900', color: RENKLER.vurgu },
+    sayiDeger: { fontSize: 18, fontWeight: '900', color: RENKLER.vurgu },
     sayiEtiket: { fontSize: 11.5, color: RENKLER.metinIkincil, marginTop: 2 },
     bolum: { fontSize: 14, fontWeight: '800', color: RENKLER.metin, marginTop: 20 },
   });
