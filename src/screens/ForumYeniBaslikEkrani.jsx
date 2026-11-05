@@ -233,7 +233,7 @@ export default function ForumYeniBaslikEkrani() {
               <View style={styles.gorselSatiri}>
                 {kartlar.map((k) => (
                   <Pressable key={k.futggId} onPress={() => setKartlar((prev) => prev.filter((x) => x.futggId !== k.futggId))} accessibilityRole="button" accessibilityLabel={`${k.name} kartını kaldır`}>
-                    <OyuncuKarti duzGorselUrl={k.flatCardUrl} yuzUrl={k.imageUrl} cerceveUrl={k.cardFrameUrl} rating={k.rating} pozisyon={k.position} genislik={84} />
+                    <OyuncuKarti yuzUrl={k.imageUrl} isim={k.name} nadirlik={k.rarity} rating={k.rating} pozisyon={k.position} genislik={84} />
                     <Text style={styles.kaldir}>✕</Text>
                   </Pressable>
                 ))}

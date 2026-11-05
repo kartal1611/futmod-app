@@ -3,7 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useRenkler } from '../constants/theme';
 
 /** Lightning mark with the wordmark and community line. */
-export default function FutModLogo({ boyut = 1, altMetin = 'FC27 Community' }) {
+export default function FutModLogo({ boyut = 1, altMetin = 'Oyuncu Topluluğu' }) {
   const RENKLER = useRenkler();
   return (
     <View style={styles.satir}>

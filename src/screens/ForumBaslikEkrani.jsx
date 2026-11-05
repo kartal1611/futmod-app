@@ -322,7 +322,7 @@ export default function ForumBaslikEkrani() {
               const statlar = p.attributes ? Object.entries(p.attributes).slice(0, 6) : [];
               return (
                 <Pressable key={p.futggId} onPress={() => router.push(`/oyuncular/${p.futggId}`)} style={styles.oyuncuKutu}>
-                  <OyuncuKarti duzGorselUrl={p.flatCardUrl} yuzUrl={p.imageUrl} cerceveUrl={p.cardFrameUrl} rating={p.rating} pozisyon={p.position} genislik={118} />
+                  <OyuncuKarti yuzUrl={p.imageUrl} isim={p.name} nadirlik={p.rarity} rating={p.rating} pozisyon={p.position} genislik={118} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.oyuncuAd} numberOfLines={1}>{p.name}</Text>
                     <Text style={styles.oyuncuAlt}>{p.position} · {p.rating} OVR</Text>

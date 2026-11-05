@@ -176,7 +176,7 @@ export default function ForumEkrani() {
                         </View>
                       </View>
                       {b.players[0] ? (
-                        <OyuncuKarti duzGorselUrl={b.players[0].flatCardUrl} yuzUrl={b.players[0].imageUrl} cerceveUrl={b.players[0].cardFrameUrl} rating={b.players[0].rating} pozisyon={b.players[0].position} genislik={92} />
+                        <OyuncuKarti yuzUrl={b.players[0].imageUrl} isim={b.players[0].name} nadirlik={b.players[0].rarity} rating={b.players[0].rating} pozisyon={b.players[0].position} genislik={92} />
                       ) : null}
                     </LinearGradient>
                   </Pressable>

@@ -83,7 +83,7 @@ export default function ContentEkrani() {
         <FutModLogo altMetin="Content" />
 
         <LinearGradient colors={['#17171c', '#2d230e', '#8a6a08']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
-          <Text style={styles.heroBaslik}>FC27</Text>
+          <Text style={styles.heroBaslik}>FutMod</Text>
           <Text style={[styles.heroBaslik, { color: RENKLER.vurgu }]}>Content Center</Text>
           <Text style={styles.heroAlt}>Tüm yeni içerikler, TOTW'ler ve promosyonlar tek yerde.</Text>
         </LinearGradient>
@@ -109,7 +109,7 @@ export default function ContentEkrani() {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                   {veri.newCards.map((k) => (
                     <Pressable key={k.futggId} onPress={() => router.push(`/oyuncular/${k.futggId}`)}>
-                      <OyuncuKarti duzGorselUrl={k.flatCardUrl} yuzUrl={k.imageUrl} cerceveUrl={k.cardFrameUrl} rating={k.rating} pozisyon={k.position} genislik={104} />
+                      <OyuncuKarti yuzUrl={k.imageUrl} isim={k.name} nadirlik={k.rarity} rating={k.rating} pozisyon={k.position} genislik={104} />
                       {k.priceCoins ? <Text style={styles.kartFiyat}>{k.priceCoins.toLocaleString('tr-TR')}</Text> : null}
                     </Pressable>
                   ))}
