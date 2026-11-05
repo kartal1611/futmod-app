@@ -30,13 +30,13 @@ const YESIL_ZEMIN = {
 };
 
 export const TEMALAR = {
+  altin: { ad: 'Altın', ornekRenk: '#FFC61A', renkler: { ...TEMEL, bg: '#0b0b0d', bg2: '#15151a', bg3: '#202027', ayrici: '#2c2c35', metin: '#f6f6f7', metinIkincil: '#c9c9d1', metinUcuncul: '#92929d', vurgu: '#FFC61A', vurgu2: '#FFC61A', basari: '#3ecf8e', uyari: '#FFC61A' } },
   yesil: { ad: 'Neon Yeşil', ornekRenk: '#39FF6E', renkler: { ...TEMEL, ...YESIL_ZEMIN, vurgu: '#39FF6E', vurgu2: '#ffcf5c', basari: '#3ecf8e', uyari: '#ffcf5c' } },
   mavi: { ad: 'Mavi', ornekRenk: '#38BDF8', renkler: { ...TEMEL, vurgu: '#38BDF8', vurgu2: '#ffcf5c', basari: '#3ecf8e', uyari: '#ffcf5c' } },
-  altin: { ad: 'Altın', ornekRenk: '#F5B942', renkler: { ...TEMEL, vurgu: '#F5B942', vurgu2: '#6fe3ff', basari: '#3ecf8e', uyari: '#F5B942' } },
   mor: { ad: 'Mor', ornekRenk: '#A78BFA', renkler: { ...TEMEL, vurgu: '#A78BFA', vurgu2: '#ffcf5c', basari: '#3ecf8e', uyari: '#ffcf5c' } },
 };
 
-export const VARSAYILAN_TEMA = 'yesil';
+export const VARSAYILAN_TEMA = 'altin';
 const TEMA_KEY = 'futmod_tema';
 
 export const useThemeStore = create((set) => ({

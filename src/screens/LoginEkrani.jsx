@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Linking,
 } from 'react-native';
 import NeonParilti from '../components/NeonParilti';
+import FutModLogo from '../components/FutModLogo';
 import { useAuthStore } from '../store/authStore';
 import { useRenkler, useOrtakStil } from '../constants/theme';
 
@@ -38,8 +39,7 @@ export default function LoginEkrani({ onAdminGiris }) {
     >
       <NeonParilti />
       <ScrollView contentContainerStyle={styles.icerik} keyboardShouldPersistTaps="handled">
-        <Text style={styles.logo}>FutMod ⚽</Text>
-        <Text style={styles.altBaslik}>Türkiye'nin oyuncu topluluğu</Text>
+        <FutModLogo boyut={1.5} />
 
         <View style={[ORTAK_STIL.kart, { marginTop: 32, width: '100%' }]}>
           <Text style={styles.formBaslik}>{kayitModu ? 'Kayıt Ol' : 'Giriş Yap'}</Text>

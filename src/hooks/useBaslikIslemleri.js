@@ -9,9 +9,9 @@ export function useBaslikIslemleri(setBasliklar) {
 
   const guncelle = (item) => setBasliklar((prev) => prev.map((b) => (b.id === item.id ? item : b)));
 
-  const oyla = async (baslik) => {
+  const oyla = async (baslik, deger) => {
     try {
-      guncelle((await api.forumVote(baslik.id)).item);
+      guncelle((await api.forumVote(baslik.id, deger)).item);
     } catch (err) {
       Alert.alert('Hata', err.message || 'Oy verilemedi');
     }

@@ -1,14 +1,14 @@
 import { getServerRootUrl } from '../services/api';
 
 export const FORUM_KATEGORILERI = [
-  { key: 'genel', label: 'Genel' },
-  { key: 'kadro', label: 'Kadro' },
-  { key: 'sbc-evo', label: 'SBC & Evrim' },
-  { key: 'oyuncu', label: 'Oyuncu' },
-  { key: 'taktik', label: 'Taktik' },
-  { key: 'market', label: 'Market' },
-  { key: 'leak', label: 'Leak' },
-  { key: 'yardim', label: 'Yardım' },
+  { key: 'genel', label: 'Genel', emoji: '💬' },
+  { key: 'kadro', label: 'Kadro', emoji: '🧩' },
+  { key: 'sbc-evo', label: 'SBC & Evrim', emoji: '🛡️' },
+  { key: 'market', label: 'Trade', emoji: '📈' },
+  { key: 'oyuncu', label: 'Oyuncu', emoji: '⚽' },
+  { key: 'taktik', label: 'Taktik', emoji: '🧠' },
+  { key: 'leak', label: 'Leak', emoji: '👀' },
+  { key: 'yardim', label: 'Yardım', emoji: '❓' },
 ];
 
 export function kategoriAdi(key) {

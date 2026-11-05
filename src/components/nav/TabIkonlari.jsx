@@ -17,6 +17,15 @@ export function ForumIkonu({ renk, boyut = 24 }) {
   );
 }
 
+export function ContentIkonu({ renk, boyut = 24 }) {
+  return (
+    <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">
+      <Path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 19 20.5H5A1.5 1.5 0 0 1 3.5 19V7A1.5 1.5 0 0 1 5 5.5Z" stroke={renk} strokeWidth={1.6} />
+      <Path d="M8 3.5v4M16 3.5v4M3.5 10.5h17" stroke={renk} strokeWidth={1.6} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export function AraIkonu({ renk, boyut = 24 }) {
   return (
     <Svg width={boyut} height={boyut} viewBox="0 0 24 24" fill="none">

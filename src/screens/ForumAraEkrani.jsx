@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBaslikIslemleri } from '../hooks/useBaslikIslemleri';
 import BaslikKarti from '../components/forum/BaslikKarti';
@@ -15,6 +16,7 @@ export default function ForumAraEkrani() {
   const ORTAK_STIL = useOrtakStil();
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [metin, setMetin] = useState('');
   const [sonuclar, setSonuclar] = useState([]);
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -53,7 +55,9 @@ export default function ForumAraEkrani() {
     <View style={ORTAK_STIL.ekran}>
       <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 12 }]}>
-        <Text style={styles.baslik}>Ara</Text>
+        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Geri">
+          <Text style={styles.baslik}>‹ Ara</Text>
+        </Pressable>
         <TextInput
           style={styles.girdi}
           placeholder="Oyuncu, taktik, konu..."

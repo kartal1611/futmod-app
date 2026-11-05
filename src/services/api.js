@@ -132,6 +132,26 @@ export const api = {
   adminLogin: (payload) => apiFetch('/auth/admin-login', { method: 'POST', body: payload, auth: false }),
   me: () => apiFetch('/auth/me'),
 
+  contentCenter: () => apiFetch('/content-center'),
+  contentGroup: (key) => apiFetch(`/content-center/groups/${key}`),
+  content: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/content${qs ? `?${qs}` : ''}`);
+  },
+  contentItem: (id) => apiFetch(`/content/${id}`),
+  players: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiFetch(`/players${qs ? `?${qs}` : ''}`);
+  },
+  playerItem: (futggId, src) => apiFetch(`/players/${futggId}${src ? `?src=${encodeURIComponent(src)}` : ''}`),
+  playerVersions: (futggId) => apiFetch(`/players/${futggId}/versions`),
+  playerPriceWatch: (futggId) => apiFetch(`/players/${futggId}/price-watch`),
+  playerPriceWatchAdd: (futggId) => apiFetch(`/players/${futggId}/price-watch`, { method: 'POST' }),
+  playerPriceWatchRemove: (futggId) => apiFetch(`/players/${futggId}/price-watch`, { method: 'DELETE' }),
+  comments: (contentId) => apiFetch(`/comments/${contentId}`),
+  addComment: (contentId, body) => apiFetch(`/comments/${contentId}`, { method: 'POST', body: { body } }),
+  deleteComment: (commentId) => apiFetch(`/comments/${commentId}`, { method: 'DELETE' }),
+
   notificationPreferences: () => apiFetch('/notification-preferences'),
   updateNotificationPreferences: (prefs) => apiFetch('/notification-preferences', { method: 'PUT', body: prefs }),
 
@@ -186,14 +206,14 @@ export const api = {
   forumPollVote: (id, optionId) => apiFetch(`/forum/threads/${id}/poll`, { method: 'POST', body: { optionId } }),
   forumPin: (id, pinned) => apiFetch(`/forum/threads/${id}/pin`, { method: 'PUT', body: { pinned } }),
   forumLock: (id, locked) => apiFetch(`/forum/threads/${id}/lock`, { method: 'PUT', body: { locked } }),
-  forumCommentVote: (commentId) => apiFetch(`/forum/threads/comments/${commentId}/vote`, { method: 'POST' }),
+  forumCommentVote: (commentId, value = 1) => apiFetch(`/forum/threads/comments/${commentId}/vote`, { method: 'POST', body: { value } }),
   forumUser: (id) => apiFetch(`/forum/threads/users/${id}`),
   forumNotifications: () => apiFetch('/forum/threads/notifications'),
   forumUnreadCount: () => apiFetch('/forum/threads/notifications/unread-count'),
   forumMarkNotificationsRead: (threadId) => apiFetch('/forum/threads/notifications/read', { method: 'POST', body: threadId ? { threadId } : {} }),
   forumCreateThread: (payload) => apiFetch('/forum/threads', { method: 'POST', body: payload }),
   forumDeleteThread: (id) => apiFetch(`/forum/threads/${id}`, { method: 'DELETE' }),
-  forumVote: (id) => apiFetch(`/forum/threads/${id}/vote`, { method: 'POST' }),
+  forumVote: (id, value = 1) => apiFetch(`/forum/threads/${id}/vote`, { method: 'POST', body: { value } }),
   forumFollow: (id, following) => apiFetch(`/forum/threads/${id}/follow`, { method: 'PUT', body: { following } }),
   forumAddComment: (id, payload) => apiFetch(`/forum/threads/${id}/comments`, { method: 'POST', body: payload }),
   forumDeleteComment: (id) => apiFetch(`/forum/threads/comments/${id}`, { method: 'DELETE' }),

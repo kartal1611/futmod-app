@@ -7,7 +7,7 @@ import { api } from '../services/api';
 import { useThemeStore } from '../store/themeStore';
 import { useRenkler } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
-import { ForumIkonu, AraIkonu, BildirimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
+import { ForumIkonu, ContentIkonu, BildirimIkonu, ProfilIkonu } from '../components/nav/TabIkonlari';
 import { useBildirimStore } from '../store/bildirimStore';
 import LoginEkrani from '../screens/LoginEkrani';
 import AdminLoginEkrani from '../screens/AdminLoginEkrani';
@@ -121,6 +121,8 @@ export default function RootLayout() {
   const bildirimYonlendir = (data) => {
     if (data?.type === 'forum' && data.threadId) {
       router.push(`/forum/${data.threadId}`);
+    } else if (data?.type === 'sbc') {
+      router.push('/content');
     }
   };
 
@@ -227,9 +229,12 @@ export default function RootLayout() {
       >
         <Tabs.Screen name="index" options={{ href: null }} />
         <Tabs.Screen name="forum" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ForumIkonu} label="Forum" focused={focused} RENKLER={RENKLER} /> }} />
-        <Tabs.Screen name="ara" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={AraIkonu} label="Ara" focused={focused} RENKLER={RENKLER} /> }} />
+        <Tabs.Screen name="content" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ContentIkonu} label="Content" focused={focused} RENKLER={RENKLER} /> }} />
         <Tabs.Screen name="bildirimler" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={BildirimIkonu} label="Bildirimler" focused={focused} RENKLER={RENKLER} rozet={okunmamis} /> }} />
         <Tabs.Screen name="profil" options={{ tabBarIcon: ({ focused }) => <TabIcon Ikon={ProfilIkonu} label="Profil" focused={focused} RENKLER={RENKLER} /> }} />
+        <Tabs.Screen name="sbc" options={{ href: null }} />
+        <Tabs.Screen name="evrimler" options={{ href: null }} />
+        <Tabs.Screen name="oyuncular" options={{ href: null }} />
       </Tabs>
     </View>
     </ThemeProvider>
