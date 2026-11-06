@@ -202,7 +202,7 @@ export default function ForumEkrani() {
               ) : null}
             </View>
           ) : null}
-          ListEmptyComponent={<Text style={styles.bos}>{hata || (kategori === TAKIP ? 'Takip ettiğin kişilerin başlıkları burada görünür.' : 'Henüz başlık yok. İlk başlığı sen aç!')}</Text>}
+          ListEmptyComponent={<Text style={styles.bos}>{hata || (kategori === TAKIP ? 'Takip ettiğin başlıklar ve kişilerin başlıkları burada görünür.' : 'Henüz başlık yok. İlk başlığı sen aç!')}</Text>}
           renderItem={({ item }) => <BaslikKarti baslik={item} islemler={islemler} />}
         />
       )}
