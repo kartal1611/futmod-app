@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Pressable, ScrollView, StyleSheet, Switch, Alert, Platform, ActivityIndicator, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
-import { TELEGRAM_URL } from '../constants/contact';
+import { DESTEK_EPOSTA } from '../constants/contact';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
@@ -164,7 +164,7 @@ export default function ProfilEkrani() {
           { etiket: 'Profilim ve başlıklarım', onPress: () => router.push(`/forum/kullanici/${user?.id}`) },
           { etiket: 'Kaydedilenler', onPress: () => router.push('/forum/kaydedilenler') },
           { etiket: 'Engellenenler', onPress: () => router.push('/forum/engellenenler') },
-          { etiket: 'Destek (Telegram)', onPress: () => Linking.openURL(TELEGRAM_URL) },
+          { etiket: 'Destek (E-posta)', onPress: () => Linking.openURL(`mailto:${DESTEK_EPOSTA}?subject=${encodeURIComponent('FutMod Destek')}`) },
           { etiket: 'Kullanım Şartları', onPress: () => Linking.openURL(KURALLAR_URL) },
           { etiket: 'Gizlilik Politikası', onPress: () => Linking.openURL(GIZLILIK_URL) },
         ].map((m) => (

@@ -1,2 +1,1 @@
-export const TELEGRAM_USERNAME = 'haintorun';
-export const TELEGRAM_URL = `https://t.me/${TELEGRAM_USERNAME}`;
+export const DESTEK_EPOSTA = 'srgnsrmz@icloud.com';
