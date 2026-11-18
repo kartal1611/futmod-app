@@ -71,7 +71,7 @@ export function usePaylasAkisi(sablonlar) {
         Alert.alert('Paylaşım desteklenmiyor', 'Bu cihazda paylaşım özelliği kullanılamıyor.');
         return;
       }
-      await Sharing.shareAsync(onizlemeUri, { mimeType: 'image/png', dialogTitle: 'FutMod\'de Paylaş' });
+      await Sharing.shareAsync(onizlemeUri, { mimeType: 'image/png', dialogTitle: 'FutChat\'te Paylaş' });
     } catch (err) {
       Alert.alert('Hata', err.message);
     }

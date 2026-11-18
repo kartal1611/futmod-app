@@ -148,7 +148,7 @@ export default function RootLayout() {
       <View style={{ flex: 1, backgroundColor: RENKLER.bg, alignItems: 'center', justifyContent: 'center' }}>
         <StatusBar barStyle="light-content" />
         <ActivityIndicator size="large" color={RENKLER.vurgu} />
-        <Text style={{ color: RENKLER.metinIkincil, marginTop: 12 }}>FutMod yükleniyor...</Text>
+        <Text style={{ color: RENKLER.metinIkincil, marginTop: 12 }}>FutChat yükleniyor...</Text>
       </View>
     );
   }

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "FutMod",
+    "name": "FutChat",
     "slug": "torunfc-app",
     "owner": "kartall",
     "privacy": "unlisted",
@@ -52,8 +52,8 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "FutMod, paylaşım görsellerini galerine kaydetmek için izin istiyor.",
-          "savePhotosPermission": "FutMod, paylaşım görsellerini galerine kaydetmek için izin istiyor."
+          "photosPermission": "FutChat, paylaşım görsellerini galerine kaydetmek için izin istiyor.",
+          "savePhotosPermission": "FutChat, paylaşım görsellerini galerine kaydetmek için izin istiyor."
         }
       ],
       "expo-sharing",

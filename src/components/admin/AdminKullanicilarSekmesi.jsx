@@ -3,6 +3,13 @@ import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator, Alert,
 import { api } from '../../services/api';
 import { useRenkler, useOrtakStil } from '../../constants/theme';
 
+// Moderatör "küçük admin"dir: forumda silme, sabitleme, kilitleme ve üye yasaklama yapabilir.
+const ROLLER = [
+  { anahtar: 'isModerator', ver: '🛡️ Moderatör yap', kaldir: 'Moderatörlüğü kaldır' },
+  { anahtar: 'isVip', ver: '💎 VIP yap', kaldir: "VIP'liği kaldır" },
+  { anahtar: 'isAffiliate', ver: 'Partner yap', kaldir: 'Partnerliği kaldır' },
+];
+
 export default function AdminKullanicilarSekmesi() {
   const RENKLER = useRenkler();
   const ORTAK_STIL = useOrtakStil();
@@ -27,9 +34,9 @@ export default function AdminKullanicilarSekmesi() {
     }
   };
 
-  const moderatorDegistir = async () => {
+  const rolDegistir = async (anahtar) => {
     try {
-      const data = await api.adminSetModerator(kullanici.id, !kullanici.isModerator);
+      const data = await api.adminSetRoles(kullanici.id, { [anahtar]: !kullanici[anahtar] });
       setKullanici(data.user);
     } catch (err) {
       setMesaj(err.message);
@@ -78,13 +85,15 @@ export default function AdminKullanicilarSekmesi() {
           <Text style={styles.ad}>{kullanici.displayName}</Text>
           <Text style={styles.satir}>{kullanici.email}</Text>
           <Text style={styles.satir}>
-            {kullanici.isAdmin ? 'Yönetici' : kullanici.isModerator ? 'Moderatör' : 'Üye'}{kullanici.isBanned ? ' · Askıda' : ''}
+            {[kullanici.isAdmin ? 'Admin' : kullanici.isModerator ? 'Moderatör' : 'Üye', kullanici.isVip && 'VIP', kullanici.isAffiliate && 'Partner', kullanici.isBanned && 'Askıda'].filter(Boolean).join(' · ')}
           </Text>
           {!kullanici.isAdmin ? (
             <>
-              <Pressable style={styles.ikincilButon} onPress={moderatorDegistir}>
-                <Text style={styles.ikincilMetin}>{kullanici.isModerator ? 'Moderatörlüğü kaldır' : 'Moderatör yap'}</Text>
-              </Pressable>
+              {ROLLER.map((r) => (
+                <Pressable key={r.anahtar} style={[styles.ikincilButon, kullanici[r.anahtar] && { borderColor: RENKLER.vurgu }]} onPress={() => rolDegistir(r.anahtar)}>
+                  <Text style={styles.ikincilMetin}>{kullanici[r.anahtar] ? r.kaldir : r.ver}</Text>
+                </Pressable>
+              ))}
               <Pressable style={[styles.ikincilButon, { borderColor: RENKLER.hata }]} onPress={askiDegistir}>
                 <Text style={[styles.ikincilMetin, { color: RENKLER.hata }]}>{kullanici.isBanned ? 'Askıyı kaldır' : 'Hesabı askıya al'}</Text>
               </Pressable>

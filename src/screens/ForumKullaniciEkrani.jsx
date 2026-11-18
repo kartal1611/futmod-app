@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useAuthStore } from '../store/authStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBaslikIslemleri } from '../hooks/useBaslikIslemleri';
 import { icerikMenusuAc } from '../components/moderation/moderasyonYardimci';
@@ -55,6 +56,35 @@ export default function ForumKullaniciEkrani() {
     }
   };
 
+  const { user } = useAuthStore();
+  const yetkili = !!(user?.isAdmin || user?.isModerator);
+  // Moderatörü yalnız admin yasaklar, admini kimse yasaklayamaz.
+  const yasaklayabilir = yetkili && profil && profil.id !== user?.id && !profil.isAdmin && (!profil.isModerator || user?.isAdmin);
+
+  const yasakDegistir = () => {
+    const yasakli = profil.isBanned;
+    Alert.alert(
+      yasakli ? 'Yasağı Kaldır' : 'Kullanıcıyı Yasakla',
+      yasakli
+        ? `${profil.name} tekrar giriş yapıp yazabilecek. Onaylıyor musun?`
+        : `${profil.name} hemen oturumdan atılacak ve tekrar giriş yapamayacak. Onaylıyor musun?`,
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        {
+          text: yasakli ? 'Kaldır' : 'Yasakla',
+          style: yasakli ? 'default' : 'destructive',
+          onPress: async () => {
+            try {
+              setProfil((await api.forumBanUser(profil.id, !yasakli)).profile);
+            } catch (err) {
+              Alert.alert('Hata', err.message || 'İşlem yapılamadı');
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const menuAc = () => icerikMenusuAc({
     hedefUserId: profil.id,
     hedefAd: profil.name,
@@ -84,8 +114,23 @@ export default function ForumKullaniciEkrani() {
           contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 32 }}
           ListHeaderComponent={(
             <View style={{ marginBottom: 8 }}>
-              <YazarSatiri ad={profil.name} isAdmin={profil.isAdmin} isModerator={profil.isModerator} rozet={profil.badge} boyut={21} />
-              <Text style={styles.katilim}>{katilimTarihi(profil.joinedAt)} tarihinde katıldı</Text>
+              <YazarSatiri ad={profil.name} isAdmin={profil.isAdmin} isModerator={profil.isModerator} isVip={profil.isVip} isAffiliate={profil.isAffiliate} rozet={profil.badge} boyut={21} />
+              <Text style={styles.katilim}>{katilimTarihi(profil.joinedAt)} tarihinde katıldı{profil.isBanned ? ' · Yasaklı' : ''}</Text>
+              {profil.points != null ? (
+                <View style={styles.rutbe}>
+                  <View style={styles.rutbeUst}>
+                    <Text style={styles.rutbeAd}>🏅 {profil.badge}</Text>
+                    <Text style={styles.rutbePuan}>
+                      {profil.nextRank ? `${profil.points} / ${profil.nextRank.min} puan · sonraki: ${profil.nextRank.label}` : `${profil.points} puan · en yüksek rütbe`}
+                    </Text>
+                  </View>
+                  {profil.nextRank ? (
+                    <View style={styles.rutbeBar}>
+                      <View style={[styles.rutbeDolgu, { width: `${Math.min(100, (profil.points / profil.nextRank.min) * 100)}%` }]} />
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
               <View style={styles.sayilar}>
                 <Sayi deger={profil.reputation} etiket="İtibar" styles={styles} />
                 <Sayi deger={profil.followerCount} etiket="Takipçi" styles={styles} />
@@ -101,6 +146,11 @@ export default function ForumKullaniciEkrani() {
                     <Text style={styles.takipMetin}>Şikayet / Engelle</Text>
                   </Pressable>
                 </View>
+              ) : null}
+              {yasaklayabilir ? (
+                <Pressable onPress={yasakDegistir} style={[styles.takipButon, styles.yasakButon, { borderColor: RENKLER.hata }]}>
+                  <Text style={[styles.takipMetin, { color: profil.isBanned ? RENKLER.metin : RENKLER.hata }]}>{profil.isBanned ? 'Yasağı Kaldır' : '⛔ Kullanıcıyı Yasakla'}</Text>
+                </Pressable>
               ) : null}
               <Text style={styles.bolum}>Başlıklar</Text>
             </View>
@@ -130,6 +180,13 @@ function olusturStyles(RENKLER) {
     ustBaslik: { flex: 1, fontSize: 17, fontWeight: '800', color: RENKLER.metin },
     bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 24 },
     eylemler: { flexDirection: 'row', gap: 8, marginTop: 14 },
+    yasakButon: { flex: 0, marginTop: 8 },
+    rutbe: { marginTop: 12, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2 },
+    rutbeUst: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+    rutbeAd: { fontSize: 15, fontWeight: '900', color: RENKLER.vurgu },
+    rutbePuan: { flexShrink: 1, fontSize: 11.5, color: RENKLER.metinIkincil, textAlign: 'right' },
+    rutbeBar: { height: 6, borderRadius: 3, backgroundColor: RENKLER.bg3, marginTop: 8, overflow: 'hidden' },
+    rutbeDolgu: { height: '100%', borderRadius: 3, backgroundColor: RENKLER.vurgu },
     takipButon: { flex: 1, minHeight: 44, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, alignItems: 'center', justifyContent: 'center' },
     takipMetin: { fontSize: 13, fontWeight: '800', color: RENKLER.metin },
     katilim: { fontSize: 12.5, color: RENKLER.metinIkincil, marginTop: 4 },

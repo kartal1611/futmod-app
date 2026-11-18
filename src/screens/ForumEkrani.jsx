@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Pressable, ScrollView, ActivityIndicator, RefreshControl, useWindowDimensions, StyleSheet } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,7 +7,7 @@ import { useModerationStore } from '../store/moderationStore';
 import { useBildirimStore } from '../store/bildirimStore';
 import { useBaslikIslemleri } from '../hooks/useBaslikIslemleri';
 import BaslikKarti from '../components/forum/BaslikKarti';
-import FutModLogo from '../components/FutModLogo';
+import MarkaLogo from '../components/MarkaLogo';
 import OyuncuKarti from '../components/OyuncuKarti';
 import NeonParilti from '../components/NeonParilti';
 import { AraIkonu, BildirimIkonu } from '../components/nav/TabIkonlari';
@@ -19,6 +19,8 @@ const SAYFA_BOYUTU = 30;
 const TAKIP = 'takip';
 const GUNDEM_SAYISI = 3;
 const TREND_SAYISI = 3;
+// Gündem bandı haber siteleri gibi kendi kendine döner.
+const GUNDEM_SURE_MS = 5000;
 const SIRALAMALAR = [
   { key: 'hot', label: 'Sıcak' },
   { key: 'new', label: 'Yeni' },
@@ -42,6 +44,10 @@ export default function ForumEkrani() {
   const [hata, setHata] = useState(null);
   const [dahaVar, setDahaVar] = useState(false);
   const [gundemSayfa, setGundemSayfa] = useState(0);
+  const [guncelTotw, setGuncelTotw] = useState(null);
+  const gundemRef = useRef(null);
+  const sayfaRef = useRef(0);
+  const kaydiriliyor = useRef(false);
   // Hızlı filtre değişiminde geç gelen eski yanıt yeni listenin üstüne yazmasın.
   const istekNo = useRef(0);
   const islemler = useBaslikIslemleri(setBasliklar);
@@ -70,6 +76,10 @@ export default function ForumEkrani() {
 
   // Yeni başlık açıp, oylayıp veya yorum yazıp dönünce liste güncel görünsün.
   useFocusEffect(useCallback(() => { yukle(); }, [yukle]));
+
+  useFocusEffect(useCallback(() => {
+    api.contentCenter().then((data) => setGuncelTotw(data.totw?.[0] ?? null)).catch(() => {});
+  }, []));
 
   const yenile = async () => {
     setYenileniyor(true);
@@ -104,13 +114,32 @@ export default function ForumEkrani() {
     ? [...gorunenler].filter((b) => b.commentCount > 0).sort((a, b) => b.commentCount - a.commentCount).slice(0, TREND_SAYISI)
     : [];
   const gundemGenislik = width - 32;
+  const slaytlar = [
+    ...gundem.map((b) => ({ anahtar: `b-${b.id}`, baslik: b })),
+    ...(anaAkis && guncelTotw ? [{ anahtar: guncelTotw.key, totw: guncelTotw }] : []),
+  ];
+  const slaytSayisi = slaytlar.length;
+
+  const sayfaGit = (i) => {
+    sayfaRef.current = i;
+    setGundemSayfa(i);
+    gundemRef.current?.scrollTo({ x: i * gundemGenislik, animated: true });
+  };
+
+  useEffect(() => {
+    if (slaytSayisi < 2) return undefined;
+    const zamanlayici = setInterval(() => {
+      if (!kaydiriliyor.current) sayfaGit((sayfaRef.current + 1) % slaytSayisi);
+    }, GUNDEM_SURE_MS);
+    return () => clearInterval(zamanlayici);
+  }, [slaytSayisi, gundemGenislik]);
 
   return (
     <View style={ORTAK_STIL.ekran}>
       <NeonParilti />
       <View style={[styles.ustBar, { paddingTop: insets.top + 10 }]}>
         <View style={styles.logoSatiri}>
-          <FutModLogo />
+          <MarkaLogo />
           <View style={styles.ikonlar}>
             <Pressable onPress={() => router.push('/forum/ara')} style={styles.ikonButon} accessibilityRole="button" accessibilityLabel="Ara">
               <AraIkonu renk={RENKLER.metin} boyut={25} />
@@ -157,34 +186,55 @@ export default function ForumEkrani() {
           refreshControl={<RefreshControl refreshing={yenileniyor} onRefresh={yenile} tintColor={RENKLER.vurgu} />}
           onEndReached={dahaYukle}
           onEndReachedThreshold={0.4}
-          ListHeaderComponent={gundem.length > 0 ? (
+          ListHeaderComponent={slaytSayisi > 0 ? (
             <View style={{ gap: 12, marginBottom: 2 }}>
               <ScrollView
+                ref={gundemRef}
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
-                onMomentumScrollEnd={(e) => setGundemSayfa(Math.round(e.nativeEvent.contentOffset.x / gundemGenislik))}
+                onScrollBeginDrag={() => { kaydiriliyor.current = true; }}
+                onMomentumScrollEnd={(e) => {
+                  kaydiriliyor.current = false;
+                  sayfaRef.current = Math.round(e.nativeEvent.contentOffset.x / gundemGenislik);
+                  setGundemSayfa(sayfaRef.current);
+                }}
               >
-                {gundem.map((b) => (
-                  <Pressable key={b.id} onPress={() => router.push(`/forum/${b.id}`)} style={{ width: gundemGenislik }}>
+                {slaytlar.map((sl) => (
+                  <Pressable
+                    key={sl.anahtar}
+                    onPress={() => router.push(sl.totw ? `/content/${sl.totw.key}` : `/forum/${sl.baslik.id}`)}
+                    style={{ width: gundemGenislik }}
+                  >
                     <LinearGradient colors={['#1a1a20', '#2b2110', RENKLER.vurgu]} locations={[0, 0.6, 1.4]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gundem}>
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.gundemUst}>🔥 Topluluk Gündemi</Text>
-                        <Text style={styles.gundemBaslik} numberOfLines={3}>{b.title}</Text>
+                        <Text style={styles.gundemUst}>{sl.totw ? '🏆 Haftanın Takımı' : '🔥 Topluluk Gündemi'}</Text>
+                        <Text style={styles.gundemBaslik} numberOfLines={3}>{sl.totw ? sl.totw.title : sl.baslik.title}</Text>
                         <View style={styles.gundemButon}>
-                          <Text style={styles.gundemButonMetin}>Tartışmaya Katıl →</Text>
+                          <Text style={styles.gundemButonMetin}>{sl.totw ? 'Kadroyu Gör →' : 'Tartışmaya Katıl →'}</Text>
                         </View>
                       </View>
-                      {b.players[0] ? (
-                        <OyuncuKarti yuzUrl={b.players[0].imageUrl} isim={b.players[0].name} nadirlik={b.players[0].rarity} rating={b.players[0].rating} pozisyon={b.players[0].position} genislik={92} />
+                      {sl.baslik?.players[0] ? (
+                        <OyuncuKarti yuzUrl={sl.baslik.players[0].imageUrl} isim={sl.baslik.players[0].name} nadirlik={sl.baslik.players[0].rarity} rating={sl.baslik.players[0].rating} pozisyon={sl.baslik.players[0].position} genislik={92} />
                       ) : null}
+                      {sl.totw ? <Text style={styles.gundemPuan}>{sl.totw.topRating}</Text> : null}
                     </LinearGradient>
                   </Pressable>
                 ))}
               </ScrollView>
-              {gundem.length > 1 ? (
+              {slaytSayisi > 1 ? (
                 <View style={styles.noktalar}>
-                  {gundem.map((b, i) => <View key={b.id} style={[styles.sayfaNokta, i === gundemSayfa && { backgroundColor: RENKLER.vurgu }]} />)}
+                  {slaytlar.map((sl, i) => (
+                    <Pressable
+                      key={sl.anahtar}
+                      onPress={() => sayfaGit(i)}
+                      style={[styles.sayfaNo, i === gundemSayfa && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${i + 1}. sayfa`}
+                    >
+                      <Text style={[styles.sayfaNoMetin, i === gundemSayfa && { color: RENKLER.bg }]}>{i + 1}</Text>
+                    </Pressable>
+                  ))}
                 </View>
               ) : null}
               {trend.length > 0 ? (
@@ -239,7 +289,9 @@ function olusturStyles(RENKLER) {
     gundemButon: { alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 9, marginTop: 12 },
     gundemButonMetin: { fontSize: 12.5, fontWeight: '800', color: RENKLER.bg },
     noktalar: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
-    sayfaNokta: { width: 7, height: 7, borderRadius: 4, backgroundColor: RENKLER.ayrici },
+    sayfaNo: { minWidth: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: RENKLER.ayrici, alignItems: 'center', justifyContent: 'center' },
+    sayfaNoMetin: { fontSize: 12.5, fontWeight: '800', color: RENKLER.metinIkincil },
+    gundemPuan: { fontSize: 46, fontWeight: '900', fontStyle: 'italic', color: RENKLER.vurgu },
     trendBaslik: { fontSize: 17, fontWeight: '900', color: RENKLER.metin, marginBottom: 8 },
     trendKutu: { backgroundColor: RENKLER.bg2, borderRadius: 14, borderWidth: 1, borderColor: RENKLER.ayrici, paddingHorizontal: 12 },
     trendSatir: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },

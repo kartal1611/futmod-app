@@ -21,7 +21,7 @@ export default function BaslikKarti({ baslik: b, islemler }) {
         <Avatar ad={b.authorName} yetkili={b.isAdmin || b.isModerator} />
         <View style={{ flex: 1 }}>
           <View style={styles.yazarSatir}>
-            <YazarSatiri ad={b.authorName} isAdmin={b.isAdmin} isModerator={b.isModerator} rozet={b.badge} />
+            <YazarSatiri ad={b.authorName} isAdmin={b.isAdmin} isModerator={b.isModerator} isVip={b.isVip} isAffiliate={b.isAffiliate} rozet={b.badge} />
             <Text style={styles.zaman} numberOfLines={1}>· {zamanFormatla(b.createdAt)}</Text>
           </View>
           <View style={styles.etiketSatir}>

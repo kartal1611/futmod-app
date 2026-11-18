@@ -298,7 +298,7 @@ export default function ForumBaslikEkrani() {
             <Pressable onPress={() => router.push(`/forum/kullanici/${baslik.userId}`)} hitSlop={6} style={styles.yazarSatir}>
               <Avatar ad={baslik.authorName} yetkili={baslik.isAdmin || baslik.isModerator} />
               <View style={{ flex: 1 }}>
-                <YazarSatiri ad={baslik.authorName} isAdmin={baslik.isAdmin} isModerator={baslik.isModerator} rozet={baslik.badge} />
+                <YazarSatiri ad={baslik.authorName} isAdmin={baslik.isAdmin} isModerator={baslik.isModerator} isVip={baslik.isVip} isAffiliate={baslik.isAffiliate} rozet={baslik.badge} />
                 <Text style={styles.zaman}>{zamanFormatla(baslik.createdAt)} · {kategoriAdi(baslik.category)}{baslik.editedAt ? ' · düzenlendi' : ''}</Text>
               </View>
             </Pressable>
@@ -395,7 +395,7 @@ export default function ForumBaslikEkrani() {
               <View style={styles.yorumUstSatir}>
                 <Pressable onPress={() => router.push(`/forum/kullanici/${y.userId}`)} hitSlop={6} style={styles.yorumYazar}>
                   <Avatar ad={y.authorName} boyut={28} yetkili={y.isAdmin || y.isModerator} />
-                  <YazarSatiri ad={y.authorName} isAdmin={y.isAdmin} isModerator={y.isModerator} rozet={y.badge} />
+                  <YazarSatiri ad={y.authorName} isAdmin={y.isAdmin} isModerator={y.isModerator} isVip={y.isVip} isAffiliate={y.isAffiliate} rozet={y.badge} />
                 </Pressable>
                 <Text style={styles.zaman}>{zamanFormatla(y.createdAt)}{y.editedAt ? ' · düzenlendi' : ''}</Text>
               </View>

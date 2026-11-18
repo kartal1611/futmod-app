@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator, RefreshControl, S
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import FutModLogo from '../components/FutModLogo';
+import MarkaLogo from '../components/MarkaLogo';
 import IcerikIkon from '../components/IcerikIkon';
 import NeonParilti from '../components/NeonParilti';
 import OyuncuKarti from '../components/OyuncuKarti';
@@ -80,10 +80,10 @@ export default function ContentEkrani() {
         contentContainerStyle={{ paddingTop: insets.top + 10, paddingHorizontal: 16, paddingBottom: 32 }}
         refreshControl={<RefreshControl refreshing={yenileniyor} onRefresh={yenile} tintColor={RENKLER.vurgu} />}
       >
-        <FutModLogo altMetin="Content" />
+        <MarkaLogo altMetin="Content" />
 
         <LinearGradient colors={['#17171c', '#2d230e', '#8a6a08']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
-          <Text style={styles.heroBaslik}>FutMod</Text>
+          <Text style={styles.heroBaslik}>FutChat</Text>
           <Text style={[styles.heroBaslik, { color: RENKLER.vurgu }]}>Content Center</Text>
           <Text style={styles.heroAlt}>Tüm yeni içerikler, TOTW'ler ve promosyonlar tek yerde.</Text>
         </LinearGradient>

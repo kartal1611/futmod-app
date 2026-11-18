@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import { Alert } from 'react-native';
 import { api } from '../services/api';
-import { getTokens, setTokens, clearTokens, getPanelMode, setPanelMode } from '../services/api';
+import { getTokens, setTokens, clearTokens, getPanelMode, setPanelMode, setYasakliHandler } from '../services/api';
 import { useModerationStore } from './moderationStore';
 
 export const useAuthStore = create((set, get) => ({
@@ -100,3 +101,9 @@ export const useAuthStore = create((set, get) => ({
     } catch { /* ignore — next natural refresh will catch up */ }
   },
 }));
+
+setYasakliHandler(() => {
+  if (!useAuthStore.getState().user) return;
+  useAuthStore.getState().logout();
+  Alert.alert('Hesap askıya alındı', 'Hesabın kurallarımızı ihlal ettiği için askıya alındı. Destek için srgnsrmz@icloud.com adresine yazabilirsin.');
+});

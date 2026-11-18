@@ -3,7 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 import { useRenkler } from '../constants/theme';
 
 /** Lightning mark with the wordmark and community line. */
-export default function FutModLogo({ boyut = 1, altMetin = 'Oyuncu Topluluğu' }) {
+export default function MarkaLogo({ boyut = 1, altMetin = 'Oyuncu Topluluğu' }) {
   const RENKLER = useRenkler();
   return (
     <View style={styles.satir}>
@@ -11,7 +11,7 @@ export default function FutModLogo({ boyut = 1, altMetin = 'Oyuncu Topluluğu' }
         <Path d="M2 2h42L33 11H19l-2 5h15L6 34l6-14H4l6-9H0z" fill={RENKLER.vurgu} />
       </Svg>
       <View>
-        <Text style={[styles.ad, { color: RENKLER.metin, fontSize: 24 * boyut, lineHeight: 27 * boyut }]}>FutMod</Text>
+        <Text style={[styles.ad, { color: RENKLER.metin, fontSize: 24 * boyut, lineHeight: 27 * boyut }]}>FutChat</Text>
         {altMetin ? <Text style={[styles.alt, { color: RENKLER.metinIkincil, fontSize: 10.5 * boyut }]}>{altMetin}</Text> : null}
       </View>
     </View>

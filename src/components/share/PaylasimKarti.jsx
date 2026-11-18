@@ -19,7 +19,7 @@ export default function PaylasimKarti({ baslik, vurguRenk, children }) {
 
       <View style={styles.icerik}>
         <View style={styles.markaSatiri}>
-          <Text style={[styles.logo, { color: RENKLER.metin }]}>FutMod</Text>
+          <Text style={[styles.logo, { color: RENKLER.metin }]}>FutChat</Text>
           <Text style={[styles.markaAlt, { color: RENKLER.metinUcuncul }]}>OYUNCU TOPLULUĞU</Text>
         </View>
 
