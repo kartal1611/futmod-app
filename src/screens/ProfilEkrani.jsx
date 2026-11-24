@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { api } from '../services/api';
-import { useRenkler, useOrtakStil, TEMALAR } from '../constants/theme';
+import { useRenkler, useOrtakStil, TEMALAR, FONT } from '../constants/theme';
 
 const KATEGORILER = [
   { key: 'forum', label: 'Forum Bildirimi', aciklama: 'Takip ettiğin başlıklara yanıt gelince haber ver' },
@@ -130,7 +130,7 @@ export default function ProfilEkrani() {
   return (
     <View style={ORTAK_STIL.ekran}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
-      <Text style={styles.baslik}>Profil 👤</Text>
+      <Text style={styles.baslik}>PROFİL</Text>
 
       <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
         <Text style={styles.etiket}>E-posta</Text>
@@ -266,8 +266,8 @@ export default function ProfilEkrani() {
 
 function olusturStyles(RENKLER) {
   return StyleSheet.create({
-  baslik: { fontSize: 24, fontWeight: '800', color: RENKLER.metin },
-  bolumBaslik: { fontSize: 15, fontWeight: '700', color: RENKLER.metin },
+  baslik: { fontFamily: FONT.dev, fontSize: 38, lineHeight: 40, color: RENKLER.metin, letterSpacing: 0.5 },
+  bolumBaslik: { fontFamily: FONT.etiket, fontSize: 15, letterSpacing: 1.4, color: RENKLER.metinIkincil, textTransform: 'uppercase' },
   etiket: { fontSize: 12, color: RENKLER.metinUcuncul },
   deger: { fontSize: 16, color: RENKLER.metin, marginTop: 2, fontWeight: '600' },
   aciklama: { fontSize: 12, color: RENKLER.metinIkincil, marginTop: 2 },

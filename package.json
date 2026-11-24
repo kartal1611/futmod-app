@@ -9,6 +9,7 @@
     "ios": "expo start --ios"
   },
   "dependencies": {
+    "@expo-google-fonts/barlow-condensed": "^0.4.1",
     "expo": "^57.0.0",
     "expo-constants": "~57.0.17",
     "expo-font": "~57.0.3",

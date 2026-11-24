@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Pressable, ScrollView, ActivityIndicator, RefreshControl, useWindowDimensions, StyleSheet } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useModerationStore } from '../store/moderationStore';
 import { useBildirimStore } from '../store/bildirimStore';
 import { useBaslikIslemleri } from '../hooks/useBaslikIslemleri';
@@ -12,7 +11,8 @@ import OyuncuKarti from '../components/OyuncuKarti';
 import NeonParilti from '../components/NeonParilti';
 import { AraIkonu, BildirimIkonu } from '../components/nav/TabIkonlari';
 import { api } from '../services/api';
-import { useRenkler, useOrtakStil } from '../constants/theme';
+import { useRenkler, useOrtakStil, FONT } from '../constants/theme';
+import KesikPanel from '../components/KesikPanel';
 import { FORUM_KATEGORILERI } from '../constants/forum';
 
 const SAYFA_BOYUTU = 30;
@@ -188,6 +188,11 @@ export default function ForumEkrani() {
           onEndReachedThreshold={0.4}
           ListHeaderComponent={slaytSayisi > 0 ? (
             <View style={{ gap: 12, marginBottom: 2 }}>
+              <View>
+                <Text style={styles.heroBeyaz}>TOPLULUK</Text>
+                <Text style={styles.heroAltin}>GÜNDEMİ</Text>
+                <View style={styles.heroCizgi} />
+              </View>
               <ScrollView
                 ref={gundemRef}
                 horizontal
@@ -206,19 +211,19 @@ export default function ForumEkrani() {
                     onPress={() => router.push(sl.totw ? `/content/${sl.totw.key}` : `/forum/${sl.baslik.id}`)}
                     style={{ width: gundemGenislik }}
                   >
-                    <LinearGradient colors={['#1a1a20', '#2b2110', RENKLER.vurgu]} locations={[0, 0.6, 1.4]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gundem}>
+                    <KesikPanel kesik={18} vurgulu parilti style={styles.gundem}>
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.gundemUst}>{sl.totw ? '🏆 Haftanın Takımı' : '🔥 Topluluk Gündemi'}</Text>
+                        <Text style={styles.gundemUst}>{sl.totw ? 'HAFTANIN TAKIMI' : 'TOPLULUK GÜNDEMİ'}</Text>
                         <Text style={styles.gundemBaslik} numberOfLines={3}>{sl.totw ? sl.totw.title : sl.baslik.title}</Text>
                         <View style={styles.gundemButon}>
-                          <Text style={styles.gundemButonMetin}>{sl.totw ? 'Kadroyu Gör →' : 'Tartışmaya Katıl →'}</Text>
+                          <Text style={styles.gundemButonMetin}>{sl.totw ? 'KADROYU GÖR ›' : 'TARTIŞMAYA KATIL ›'}</Text>
                         </View>
                       </View>
                       {sl.baslik?.players[0] ? (
                         <OyuncuKarti yuzUrl={sl.baslik.players[0].imageUrl} isim={sl.baslik.players[0].name} nadirlik={sl.baslik.players[0].rarity} rating={sl.baslik.players[0].rating} pozisyon={sl.baslik.players[0].position} genislik={92} />
                       ) : null}
                       {sl.totw ? <Text style={styles.gundemPuan}>{sl.totw.topRating}</Text> : null}
-                    </LinearGradient>
+                    </KesikPanel>
                   </Pressable>
                 ))}
               </ScrollView>
@@ -239,15 +244,16 @@ export default function ForumEkrani() {
               ) : null}
               {trend.length > 0 ? (
                 <View>
-                  <Text style={styles.trendBaslik}>📊 Trend Konular</Text>
-                  <View style={styles.trendKutu}>
+                  <Text style={styles.trendBaslik}>TREND KONULAR</Text>
+                  <KesikPanel style={styles.trendKutu}>
                     {trend.map((b, i) => (
                       <Pressable key={b.id} onPress={() => router.push(`/forum/${b.id}`)} style={[styles.trendSatir, i > 0 && styles.trendAyrac]}>
-                        <Text style={styles.trendMetin} numberOfLines={1}>🔥 {b.title}</Text>
-                        <Text style={styles.trendSayi}>💬 {b.commentCount}</Text>
+                        <Text style={styles.trendNo}>{String(i + 1).padStart(2, '0')}</Text>
+                        <Text style={styles.trendMetin} numberOfLines={1}>{b.title}</Text>
+                        <Text style={styles.trendSayi}>{b.commentCount} YORUM</Text>
                       </Pressable>
                     ))}
-                  </View>
+                  </KesikPanel>
                 </View>
               ) : null}
             </View>
@@ -277,29 +283,33 @@ function olusturStyles(RENKLER) {
     ikonButon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
     nokta: { position: 'absolute', top: 8, right: 8, width: 9, height: 9, borderRadius: 5, backgroundColor: RENKLER.vurgu },
     siralamaSatiri: { alignItems: 'flex-end', paddingHorizontal: 16, marginTop: 4 },
-    siralamaKutu: { flexDirection: 'row', backgroundColor: RENKLER.bg2, borderRadius: 18, borderWidth: 1, borderColor: RENKLER.ayrici, padding: 2 },
-    siralamaButon: { paddingHorizontal: 15, paddingVertical: 7, borderRadius: 16 },
+    siralamaKutu: { flexDirection: 'row', backgroundColor: RENKLER.bg2, borderRadius: 10, borderWidth: 1, borderColor: RENKLER.ayrici, padding: 3 },
+    siralamaButon: { paddingHorizontal: 15, paddingVertical: 7, borderRadius: 8 },
     siralamaMetin: { fontSize: 13, fontWeight: '700', color: RENKLER.metinIkincil },
     kategoriSatiri: { flexDirection: 'row', gap: 8, marginTop: 10, paddingHorizontal: 16 },
-    kategoriButon: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 11, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2 },
+    kategoriButon: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2, transform: [{ skewX: '-8deg' }] },
     kategoriMetin: { fontSize: 12.5, fontWeight: '700', color: RENKLER.metin },
-    gundem: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 150, borderRadius: 16, borderWidth: 1, borderColor: RENKLER.ayrici, padding: 16, overflow: 'hidden' },
-    gundemUst: { fontSize: 12.5, fontWeight: '800', color: RENKLER.vurgu },
-    gundemBaslik: { fontSize: 20, fontWeight: '900', color: RENKLER.metin, marginTop: 6, lineHeight: 25 },
-    gundemButon: { alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 9, marginTop: 12 },
-    gundemButonMetin: { fontSize: 12.5, fontWeight: '800', color: RENKLER.bg },
+    heroBeyaz: { fontFamily: FONT.dev, fontSize: 34, lineHeight: 34, color: RENKLER.metin, letterSpacing: 0.5 },
+    heroAltin: { fontFamily: FONT.dev, fontSize: 34, lineHeight: 36, color: RENKLER.vurgu, letterSpacing: 0.5 },
+    heroCizgi: { width: 46, height: 4, backgroundColor: RENKLER.vurgu, marginTop: 4, transform: [{ skewX: '-30deg' }] },
+    gundem: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 150, padding: 16 },
+    gundemUst: { fontFamily: FONT.etiket, fontSize: 13, letterSpacing: 1.5, color: RENKLER.vurgu },
+    gundemBaslik: { fontFamily: FONT.baslik, fontSize: 25, color: RENKLER.metin, marginTop: 4, lineHeight: 27 },
+    gundemButon: { alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu, borderRadius: 2, paddingHorizontal: 14, paddingVertical: 8, marginTop: 12, transform: [{ skewX: '-12deg' }] },
+    gundemButonMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, letterSpacing: 1, color: RENKLER.bg },
     noktalar: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
-    sayfaNo: { minWidth: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: RENKLER.ayrici, alignItems: 'center', justifyContent: 'center' },
-    sayfaNoMetin: { fontSize: 12.5, fontWeight: '800', color: RENKLER.metinIkincil },
-    gundemPuan: { fontSize: 46, fontWeight: '900', fontStyle: 'italic', color: RENKLER.vurgu },
-    trendBaslik: { fontSize: 17, fontWeight: '900', color: RENKLER.metin, marginBottom: 8 },
-    trendKutu: { backgroundColor: RENKLER.bg2, borderRadius: 14, borderWidth: 1, borderColor: RENKLER.ayrici, paddingHorizontal: 12 },
+    sayfaNo: { minWidth: 30, height: 28, borderRadius: 2, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2, alignItems: 'center', justifyContent: 'center', transform: [{ skewX: '-12deg' }] },
+    sayfaNoMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, color: RENKLER.metinIkincil },
+    gundemPuan: { fontFamily: FONT.dev, fontSize: 58, color: RENKLER.vurgu },
+    trendBaslik: { fontFamily: FONT.etiket, fontSize: 14, letterSpacing: 1.5, color: RENKLER.metinIkincil, marginBottom: 8 },
+    trendKutu: { paddingHorizontal: 12 },
+    trendNo: { fontFamily: FONT.dev, fontSize: 20, color: RENKLER.vurgu, width: 26 },
     trendSatir: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
     trendAyrac: { borderTopWidth: 1, borderTopColor: RENKLER.ayrici },
     trendMetin: { flex: 1, fontSize: 13.5, fontWeight: '600', color: RENKLER.metin },
-    trendSayi: { fontSize: 12, color: RENKLER.metinIkincil },
+    trendSayi: { fontFamily: FONT.etiket, fontSize: 13, color: RENKLER.basari },
     bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 40 },
-    yeniButon: { position: 'absolute', right: 18, bottom: 18, width: 58, height: 58, borderRadius: 29, alignItems: 'center', justifyContent: 'center' },
+    yeniButon: { position: 'absolute', right: 18, bottom: 18, width: 58, height: 54, borderRadius: 4, alignItems: 'center', justifyContent: 'center', transform: [{ skewX: '-10deg' }] },
     yeniButonMetin: { fontWeight: '500', fontSize: 34, lineHeight: 38 },
   });
 }

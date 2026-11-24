@@ -3,6 +3,14 @@ import { useThemeStore, TEMALAR, VARSAYILAN_TEMA } from '../store/themeStore';
 
 export { TEMALAR, VARSAYILAN_TEMA };
 
+/** Barlow Condensed: Torunbot tarzı dar, italik, kalın başlıklar. _layout.jsx yükler. */
+export const FONT = {
+  dev: 'BarlowCondensed_900Black_Italic',
+  baslik: 'BarlowCondensed_800ExtraBold_Italic',
+  etiket: 'BarlowCondensed_700Bold',
+  etiketItalik: 'BarlowCondensed_700Bold_Italic',
+};
+
 /** Static fallback — only for code paths that run before the theme store hydrates. */
 export const RENKLER = TEMALAR[VARSAYILAN_TEMA].renkler;
 
@@ -21,12 +29,10 @@ export function olusturOrtakStil(RENKLER) {
     ekran: { flex: 1, backgroundColor: 'transparent' },
     kart: {
       backgroundColor: RENKLER.bg2,
-      borderRadius: 16,
+      borderRadius: 4,
       padding: 16,
       borderWidth: 1,
       borderColor: RENKLER.ayrici,
-      borderLeftWidth: 3,
-      borderLeftColor: RENKLER.vurgu,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.25,
@@ -35,8 +41,9 @@ export function olusturOrtakStil(RENKLER) {
     },
     buyukButon: {
       backgroundColor: RENKLER.vurgu,
-      borderRadius: 14,
+      borderRadius: 4,
       paddingVertical: 16,
+      transform: [{ skewX: '-8deg' }],
       alignItems: 'center',
       justifyContent: 'center',
       shadowColor: RENKLER.vurgu,
