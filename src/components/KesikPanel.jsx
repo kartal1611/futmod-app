@@ -34,7 +34,8 @@ export default function KesikPanel({ children, style, kesik = 14, dolgu, kenar, 
 
   const ortak = {
     ...rest,
-    style: [styles.kap, style],
+    // Ölçüm gelene kadar (ve SVG çizilemezse) düz zemin+kenar görünür; panel hiç boş kalmaz.
+    style: [styles.kap, !boyut && { backgroundColor: dolgu || RENKLER.bg2, borderWidth: 1, borderColor: kenarRenk }, style],
     onLayout: (e) => {
       const { width: w, height: h } = e.nativeEvent.layout;
       if (!boyut || boyut.w !== w || boyut.h !== h) setBoyut({ w, h });

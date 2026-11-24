@@ -8,6 +8,7 @@ import { useThemeStore } from '../store/themeStore';
 import { useRenkler } from '../constants/theme';
 import NeonParilti from '../components/NeonParilti';
 import AltSekmeCubugu from '../components/nav/AltSekmeCubugu';
+import HataSiniri from '../components/HataSiniri';
 import { useFonts, BarlowCondensed_700Bold, BarlowCondensed_700Bold_Italic, BarlowCondensed_800ExtraBold_Italic, BarlowCondensed_900Black_Italic } from '@expo-google-fonts/barlow-condensed';
 import { useBildirimStore } from '../store/bildirimStore';
 import LoginEkrani from '../screens/LoginEkrani';
@@ -34,6 +35,18 @@ Notifications.setNotificationHandler({
 
 const BILDIRIM_YENILEME_ARALIGI = 60000;
 const TANITIM_KEY = 'futmod_tanitim_goruldu';
+
+// expo-router bir rota çizilirken hata olursa bunu gösterir (boş ekran yerine).
+export function ErrorBoundary({ error, retry }) {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#0c0d10', paddingTop: 70, paddingHorizontal: 20 }}>
+      <Text style={{ color: '#F4C24D', fontSize: 20, fontWeight: '900' }}>Bir hata oluştu</Text>
+      <Text selectable style={{ color: '#f5f5f2', fontSize: 12, marginTop: 12 }}>{String(error?.message || error)}</Text>
+      <Text selectable style={{ color: '#767c88', fontSize: 10.5, marginTop: 8 }}>{String(error?.stack || '').split('\n').slice(0, 12).join('\n')}</Text>
+      <Text onPress={retry} style={{ color: '#F4C24D', fontWeight: '900', marginTop: 20 }}>Tekrar dene</Text>
+    </View>
+  );
+}
 
 export default function RootLayout() {
   const { user, panelMode, init } = useAuthStore();
@@ -180,6 +193,7 @@ export default function RootLayout() {
           Burada, Tabs navigator'ının render ettiği hiçbir iç ScrollView'a
           hiç girmediği için artık kesinlikle sabit kalır. */}
       <NeonParilti />
+      <HataSiniri>
       <Tabs
         style={{ flex: 1 }}
         tabBar={(props) => <AltSekmeCubugu {...props} rozet={okunmamis} />}
@@ -197,6 +211,7 @@ export default function RootLayout() {
         <Tabs.Screen name="evrimler" options={{ href: null }} />
         <Tabs.Screen name="oyuncular" options={{ href: null }} />
       </Tabs>
+      </HataSiniri>
     </View>
     </ThemeProvider>
   );
