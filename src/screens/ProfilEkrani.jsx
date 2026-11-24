@@ -177,7 +177,7 @@ export default function ProfilEkrani() {
 
       <View style={[ORTAK_STIL.kart, { marginTop: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.bolumBaslik}>Push Bildirimleri</Text>
+          <Text style={styles.bolumBaslik}>PUSH BİLDİRİMLERİ</Text>
           <Text style={styles.aciklama}>Bildirim almak için aç</Text>
         </View>
         <Switch value={bildirimAcik} onValueChange={bildirimAyarla} disabled={islemde} />
@@ -185,7 +185,7 @@ export default function ProfilEkrani() {
 
       {tercihler ? (
         <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
-          <Text style={styles.bolumBaslik}>Bildirim Türleri</Text>
+          <Text style={styles.bolumBaslik}>BİLDİRİM TÜRLERİ</Text>
           {KATEGORILER.map((k) => (
             <View key={k.key} style={styles.kategoriSatiri}>
               <View style={{ flex: 1 }}>
@@ -199,7 +199,7 @@ export default function ProfilEkrani() {
       ) : null}
 
       <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
-        <Text style={styles.bolumBaslik}>🎨 Tema</Text>
+        <Text style={styles.bolumBaslik}>TEMA</Text>
         <Text style={styles.aciklama}>Uygulamanın vurgu rengini seç</Text>
         <View style={styles.temaSatiri}>
           {Object.entries(TEMALAR).map(([key, t]) => (
@@ -227,7 +227,7 @@ export default function ProfilEkrani() {
         </Pressable>
       ) : (
         <View style={[ORTAK_STIL.kart, { marginTop: 20, borderColor: RENKLER.hata, borderWidth: 1 }]}>
-          <Text style={styles.bolumBaslik}>Hesabı Sil</Text>
+          <Text style={styles.bolumBaslik}>HESABI SİL</Text>
           <Text style={styles.aciklama}>
             Hesabın, e-postan ve kişisel bilgilerin kalıcı olarak silinir, tekrar giriş yapamazsın.
             Onaylamak için şifreni gir.
@@ -254,7 +254,7 @@ export default function ProfilEkrani() {
               onPress={hesabiSilOnayla}
               disabled={silmeYukleniyor}
             >
-              {silmeYukleniyor ? <ActivityIndicator color="#fff" /> : <Text style={styles.cikisMetin}>Hesabı Sil</Text>}
+              {silmeYukleniyor ? <ActivityIndicator color="#fff" /> : <Text style={styles.cikisMetin}>HESABI SİL</Text>}
             </TouchableOpacity>
           </View>
         </View>
@@ -267,7 +267,7 @@ export default function ProfilEkrani() {
 function olusturStyles(RENKLER) {
   return StyleSheet.create({
   baslik: { fontFamily: FONT.dev, fontSize: 38, lineHeight: 40, color: RENKLER.metin, letterSpacing: 0.5 },
-  bolumBaslik: { fontFamily: FONT.etiket, fontSize: 15, letterSpacing: 1.4, color: RENKLER.metinIkincil, textTransform: 'uppercase' },
+  bolumBaslik: { fontFamily: FONT.etiket, fontSize: 15, letterSpacing: 1.4, color: RENKLER.metinIkincil },
   etiket: { fontSize: 12, color: RENKLER.metinUcuncul },
   deger: { fontSize: 16, color: RENKLER.metin, marginTop: 2, fontWeight: '600' },
   aciklama: { fontSize: 12, color: RENKLER.metinIkincil, marginTop: 2 },
