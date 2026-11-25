@@ -56,6 +56,6 @@ function olusturStyles(RENKLER) {
     metin: { fontSize: 15.5, color: RENKLER.metinIkincil, textAlign: 'center', lineHeight: 22, marginTop: 12 },
     noktalar: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 22 },
     nokta: { width: 8, height: 8, borderRadius: 4, backgroundColor: RENKLER.ayrici },
-    buton: { color: RENKLER.bg, fontWeight: '800', fontSize: 15 },
+    buton: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 15 },
   });
 }

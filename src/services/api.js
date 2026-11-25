@@ -169,6 +169,17 @@ export const api = {
   // Admin panel
   adminFindUser: (email) => apiFetch(`/admin/users/${encodeURIComponent(email)}`),
   adminSetRoles: (id, roles) => apiFetch(`/admin/users/${id}/roles`, { method: 'PUT', body: roles }),
+  adminStats: () => apiFetch('/admin/stats'),
+  adminUsers: (q = '') => apiFetch(`/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  adminContent: (type, q = '') => apiFetch(`/admin/content?type=${type}${q ? `&q=${encodeURIComponent(q)}` : ''}`),
+  adminCreateContent: (payload) => apiFetch('/admin/content', { method: 'POST', body: payload }),
+  adminUpdateContent: (id, payload) => apiFetch(`/admin/content/${id}`, { method: 'PUT', body: payload }),
+  adminDeleteContent: (id) => apiFetch(`/admin/content/${id}`, { method: 'DELETE' }),
+  adminGroups: () => apiFetch('/admin/groups'),
+  adminPlayers: (q = '') => apiFetch(`/admin/players${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  adminCreatePlayer: (payload) => apiFetch('/admin/players', { method: 'POST', body: payload }),
+  adminUpdatePlayer: (id, payload) => apiFetch(`/admin/players/${id}`, { method: 'PUT', body: payload }),
+  adminDeletePlayer: (id) => apiFetch(`/admin/players/${id}`, { method: 'DELETE' }),
   adminBanUser: (id) => apiFetch(`/admin/users/${id}/ban`, { method: 'POST' }),
   adminUnbanUser: (id) => apiFetch(`/admin/users/${id}/unban`, { method: 'POST' }),
 

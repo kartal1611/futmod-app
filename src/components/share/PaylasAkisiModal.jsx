@@ -63,7 +63,7 @@ export default function PaylasAkisiModal({ akis }) {
                   {akis.kaydediliyor ? <ActivityIndicator size="small" color={RENKLER.metin} /> : <Text style={styles.anaButonMetin}>💾 Kaydet</Text>}
                 </Pressable>
                 <Pressable onPress={akis.paylas} style={[styles.anaButon, { backgroundColor: RENKLER.vurgu }]}>
-                  <Text style={[styles.anaButonMetin, { color: RENKLER.bg }]}>📤 Paylaş</Text>
+                  <Text style={[styles.anaButonMetin, { color: RENKLER.vurguUstu }]}>📤 Paylaş</Text>
                 </Pressable>
               </View>
             </>

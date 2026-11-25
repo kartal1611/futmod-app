@@ -140,7 +140,7 @@ export default function ForumKullaniciEkrani() {
               {profil.id !== islemler.benimId ? (
                 <View style={styles.eylemler}>
                   <Pressable onPress={takipDegistir} style={[styles.takipButon, !profil.isFollowing && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}>
-                    <Text style={[styles.takipMetin, !profil.isFollowing && { color: RENKLER.bg }]}>{profil.isFollowing ? 'Takipten Çık' : 'Takip Et'}</Text>
+                    <Text style={[styles.takipMetin, !profil.isFollowing && { color: RENKLER.vurguUstu }]}>{profil.isFollowing ? 'Takipten Çık' : 'Takip Et'}</Text>
                   </Pressable>
                   <Pressable onPress={menuAc} style={styles.takipButon}>
                     <Text style={styles.takipMetin}>Şikayet / Engelle</Text>

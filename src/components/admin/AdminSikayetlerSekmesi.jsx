@@ -51,7 +51,7 @@ export default function AdminSikayetlerSekmesi() {
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
         {['pending', 'resolved'].map((d) => (
           <Pressable key={d} onPress={() => setDurum(d)} style={[styles.durumButon, durum === d && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}>
-            <Text style={[styles.durumMetin, durum === d && { color: RENKLER.bg }]}>{d === 'pending' ? 'Bekleyen' : 'Çözülen'}</Text>
+            <Text style={[styles.durumMetin, durum === d && { color: RENKLER.vurguUstu }]}>{d === 'pending' ? 'Bekleyen' : 'Çözülen'}</Text>
           </Pressable>
         ))}
       </View>

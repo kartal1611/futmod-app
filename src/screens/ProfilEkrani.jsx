@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { api } from '../services/api';
-import { useRenkler, useOrtakStil, TEMALAR, FONT } from '../constants/theme';
+import { useRenkler, useOrtakStil, VURGULAR, MODLAR, FONT } from '../constants/theme';
 
 const KATEGORILER = [
   { key: 'forum', label: 'Forum Bildirimi', aciklama: 'Takip ettiğin başlıklara yanıt gelince haber ver' },
@@ -23,11 +23,11 @@ export default function ProfilEkrani() {
   const styles = olusturStyles(RENKLER);
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, logout, deleteAccount, refreshUser } = useAuthStore();
+  const { user, logout, deleteAccount, refreshUser, panelDegistir } = useAuthStore();
   const [yeniAd, setYeniAd] = useState(user?.displayName || '');
   const [adHata, setAdHata] = useState(null);
   const [adKaydediliyor, setAdKaydediliyor] = useState(false);
-  const { temaAdi, temaSec } = useThemeStore();
+  const { mod, vurgu, modSec, vurguSec } = useThemeStore();
   const [bildirimAcik, setBildirimAcik] = useState(false);
   const [islemde, setIslemde] = useState(false);
   const [tercihler, setTercihler] = useState(null);
@@ -148,7 +148,7 @@ export default function ProfilEkrani() {
           />
           {yeniAd.trim() !== (user?.displayName || '') ? (
             <TouchableOpacity style={[styles.silmeButon, { backgroundColor: RENKLER.vurgu, paddingHorizontal: 16 }]} onPress={adKaydet} disabled={adKaydediliyor}>
-              {adKaydediliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={[styles.cikisMetin, { color: RENKLER.bg }]}>Kaydet</Text>}
+              {adKaydediliyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={[styles.cikisMetin, { color: RENKLER.vurguUstu }]}>Kaydet</Text>}
             </TouchableOpacity>
           ) : null}
         </View>
@@ -200,22 +200,42 @@ export default function ProfilEkrani() {
 
       <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
         <Text style={styles.bolumBaslik}>TEMA</Text>
-        <Text style={styles.aciklama}>Uygulamanın vurgu rengini seç</Text>
+        <Text style={styles.aciklama}>Görünüm</Text>
+        <View style={styles.modSatiri}>
+          {Object.entries(MODLAR).map(([key, ad]) => (
+            <Pressable
+              key={key}
+              onPress={() => modSec(key)}
+              style={[styles.modButon, mod === key && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: mod === key }}
+            >
+              <Text style={[styles.modMetin, mod === key && { color: RENKLER.vurguUstu }]}>{key === 'koyu' ? '🌙' : '☀️'} {ad.toLocaleUpperCase('tr-TR')} MOD</Text>
+            </Pressable>
+          ))}
+        </View>
+        <Text style={[styles.aciklama, { marginTop: 14 }]}>Vurgu rengi</Text>
         <View style={styles.temaSatiri}>
-          {Object.entries(TEMALAR).map(([key, t]) => (
-            <Pressable key={key} onPress={() => temaSec(key)} style={styles.temaSecenek}>
+          {Object.entries(VURGULAR).map(([key, t]) => (
+            <Pressable key={key} onPress={() => vurguSec(key)} style={styles.temaSecenek} accessibilityRole="button" accessibilityLabel={t.ad}>
               <View style={[
                 styles.temaDaire,
-                { backgroundColor: t.ornekRenk },
-                temaAdi === key && styles.temaDaireSecili,
+                { backgroundColor: mod === 'acik' ? t.acik : t.koyu },
+                vurgu === key && styles.temaDaireSecili,
               ]}>
-                {temaAdi === key ? <Text style={styles.temaTik}>✓</Text> : null}
+                {vurgu === key ? <Text style={[styles.temaTik, { color: mod === 'acik' ? t.ustuAcik : t.ustuKoyu }]}>✓</Text> : null}
               </View>
-              <Text style={[styles.temaAd, temaAdi === key && { color: RENKLER.metin, fontWeight: '800' }]}>{t.ad}</Text>
+              <Text style={[styles.temaAd, vurgu === key && { color: RENKLER.metin, fontWeight: '800' }]}>{t.ad}</Text>
             </Pressable>
           ))}
         </View>
       </View>
+
+      {user?.isAdmin ? (
+        <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 24 }]} onPress={() => panelDegistir('admin')}>
+          <Text style={{ color: RENKLER.vurguUstu, fontFamily: FONT.etiketItalik, fontSize: 17, letterSpacing: 1 }}>🛠️ YÖNETİM PANELİ</Text>
+        </TouchableOpacity>
+      ) : null}
 
       <TouchableOpacity style={[styles.cikisButon, { marginTop: 24 }]} onPress={logout}>
         <Text style={styles.cikisMetin}>Çıkış Yap</Text>
@@ -291,9 +311,12 @@ function olusturStyles(RENKLER) {
   silmeButon: { borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
   temaSatiri: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 14 },
   temaSecenek: { alignItems: 'center', gap: 6 },
+  modSatiri: { flexDirection: 'row', gap: 10, marginTop: 8 },
+  modButon: { flex: 1, minHeight: 46, borderRadius: 3, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg3, alignItems: 'center', justifyContent: 'center', transform: [{ skewX: '-8deg' }] },
+  modMetin: { fontFamily: FONT.etiketItalik, fontSize: 15, letterSpacing: 1, color: RENKLER.metin },
   temaDaire: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'transparent' },
   temaDaireSecili: { borderColor: RENKLER.metin },
-  temaTik: { color: RENKLER.bg, fontWeight: '900', fontSize: 16 },
+  temaTik: { color: RENKLER.vurguUstu, fontWeight: '900', fontSize: 16 },
   temaAd: { fontSize: 11, color: RENKLER.metinIkincil, fontWeight: '600' },
   });
 }

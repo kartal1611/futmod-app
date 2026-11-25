@@ -55,7 +55,7 @@ export default function ContentGrupEkrani() {
         hata ? <Text style={styles.bos}>{hata}</Text> : <ActivityIndicator style={{ marginTop: 40 }} color={RENKLER.vurgu} />
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-          <LinearGradient colors={['#1d1708', RENKLER.bg]} style={styles.vitrin}>
+          <LinearGradient colors={[RENKLER.bg3, RENKLER.bg]} style={styles.vitrin}>
             <Text style={styles.baslik}>{grup.title}</Text>
             <Text style={styles.altBaslik}>{grup.subtitle}</Text>
             <View style={styles.vitrinKartlar}>
@@ -129,6 +129,6 @@ function olusturStyles(RENKLER) {
     tumuMetin: { fontSize: 14.5, fontWeight: '800', color: RENKLER.metin },
     izgara: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 14, paddingHorizontal: 12 },
     tartisButon: { marginHorizontal: 16, marginTop: 12, minHeight: 50, borderRadius: 14, backgroundColor: RENKLER.vurgu, alignItems: 'center', justifyContent: 'center' },
-    tartisMetin: { fontSize: 15, fontWeight: '800', color: RENKLER.bg },
+    tartisMetin: { fontSize: 15, fontWeight: '800', color: RENKLER.vurguUstu },
   });
 }

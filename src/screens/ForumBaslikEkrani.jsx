@@ -447,7 +447,7 @@ export default function ForumBaslikEkrani() {
               multiline
             />
             <Pressable onPress={gonder} disabled={gonderiliyor || !metin.trim()} style={[styles.gonderButon, (!metin.trim() || gonderiliyor) && { opacity: 0.5 }]}>
-              {gonderiliyor ? <ActivityIndicator size="small" color={RENKLER.bg} /> : <Text style={styles.gonderMetin}>{duzenlenen ? 'Kaydet' : 'Gönder'}</Text>}
+              {gonderiliyor ? <ActivityIndicator size="small" color={RENKLER.vurguUstu} /> : <Text style={styles.gonderMetin}>{duzenlenen ? 'Kaydet' : 'Gönder'}</Text>}
             </Pressable>
           </View>
         </View>
@@ -517,7 +517,7 @@ function olusturStyles(RENKLER) {
       color: RENKLER.metin, fontSize: 13.5, maxHeight: 100, borderWidth: 1, borderColor: RENKLER.ayrici,
     },
     gonderButon: { backgroundColor: RENKLER.vurgu, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 12, minWidth: 74, alignItems: 'center' },
-    gonderMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 12.5 },
+    gonderMetin: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 12.5 },
     paylasBaslik: { fontSize: 20, fontWeight: '900', color: RENKLER.metin, lineHeight: 25 },
     paylasMetin: { fontSize: 13.5, color: RENKLER.metinIkincil, lineHeight: 19, marginTop: 8 },
     paylasAlt: { fontSize: 12, fontWeight: '700', color: RENKLER.metinIkincil, marginTop: 12 },

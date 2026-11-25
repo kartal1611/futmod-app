@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Tabs, useRouter, ThemeProvider, DarkTheme } from 'expo-router';
+import { Tabs, useRouter, ThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 import { View, Text, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '../store/authStore';
@@ -127,7 +127,7 @@ export default function RootLayout() {
   if (!ready || (!fontlarHazir && !fontHatasi)) {
     return (
       <View style={{ flex: 1, backgroundColor: RENKLER.bg, alignItems: 'center', justifyContent: 'center' }}>
-        <StatusBar barStyle="light-content" />
+        <StatusBar barStyle={RENKLER.durumCubugu} />
         <ActivityIndicator size="large" color={RENKLER.vurgu} />
         <Text style={{ color: RENKLER.metinIkincil, marginTop: 12 }}>FutChat yükleniyor...</Text>
       </View>
@@ -155,7 +155,7 @@ export default function RootLayout() {
   if (panelMode !== 'admin' && !user.termsAcceptedAt) {
     return (
       <>
-        <StatusBar barStyle="light-content" />
+        <StatusBar barStyle={RENKLER.durumCubugu} />
         <KurallarOnayEkrani />
       </>
     );
@@ -164,7 +164,7 @@ export default function RootLayout() {
   if (panelMode === 'admin' && user.isAdmin) {
     return (
       <>
-        <StatusBar barStyle="light-content" />
+        <StatusBar barStyle={RENKLER.durumCubugu} />
         <AdminPanelEkrani />
       </>
     );
@@ -179,12 +179,13 @@ export default function RootLayout() {
   // edilen ekranlarda net şekilde görüldü. Çözüm: navigasyon temasının
   // `colors.background`'unu buradan RENKLER.bg'ye sabitlemek — artık en
   // altta hiçbir zaman beyaz yok, olsa olsa koyu lacivert taban var.
-  const navTemasi = { ...DarkTheme, colors: { ...DarkTheme.colors, background: RENKLER.bg, card: RENKLER.bg } };
+  const navTaban = RENKLER.mod === 'acik' ? DefaultTheme : DarkTheme;
+  const navTemasi = { ...navTaban, colors: { ...navTaban.colors, background: RENKLER.bg, card: RENKLER.bg, text: RENKLER.metin, border: RENKLER.ayrici, primary: RENKLER.vurgu } };
 
   return (
     <ThemeProvider value={navTemasi}>
     <View style={{ flex: 1, backgroundColor: RENKLER.bg }}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={RENKLER.durumCubugu} />
       {/* Sekmelerin (Tabs) DIŞINDA, en üst seviyede TEK bir sabit katman —
           önceki tasarımda her ekranın kendi ScrollView'ından önce ayrı ayrı
           eklenmişti, ama gerçek cihazda içerikle birlikte kayıyordu

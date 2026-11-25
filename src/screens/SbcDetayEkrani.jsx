@@ -281,7 +281,7 @@ export default function SbcDetayEkrani() {
                 maxLength={500}
               />
               <Pressable onPress={yorumGonder} disabled={yorumGonderiliyor || !yorumMetni.trim()} style={[styles.yorumGonderButon, (!yorumMetni.trim() || yorumGonderiliyor) && { opacity: 0.5 }]}>
-                {yorumGonderiliyor ? <ActivityIndicator size="small" color={RENKLER.bg} /> : <Text style={styles.yorumGonderMetin}>Gönder</Text>}
+                {yorumGonderiliyor ? <ActivityIndicator size="small" color={RENKLER.vurguUstu} /> : <Text style={styles.yorumGonderMetin}>Gönder</Text>}
               </Pressable>
             </View>
 
@@ -359,7 +359,7 @@ function olusturStyles(RENKLER) {
   sartSatiri: { flexDirection: 'row', gap: 6, marginTop: 3 },
   sartNokta: { color: RENKLER.vurgu, fontSize: 13 },
   sartMetin: { color: RENKLER.metinIkincil, fontSize: 12.5, flex: 1 },
-  yeniEtiket: { fontSize: 10, fontWeight: '800', color: RENKLER.bg, backgroundColor: RENKLER.vurgu, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, marginTop: 8 },
+  yeniEtiket: { fontSize: 10, fontWeight: '800', color: RENKLER.vurguUstu, backgroundColor: RENKLER.vurgu, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, marginTop: 8 },
   istatistikSatiri: { flexDirection: 'row', gap: 8, marginTop: 14, width: '100%' },
   istatistikKutu: { flex: 1, backgroundColor: RENKLER.bg3, borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
   istatistikEtiket: { fontSize: 9, fontWeight: '700', color: RENKLER.metinUcuncul, textTransform: 'uppercase' },
@@ -373,8 +373,8 @@ function olusturStyles(RENKLER) {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14,
     backgroundColor: RENKLER.vurgu, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 20, width: '100%',
   },
-  oyuncuKartiMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 13 },
-  oyuncuKartiOk: { color: RENKLER.bg, fontSize: 18, fontWeight: '300' },
+  oyuncuKartiMetin: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 13 },
+  oyuncuKartiOk: { color: RENKLER.vurguUstu, fontSize: 18, fontWeight: '300' },
   yorumBaslik: { fontSize: 16, fontWeight: '800', color: RENKLER.metin, marginBottom: 10 },
   yorumYazmaKutusu: { flexDirection: 'row', gap: 8, alignItems: 'flex-end', marginBottom: 16 },
   yorumInput: {
@@ -382,7 +382,7 @@ function olusturStyles(RENKLER) {
     color: RENKLER.metin, borderWidth: 1, borderColor: RENKLER.ayrici, maxHeight: 100, fontSize: 13.5,
   },
   yorumGonderButon: { backgroundColor: RENKLER.vurgu, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12 },
-  yorumGonderMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 13 },
+  yorumGonderMetin: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 13 },
   yorumBos: { color: RENKLER.metinIkincil, textAlign: 'center', fontSize: 12.5, marginTop: 8 },
   yorumKarti: { backgroundColor: RENKLER.bg2, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: RENKLER.ayrici, marginBottom: 10 },
   yorumUstSatir: { flexDirection: 'row', justifyContent: 'space-between' },

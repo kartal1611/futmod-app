@@ -92,7 +92,7 @@ export default function ContentEkrani() {
         <View style={styles.sekmeler}>
           {SEKMELER.map((s) => (
             <Pressable key={s.key} onPress={() => setSekme(s.key)} style={[styles.sekme, sekme === s.key && { borderColor: RENKLER.vurgu, backgroundColor: RENKLER.vurgu }]}>
-              <Text style={[styles.sekmeMetin, sekme === s.key && { color: RENKLER.bg }]}>{s.label.toLocaleUpperCase('tr-TR')}</Text>
+              <Text style={[styles.sekmeMetin, sekme === s.key && { color: RENKLER.vurguUstu }]}>{s.label.toLocaleUpperCase('tr-TR')}</Text>
             </Pressable>
           ))}
         </View>
@@ -168,7 +168,7 @@ function olusturStyles(RENKLER) {
     grupIkon: { width: 44, height: 44, borderRadius: 3, borderWidth: 1, borderColor: RENKLER.vurgu, alignItems: 'center', justifyContent: 'center', backgroundColor: RENKLER.bg3 },
     grupPuan: { fontFamily: FONT.dev, fontSize: 24, color: RENKLER.vurgu },
     guncel: { backgroundColor: RENKLER.vurgu, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 2, transform: [{ skewX: '-12deg' }] },
-    guncelMetin: { fontFamily: FONT.etiketItalik, fontSize: 12, letterSpacing: 0.8, color: RENKLER.bg },
+    guncelMetin: { fontFamily: FONT.etiketItalik, fontSize: 12, letterSpacing: 0.8, color: RENKLER.vurguUstu },
     kartFiyat: { fontSize: 11.5, fontWeight: '700', color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 3 },
     bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 32 },
   });

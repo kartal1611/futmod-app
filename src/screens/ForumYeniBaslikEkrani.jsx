@@ -144,7 +144,7 @@ export default function ForumYeniBaslikEkrani() {
         </Pressable>
         <Text style={styles.baslikMetin}>{duzenleId ? 'Başlığı Düzenle' : 'Başlık Oluştur'}</Text>
         <Pressable onPress={kaydet} disabled={!hazir} style={[styles.paylas, !hazir && { opacity: 0.5 }]}>
-          {gonderiliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.paylasMetin}>{duzenleId ? 'Kaydet' : 'Paylaş'}</Text>}
+          {gonderiliyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={styles.paylasMetin}>{duzenleId ? 'Kaydet' : 'Paylaş'}</Text>}
         </Pressable>
       </View>
 
@@ -321,7 +321,7 @@ function olusturStyles(RENKLER) {
     geriMetin: { fontSize: 22, color: RENKLER.metin },
     baslikMetin: { flex: 1, fontSize: 18, fontWeight: '900', color: RENKLER.metin, textAlign: 'center' },
     paylas: { minWidth: 74, minHeight: 40, borderRadius: 12, backgroundColor: RENKLER.vurgu, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 14 },
-    paylasMetin: { fontSize: 14, fontWeight: '800', color: RENKLER.bg },
+    paylasMetin: { fontSize: 14, fontWeight: '800', color: RENKLER.vurguUstu },
     turSatiri: { flexDirection: 'row', gap: 6 },
     turButon: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2 },
     turEmoji: { fontSize: 17 },

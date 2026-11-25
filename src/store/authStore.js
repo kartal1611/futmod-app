@@ -77,6 +77,13 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  /** Admin aynı oturumla yönetim paneli ile normal uygulama arasında geçer. */
+  panelDegistir: async (mode) => {
+    if (mode === 'admin' && !get().user?.isAdmin) return;
+    await setPanelMode(mode);
+    set({ panelMode: mode });
+  },
+
   logout: async () => {
     await clearTokens();
     await setPanelMode('member');

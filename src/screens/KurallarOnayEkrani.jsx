@@ -44,7 +44,7 @@ export default function KurallarOnayEkrani() {
         </Text>
       </ScrollView>
       <Pressable style={ORTAK_STIL.buyukButon} onPress={kabulEt} disabled={gonderiliyor}>
-        {gonderiliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.butonMetin}>Okudum, Kabul Ediyorum</Text>}
+        {gonderiliyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={styles.butonMetin}>Okudum, Kabul Ediyorum</Text>}
       </Pressable>
       <Pressable onPress={logout} style={{ marginTop: 16 }}>
         <Text style={styles.cikis}>Kabul etmek istemiyorum, çıkış yap</Text>
@@ -59,7 +59,7 @@ function olusturStyles(RENKLER) {
     aciklama: { fontSize: 14, color: RENKLER.metinIkincil, lineHeight: 20, marginBottom: 16 },
     kutu: { maxHeight: 60, marginBottom: 20 },
     link: { color: RENKLER.vurgu2, fontSize: 14, fontWeight: '700' },
-    butonMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 15 },
+    butonMetin: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 15 },
     cikis: { color: RENKLER.metinUcuncul, fontSize: 12.5, textAlign: 'center', textDecorationLine: 'underline' },
   });
 }

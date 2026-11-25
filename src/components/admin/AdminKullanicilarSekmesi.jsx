@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { api } from '../../services/api';
 import { useRenkler, useOrtakStil } from '../../constants/theme';
@@ -15,29 +15,37 @@ export default function AdminKullanicilarSekmesi() {
   const ORTAK_STIL = useOrtakStil();
   const styles = olusturStyles(RENKLER);
   const [email, setEmail] = useState('');
+  const [liste, setListe] = useState([]);
   const [kullanici, setKullanici] = useState(null);
   const [mesaj, setMesaj] = useState(null);
   const [isleniyor, setIsleniyor] = useState(false);
 
+  // Boş arama en yeni üyeleri getirir; e-posta ya da kullanıcı adının bir parçası yeter.
   const ara = async () => {
-    if (!email.trim()) return;
     setIsleniyor(true);
     setMesaj(null);
     try {
-      const data = await api.adminFindUser(email.trim().toLowerCase());
-      setKullanici(data.user);
+      const data = await api.adminUsers(email.trim());
+      setListe(data.items || []);
+      if (!data.items?.length) setMesaj('Kullanıcı bulunamadı');
     } catch (err) {
-      setKullanici(null);
       setMesaj(err.message);
     } finally {
       setIsleniyor(false);
     }
   };
 
+  useEffect(() => { ara(); }, []);
+
+  const guncelle = (u) => {
+    setKullanici(u);
+    setListe((l) => l.map((x) => (x.id === u.id ? u : x)));
+  };
+
   const rolDegistir = async (anahtar) => {
     try {
       const data = await api.adminSetRoles(kullanici.id, { [anahtar]: !kullanici[anahtar] });
-      setKullanici(data.user);
+      guncelle(data.user);
     } catch (err) {
       setMesaj(err.message);
     }
@@ -51,7 +59,7 @@ export default function AdminKullanicilarSekmesi() {
         text: 'Onayla', style: askida ? 'default' : 'destructive', onPress: async () => {
           try {
             await (askida ? api.adminUnbanUser(kullanici.id) : api.adminBanUser(kullanici.id));
-            setKullanici((k) => ({ ...k, isBanned: !askida }));
+            guncelle({ ...kullanici, isBanned: !askida });
           } catch (err) {
             setMesaj(err.message);
           }
@@ -66,22 +74,25 @@ export default function AdminKullanicilarSekmesi() {
         <Text style={styles.baslik}>Kullanıcı Ara</Text>
         <TextInput
           style={styles.input}
-          placeholder="E-posta"
+          placeholder="E-posta veya kullanıcı adı (boşsa en yeniler)"
           placeholderTextColor={RENKLER.metinUcuncul}
           autoCapitalize="none"
-          keyboardType="email-address"
+          returnKeyType="search"
           value={email}
           onChangeText={setEmail}
           onSubmitEditing={ara}
         />
         <Pressable style={[ORTAK_STIL.buyukButon, { marginTop: 12 }]} onPress={ara} disabled={isleniyor}>
-          {isleniyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.butonMetin}>Ara</Text>}
+          {isleniyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={styles.butonMetin}>Ara</Text>}
         </Pressable>
         {mesaj ? <Text style={styles.mesaj}>{mesaj}</Text> : null}
       </View>
 
       {kullanici ? (
         <View style={[ORTAK_STIL.kart, { marginTop: 14 }]}>
+          <Pressable onPress={() => setKullanici(null)} hitSlop={10}>
+            <Text style={{ color: RENKLER.vurgu, fontWeight: '800', marginBottom: 8 }}>‹ Listeye dön</Text>
+          </Pressable>
           <Text style={styles.ad}>{kullanici.displayName}</Text>
           <Text style={styles.satir}>{kullanici.email}</Text>
           <Text style={styles.satir}>
@@ -100,7 +111,18 @@ export default function AdminKullanicilarSekmesi() {
             </>
           ) : null}
         </View>
-      ) : null}
+      ) : (
+        <View style={{ marginTop: 14, gap: 8 }}>
+          {liste.map((u) => (
+            <Pressable key={u.id} onPress={() => setKullanici(u)} style={styles.listeSatir}>
+              <Text style={styles.listeAd} numberOfLines={1}>{u.displayName}</Text>
+              <Text style={styles.satir} numberOfLines={1}>
+                {u.email} · {[u.isAdmin ? 'Admin' : u.isModerator ? 'Moderatör' : 'Üye', u.isVip && 'VIP', u.isAffiliate && 'Partner', u.isBanned && 'Yasaklı'].filter(Boolean).join(' · ')}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -112,11 +134,13 @@ function olusturStyles(RENKLER) {
       marginTop: 10, backgroundColor: RENKLER.bg3, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
       color: RENKLER.metin, borderWidth: 1, borderColor: RENKLER.ayrici,
     },
-    butonMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 14 },
+    butonMetin: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 14 },
     mesaj: { marginTop: 12, color: RENKLER.vurgu2, textAlign: 'center', fontSize: 13 },
     ad: { fontSize: 17, fontWeight: '800', color: RENKLER.metin },
     satir: { fontSize: 13, color: RENKLER.metinIkincil, marginTop: 4 },
     ikincilButon: { marginTop: 12, minHeight: 46, borderRadius: 12, borderWidth: 1, borderColor: RENKLER.ayrici, alignItems: 'center', justifyContent: 'center' },
+    listeSatir: { backgroundColor: RENKLER.bg2, borderRadius: 4, borderWidth: 1, borderColor: RENKLER.ayrici, padding: 12 },
+    listeAd: { fontSize: 15, fontWeight: '800', color: RENKLER.metin },
     ikincilMetin: { fontSize: 13.5, fontWeight: '700', color: RENKLER.metin },
   });
 }

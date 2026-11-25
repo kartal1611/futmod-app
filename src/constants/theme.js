@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { useThemeStore, TEMALAR, VARSAYILAN_TEMA } from '../store/themeStore';
+import { useThemeStore, renklerOlustur, VURGULAR, MODLAR, VARSAYILAN_MOD, VARSAYILAN_VURGU } from '../store/themeStore';
 
-export { TEMALAR, VARSAYILAN_TEMA };
+export { VURGULAR, MODLAR };
 
 /** Barlow Condensed: Torunbot tarzı dar, italik, kalın başlıklar. _layout.jsx yükler. */
 export const FONT = {
@@ -12,7 +12,7 @@ export const FONT = {
 };
 
 /** Static fallback — only for code paths that run before the theme store hydrates. */
-export const RENKLER = TEMALAR[VARSAYILAN_TEMA].renkler;
+export const RENKLER = renklerOlustur(VARSAYILAN_MOD, VARSAYILAN_VURGU);
 
 /** Reactive hook: re-renders the component when the user changes theme. */
 export function useRenkler() {

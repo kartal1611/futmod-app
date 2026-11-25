@@ -271,7 +271,7 @@ export default function OyuncuDetayEkrani() {
               {fiyatTakipIslemde ? (
                 <ActivityIndicator size="small" color={fiyatTakip ? RENKLER.bg : RENKLER.vurgu} />
               ) : (
-                <Text style={[styles.fiyatTakipMetin, fiyatTakip ? { color: RENKLER.bg } : null]}>
+                <Text style={[styles.fiyatTakipMetin, fiyatTakip ? { color: RENKLER.vurguUstu } : null]}>
                   {fiyatTakip ? '🔔 Fiyat takipte' : '🔕 Fiyat takibi ekle'}
                 </Text>
               )}
@@ -421,7 +421,7 @@ function olusturStyles(RENKLER) {
   ustBolum: { flexDirection: 'row', paddingHorizontal: 16, marginTop: 8, gap: 14, alignItems: 'flex-start' },
   bilgiSutunu: { flex: 1, paddingTop: 6 },
   rozetSatiri: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  anaPozisyon: { fontSize: 13, fontWeight: '800', color: RENKLER.bg, backgroundColor: RENKLER.vurgu2, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
+  anaPozisyon: { fontSize: 13, fontWeight: '800', color: RENKLER.vurguUstu, backgroundColor: RENKLER.vurgu2, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   ratingBuyuk: { fontSize: 20, fontWeight: '900', color: RENKLER.metin },
   chipSatiri: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
   altPozisyonChip: { fontSize: 10.5, fontWeight: '700', color: RENKLER.metinIkincil, backgroundColor: RENKLER.bg3, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5 },
@@ -445,7 +445,7 @@ function olusturStyles(RENKLER) {
   ggGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   ggKart: { width: '48%', backgroundColor: RENKLER.bg2, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: RENKLER.ayrici },
   ggUstSatir: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  ggPozisyon: { fontSize: 11, fontWeight: '800', color: RENKLER.bg, backgroundColor: RENKLER.vurgu, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  ggPozisyon: { fontSize: 11, fontWeight: '800', color: RENKLER.vurguUstu, backgroundColor: RENKLER.vurgu, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   ggRating: { fontSize: 17, fontWeight: '900', color: RENKLER.metin },
   ggRol: { fontSize: 11, color: RENKLER.metinIkincil, marginTop: 4 },
   ggRank: { fontSize: 10.5, color: RENKLER.vurgu2, marginTop: 2, fontWeight: '700' },
@@ -475,7 +475,7 @@ function olusturStyles(RENKLER) {
   paylasUstSatir: { flexDirection: 'row', gap: 16, alignItems: 'center', marginTop: 18 },
   paylasIsim: { fontSize: 19, fontWeight: '900', color: RENKLER.metin },
   paylasRozetSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
-  paylasPozisyon: { fontSize: 11, fontWeight: '800', color: RENKLER.bg, backgroundColor: RENKLER.vurgu2, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5 },
+  paylasPozisyon: { fontSize: 11, fontWeight: '800', color: RENKLER.vurguUstu, backgroundColor: RENKLER.vurgu2, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5 },
   paylasRating: { fontSize: 18, fontWeight: '900', color: RENKLER.metin },
   paylasRarity: { fontSize: 11.5, color: RENKLER.metinIkincil, marginTop: 4 },
   paylasAttrEtiket: { fontSize: 11, fontWeight: '800', color: RENKLER.metinUcuncul, letterSpacing: 0.5 },

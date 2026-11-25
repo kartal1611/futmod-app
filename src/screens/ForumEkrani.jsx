@@ -158,7 +158,7 @@ export default function ForumEkrani() {
                 onPress={() => { if (s.key !== siralama) secenekDegistir(() => setSiralama(s.key)); }}
                 style={[styles.siralamaButon, siralama === s.key && { backgroundColor: RENKLER.vurgu }]}
               >
-                <Text style={[styles.siralamaMetin, siralama === s.key && { color: RENKLER.bg }]}>{s.label}</Text>
+                <Text style={[styles.siralamaMetin, siralama === s.key && { color: RENKLER.vurguUstu }]}>{s.label}</Text>
               </Pressable>
             ))}
           </View>
@@ -237,7 +237,7 @@ export default function ForumEkrani() {
                       accessibilityRole="button"
                       accessibilityLabel={`${i + 1}. sayfa`}
                     >
-                      <Text style={[styles.sayfaNoMetin, i === gundemSayfa && { color: RENKLER.bg }]}>{i + 1}</Text>
+                      <Text style={[styles.sayfaNoMetin, i === gundemSayfa && { color: RENKLER.vurguUstu }]}>{i + 1}</Text>
                     </Pressable>
                   ))}
                 </View>
@@ -269,7 +269,7 @@ export default function ForumEkrani() {
         accessibilityRole="button"
         accessibilityLabel="Başlık aç"
       >
-        <Text style={[styles.yeniButonMetin, { color: RENKLER.bg }]}>+</Text>
+        <Text style={[styles.yeniButonMetin, { color: RENKLER.vurguUstu }]}>+</Text>
       </Pressable>
     </View>
   );
@@ -296,7 +296,7 @@ function olusturStyles(RENKLER) {
     gundemUst: { fontFamily: FONT.etiket, fontSize: 13, letterSpacing: 1.5, color: RENKLER.vurgu },
     gundemBaslik: { fontFamily: FONT.baslik, fontSize: 25, color: RENKLER.metin, marginTop: 4, lineHeight: 27 },
     gundemButon: { alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu, borderRadius: 2, paddingHorizontal: 14, paddingVertical: 8, marginTop: 12, transform: [{ skewX: '-12deg' }] },
-    gundemButonMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, letterSpacing: 1, color: RENKLER.bg },
+    gundemButonMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, letterSpacing: 1, color: RENKLER.vurguUstu },
     noktalar: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
     sayfaNo: { minWidth: 30, height: 28, borderRadius: 2, borderWidth: 1, borderColor: RENKLER.ayrici, backgroundColor: RENKLER.bg2, alignItems: 'center', justifyContent: 'center', transform: [{ skewX: '-12deg' }] },
     sayfaNoMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, color: RENKLER.metinIkincil },

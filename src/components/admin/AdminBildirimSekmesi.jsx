@@ -72,7 +72,7 @@ export default function AdminBildirimSekmesi() {
         />
 
         <Pressable style={[ORTAK_STIL.buyukButon, { marginTop: 14 }]} onPress={gonder} disabled={gonderiliyor}>
-          {gonderiliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.buttonMetin}>Gönder</Text>}
+          {gonderiliyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={styles.buttonMetin}>Gönder</Text>}
         </Pressable>
         {mesaj ? <Text style={styles.mesaj}>{mesaj}</Text> : null}
       </View>
@@ -87,13 +87,13 @@ function olusturStyles(RENKLER) {
   kategoriChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: RENKLER.bg3, borderWidth: 1, borderColor: RENKLER.ayrici },
   kategoriChipSecili: { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu },
   kategoriMetin: { fontSize: 12.5, fontWeight: '700', color: RENKLER.metinIkincil },
-  kategoriMetinSecili: { color: RENKLER.bg },
+  kategoriMetinSecili: { color: RENKLER.vurguUstu },
   kategoriNot: { fontSize: 11.5, color: RENKLER.metinUcuncul, marginTop: 8 },
   input: {
     backgroundColor: RENKLER.bg3, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
     color: RENKLER.metin, borderWidth: 1, borderColor: RENKLER.ayrici,
   },
-  buttonMetin: { color: RENKLER.bg, fontWeight: '800', fontSize: 14 },
+  buttonMetin: { color: RENKLER.vurguUstu, fontWeight: '800', fontSize: 14 },
   mesaj: { marginTop: 12, color: RENKLER.vurgu2, textAlign: 'center', fontSize: 13 },
   });
 }

@@ -78,7 +78,7 @@ export default function LoginEkrani({ onAdminGiris }) {
           {kayitModu && (
             <TouchableOpacity style={styles.sartSatiri} onPress={() => setSartlarKabul((v) => !v)}>
               <View style={[styles.kutucuk, sartlarKabul && { backgroundColor: RENKLER.vurgu, borderColor: RENKLER.vurgu }]}>
-                {sartlarKabul ? <Text style={{ color: RENKLER.bg, fontSize: 12, fontWeight: '800' }}>✓</Text> : null}
+                {sartlarKabul ? <Text style={{ color: RENKLER.vurguUstu, fontSize: 12, fontWeight: '800' }}>✓</Text> : null}
               </View>
               <Text style={styles.sartMetin}>
                 <Text onPress={() => Linking.openURL('https://fc26.efendiler.net/torunfc/kurallar.html')} style={styles.sartLink}>
@@ -97,7 +97,7 @@ export default function LoginEkrani({ onAdminGiris }) {
             disabled={gonderiliyor || (kayitModu && !sartlarKabul)}
           >
             {gonderiliyor ? (
-              <ActivityIndicator color={RENKLER.bg} />
+              <ActivityIndicator color={RENKLER.vurguUstu} />
             ) : (
               <Text style={styles.buttonMetin}>{kayitModu ? 'Kayıt Ol' : 'Giriş Yap'}</Text>
             )}
@@ -137,7 +137,7 @@ function olusturStyles(RENKLER) {
     borderWidth: 1,
     borderColor: RENKLER.ayrici,
   },
-  buttonMetin: { color: RENKLER.bg, fontWeight: '700', fontSize: 16 },
+  buttonMetin: { color: RENKLER.vurguUstu, fontWeight: '700', fontSize: 16 },
   gecis: { color: RENKLER.vurgu2, textAlign: 'center' },
   hata: { color: RENKLER.hata, marginBottom: 8 },
   sartSatiri: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 4, marginBottom: 4 },

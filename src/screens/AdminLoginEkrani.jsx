@@ -50,7 +50,7 @@ export default function AdminLoginEkrani({ onGeri }) {
           {error ? <Text style={styles.hata}>{error}</Text> : null}
 
           <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 16 }]} onPress={gonder} disabled={gonderiliyor}>
-            {gonderiliyor ? <ActivityIndicator color={RENKLER.bg} /> : <Text style={styles.buttonMetin}>Giriş Yap</Text>}
+            {gonderiliyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={styles.buttonMetin}>Giriş Yap</Text>}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onGeri} style={{ marginTop: 16 }}>
@@ -71,7 +71,7 @@ function olusturStyles(RENKLER) {
     backgroundColor: RENKLER.bg3, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
     color: RENKLER.metin, marginBottom: 12, borderWidth: 1, borderColor: RENKLER.ayrici,
   },
-  buttonMetin: { color: RENKLER.bg, fontWeight: '700', fontSize: 16 },
+  buttonMetin: { color: RENKLER.vurguUstu, fontWeight: '700', fontSize: 16 },
   gecis: { color: RENKLER.vurgu2, textAlign: 'center' },
   hata: { color: RENKLER.hata, marginBottom: 8 },
   });
