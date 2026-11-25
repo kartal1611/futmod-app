@@ -116,6 +116,15 @@ export default function ForumBaslikEkrani() {
   const kaydet = () => baslikGuncelle(() => api.forumSave(baslik.id, !baslik.saved), 'Kaydedilemedi');
   const sabitle = () => baslikGuncelle(() => api.forumPin(baslik.id, !baslik.isPinned), 'Sabitlenemedi');
   const kilitle = () => baslikGuncelle(() => api.forumLock(baslik.id, !baslik.isLocked), 'Kilitlenemedi');
+  // Başlığı forum ana sayfasındaki dönen banda ekler (yönetim panelinden sıralanır/kaldırılır).
+  const mansetEkle = async () => {
+    try {
+      await api.adminCreateBanner({ threadId: baslik.id });
+      Alert.alert('Manşete eklendi', 'Başlık ana sayfadaki kayan bantta en başta görünecek. Sırasını yönetim panelindeki Manşet sekmesinden değiştirebilirsin.');
+    } catch (err) {
+      Alert.alert('Hata', err.message || 'Eklenemedi');
+    }
+  };
 
   const anketOyla = async (secenekId) => {
     try {
@@ -376,6 +385,11 @@ export default function ForumBaslikEkrani() {
                   <Pressable onPress={kilitle} style={styles.eylemButon}>
                     <Text style={styles.eylemMetin}>{baslik.isLocked ? '🔓 Kilidi aç' : '🔒 Kilitle'}</Text>
                   </Pressable>
+                  {user?.isAdmin ? (
+                    <Pressable onPress={mansetEkle} style={styles.eylemButon}>
+                      <Text style={styles.eylemMetin}>📣 Manşete ekle</Text>
+                    </Pressable>
+                  ) : null}
                 </>
               ) : null}
             </View>

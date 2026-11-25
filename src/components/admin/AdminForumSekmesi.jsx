@@ -95,6 +95,7 @@ export default function AdminForumSekmesi() {
       <Kucuk metin="✏️ Düzenle" onPress={() => setDuzenle({ tur: 'baslik', id: b.id, title: b.title, body: b.body || '' })} />
       <Kucuk metin={b.isPinned ? '📌 Sabiti kaldır' : '📌 Sabitle'} onPress={() => sabitle(b)} />
       <Kucuk metin={b.isLocked ? '🔓 Kilidi aç' : '🔒 Kilitle'} onPress={() => kilitle(b)} />
+      <Kucuk metin="📣 Manşete ekle" onPress={() => islem(async () => { await api.adminCreateBanner({ threadId: b.id }); Alert.alert('Manşete eklendi', 'Ana sayfadaki kayan bantta en başta görünecek.'); })} />
       <Kucuk metin="🗑 Sil" tehlike onPress={() => sil(b)} />
       {!b.isAdmin ? <Kucuk metin="⛔ Yazarı yasakla" tehlike onPress={() => yasakla(b.userId, b.authorName)} /> : null}
     </View>

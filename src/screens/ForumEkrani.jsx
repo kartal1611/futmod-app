@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, FlatList, Pressable, ScrollView, ActivityIndicator, RefreshControl, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, Image, FlatList, Pressable, ScrollView, ActivityIndicator, RefreshControl, Linking, useWindowDimensions, StyleSheet } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useModerationStore } from '../store/moderationStore';
@@ -13,7 +13,7 @@ import { AraIkonu, BildirimIkonu } from '../components/nav/TabIkonlari';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil, FONT } from '../constants/theme';
 import KesikPanel from '../components/KesikPanel';
-import { FORUM_KATEGORILERI } from '../constants/forum';
+import { FORUM_KATEGORILERI, tamGorselUrl } from '../constants/forum';
 
 const SAYFA_BOYUTU = 30;
 const TAKIP = 'takip';
@@ -45,6 +45,7 @@ export default function ForumEkrani() {
   const [dahaVar, setDahaVar] = useState(false);
   const [gundemSayfa, setGundemSayfa] = useState(0);
   const [guncelTotw, setGuncelTotw] = useState(null);
+  const [manset, setManset] = useState([]);
   const gundemRef = useRef(null);
   const sayfaRef = useRef(0);
   const kaydiriliyor = useRef(false);
@@ -79,6 +80,7 @@ export default function ForumEkrani() {
 
   useFocusEffect(useCallback(() => {
     api.contentCenter().then((data) => setGuncelTotw(data.totw?.[0] ?? null)).catch(() => {});
+    api.banner().then((data) => setManset(data.items || [])).catch(() => {});
   }, []));
 
   const yenile = async () => {
@@ -109,16 +111,29 @@ export default function ForumEkrani() {
   const gorunenler = basliklar.filter((b) => !blockedIds.includes(b.userId));
   // Gündem ve trend yalnız ana akışta anlamlı, filtre seçilince araya girmesin.
   const anaAkis = !kategori && siralama === 'hot';
-  const gundem = anaAkis ? gorunenler.slice(0, GUNDEM_SAYISI) : [];
+  // Yönetimin eklediği manşetler başta; kalan yerleri sıcak konular doldurur (en az bir tane).
+  const mansetBasliklari = manset.map((m) => m.threadId).filter(Boolean);
+  const gundem = anaAkis
+    ? gorunenler.filter((b) => !mansetBasliklari.includes(b.id)).slice(0, Math.max(1, GUNDEM_SAYISI - manset.length))
+    : [];
   const trend = anaAkis
     ? [...gorunenler].filter((b) => b.commentCount > 0).sort((a, b) => b.commentCount - a.commentCount).slice(0, TREND_SAYISI)
     : [];
   const gundemGenislik = width - 32;
   const slaytlar = [
+    ...(anaAkis ? manset.map((m) => ({ anahtar: `m-${m.id}`, manset: m })) : []),
     ...gundem.map((b) => ({ anahtar: `b-${b.id}`, baslik: b })),
     ...(anaAkis && guncelTotw ? [{ anahtar: guncelTotw.key, totw: guncelTotw }] : []),
   ];
   const slaytSayisi = slaytlar.length;
+  const slaytImzasi = slaytlar.map((sl) => sl.anahtar).join('|');
+
+  // Slaytlar değişince (ör. manşetler listeden sonra gelince) bant ilk slayttan başlasın.
+  useEffect(() => {
+    sayfaRef.current = 0;
+    setGundemSayfa(0);
+    gundemRef.current?.scrollTo({ x: 0, animated: false });
+  }, [slaytImzasi]);
 
   const sayfaGit = (i) => {
     sayfaRef.current = i;
@@ -194,6 +209,8 @@ export default function ForumEkrani() {
                 <View style={styles.heroCizgi} />
               </View>
               <ScrollView
+                // Slayt listesi değişince bant baştan kurulur: konum kayıp ilk slayttan başlamaz.
+                key={slaytImzasi}
                 ref={gundemRef}
                 horizontal
                 pagingEnabled
@@ -208,17 +225,28 @@ export default function ForumEkrani() {
                 {slaytlar.map((sl) => (
                   <Pressable
                     key={sl.anahtar}
-                    onPress={() => router.push(sl.totw ? `/content/${sl.totw.key}` : `/forum/${sl.baslik.id}`)}
+                    onPress={() => {
+                      if (sl.manset) {
+                        if (sl.manset.threadId) router.push(`/forum/${sl.manset.threadId}`);
+                        else if (sl.manset.linkUrl) Linking.openURL(sl.manset.linkUrl).catch(() => {});
+                        return;
+                      }
+                      router.push(sl.totw ? `/content/${sl.totw.key}` : `/forum/${sl.baslik.id}`);
+                    }}
                     style={{ width: gundemGenislik }}
                   >
                     <KesikPanel kesik={18} vurgulu parilti style={styles.gundem}>
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.gundemUst}>{sl.totw ? 'HAFTANIN TAKIMI' : 'TOPLULUK GÜNDEMİ'}</Text>
-                        <Text style={styles.gundemBaslik} numberOfLines={3}>{sl.totw ? sl.totw.title : sl.baslik.title}</Text>
-                        <View style={styles.gundemButon}>
-                          <Text style={styles.gundemButonMetin}>{sl.totw ? 'KADROYU GÖR ›' : 'TARTIŞMAYA KATIL ›'}</Text>
-                        </View>
+                        <Text style={styles.gundemUst}>{sl.manset ? 'ÖNE ÇIKAN' : sl.totw ? 'HAFTANIN TAKIMI' : 'TOPLULUK GÜNDEMİ'}</Text>
+                        <Text style={styles.gundemBaslik} numberOfLines={3}>{sl.manset ? sl.manset.title : sl.totw ? sl.totw.title : sl.baslik.title}</Text>
+                        {sl.manset?.subtitle ? <Text style={styles.gundemAlt} numberOfLines={2}>{sl.manset.subtitle}</Text> : null}
+                        {!sl.manset || sl.manset.threadId || sl.manset.linkUrl ? (
+                          <View style={styles.gundemButon}>
+                            <Text style={styles.gundemButonMetin}>{sl.manset ? (sl.manset.threadId ? 'KONUYA GİT ›' : 'İNCELE ›') : sl.totw ? 'KADROYU GÖR ›' : 'TARTIŞMAYA KATIL ›'}</Text>
+                          </View>
+                        ) : null}
                       </View>
+                      {sl.manset?.imageUrl ? <Image source={{ uri: tamGorselUrl(sl.manset.imageUrl) }} style={styles.gundemGorsel} resizeMode="cover" /> : null}
                       {sl.baslik?.players[0] ? (
                         <OyuncuKarti yuzUrl={sl.baslik.players[0].imageUrl} isim={sl.baslik.players[0].name} nadirlik={sl.baslik.players[0].rarity} rating={sl.baslik.players[0].rating} pozisyon={sl.baslik.players[0].position} genislik={92} />
                       ) : null}
@@ -295,6 +323,8 @@ function olusturStyles(RENKLER) {
     gundem: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 150, padding: 16 },
     gundemUst: { fontFamily: FONT.etiket, fontSize: 13, letterSpacing: 1.5, color: RENKLER.vurgu },
     gundemBaslik: { fontFamily: FONT.baslik, fontSize: 25, color: RENKLER.metin, marginTop: 4, lineHeight: 27 },
+    gundemAlt: { fontSize: 13, color: RENKLER.metinIkincil, marginTop: 4, lineHeight: 18 },
+    gundemGorsel: { width: 96, height: 118, borderRadius: 4, backgroundColor: RENKLER.bg3 },
     gundemButon: { alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu, borderRadius: 2, paddingHorizontal: 14, paddingVertical: 8, marginTop: 12, transform: [{ skewX: '-12deg' }] },
     gundemButonMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, letterSpacing: 1, color: RENKLER.vurguUstu },
     noktalar: { flexDirection: 'row', justifyContent: 'center', gap: 6 },

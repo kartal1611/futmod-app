@@ -7,6 +7,7 @@ import NeonParilti from '../components/NeonParilti';
 import AdminBildirimSekmesi from '../components/admin/AdminBildirimSekmesi';
 import AdminGenelSekmesi from '../components/admin/AdminGenelSekmesi';
 import AdminForumSekmesi from '../components/admin/AdminForumSekmesi';
+import AdminMansetSekmesi from '../components/admin/AdminMansetSekmesi';
 import AdminIcerikSekmesi from '../components/admin/AdminIcerikSekmesi';
 import AdminKartlarSekmesi from '../components/admin/AdminKartlarSekmesi';
 import AdminKullanicilarSekmesi from '../components/admin/AdminKullanicilarSekmesi';
@@ -14,6 +15,7 @@ import AdminSikayetlerSekmesi from '../components/admin/AdminSikayetlerSekmesi';
 
 const SEKMELER = [
   { key: 'genel', baslik: 'Genel', emoji: '📊' },
+  { key: 'manset', baslik: 'Manşet', emoji: '📣' },
   { key: 'forum', baslik: 'Forum', emoji: '💬' },
   { key: 'icerik', baslik: 'SBC / Evrim', emoji: '🧩' },
   { key: 'kartlar', baslik: 'Kartlar', emoji: '🃏' },
@@ -53,6 +55,7 @@ export default function AdminPanelEkrani() {
 
       <View style={{ flex: 1 }}>
         {aktifSekme === 'genel' ? <AdminGenelSekmesi /> : null}
+        {aktifSekme === 'manset' ? <AdminMansetSekmesi /> : null}
         {aktifSekme === 'forum' ? <AdminForumSekmesi /> : null}
         {aktifSekme === 'icerik' ? <AdminIcerikSekmesi /> : null}
         {aktifSekme === 'kartlar' ? <AdminKartlarSekmesi /> : null}

@@ -141,6 +141,7 @@ export const api = {
   me: () => apiFetch('/auth/me'),
 
   contentCenter: () => apiFetch('/content-center'),
+  banner: () => apiFetch('/content-center/banner'),
   contentGroup: (key) => apiFetch(`/content-center/groups/${key}`),
   content: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
@@ -180,6 +181,11 @@ export const api = {
   adminCreatePlayer: (payload) => apiFetch('/admin/players', { method: 'POST', body: payload }),
   adminUpdatePlayer: (id, payload) => apiFetch(`/admin/players/${id}`, { method: 'PUT', body: payload }),
   adminDeletePlayer: (id) => apiFetch(`/admin/players/${id}`, { method: 'DELETE' }),
+  adminBanner: () => apiFetch('/admin/banner'),
+  adminCreateBanner: (payload) => apiFetch('/admin/banner', { method: 'POST', body: payload }),
+  adminUpdateBanner: (id, payload) => apiFetch(`/admin/banner/${id}`, { method: 'PUT', body: payload }),
+  adminMoveBanner: (id, direction) => apiFetch(`/admin/banner/${id}/move`, { method: 'POST', body: { direction } }),
+  adminDeleteBanner: (id) => apiFetch(`/admin/banner/${id}`, { method: 'DELETE' }),
   adminBanUser: (id) => apiFetch(`/admin/users/${id}/ban`, { method: 'POST' }),
   adminUnbanUser: (id) => apiFetch(`/admin/users/${id}/unban`, { method: 'POST' }),
 
