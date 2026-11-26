@@ -50,6 +50,7 @@ export default function ForumBaslikEkrani() {
   const [gonderiliyor, setGonderiliyor] = useState(false);
   const [yorumSirasi, setYorumSirasi] = useState('old');
   const [tamEkranGorsel, setTamEkranGorsel] = useState(null);
+  const [gorselYukleniyor, setGorselYukleniyor] = useState(false);
   const [oneriler, setOneriler] = useState([]);
   const kartRef = useRef(null);
   const girdiRef = useRef(null);
@@ -282,7 +283,17 @@ export default function ForumBaslikEkrani() {
 
       <Modal visible={!!tamEkranGorsel} transparent animationType="fade" onRequestClose={() => setTamEkranGorsel(null)}>
         <Pressable onPress={() => setTamEkranGorsel(null)} style={styles.tamEkran} accessibilityRole="button" accessibilityLabel="Görseli kapat">
-          {tamEkranGorsel ? <Image source={{ uri: tamEkranGorsel }} style={{ width: '100%', height: '100%' }} resizeMode="contain" /> : null}
+          {tamEkranGorsel ? (
+            <Image
+              source={{ uri: tamEkranGorsel }}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="contain"
+              onLoadStart={() => setGorselYukleniyor(true)}
+              onLoadEnd={() => setGorselYukleniyor(false)}
+            />
+          ) : null}
+          {gorselYukleniyor ? <ActivityIndicator size="large" color="#ffffff" style={StyleSheet.absoluteFill} /> : null}
+          <Text style={styles.kapatIpucu}>Kapatmak için dokun</Text>
         </Pressable>
       </Modal>
 
@@ -483,6 +494,7 @@ function olusturStyles(RENKLER) {
     takipButon: { borderRadius: 10, borderWidth: 1, borderColor: RENKLER.ayrici, paddingHorizontal: 12, paddingVertical: 8 },
     takipMetin: { fontSize: 12.5, fontWeight: '700', color: RENKLER.metin },
     tamEkran: { flex: 1, backgroundColor: 'rgba(0,0,0,0.95)' },
+    kapatIpucu: { position: 'absolute', bottom: 40, alignSelf: 'center', color: 'rgba(255,255,255,0.7)', fontSize: 13 },
     bos: { color: RENKLER.metinIkincil, textAlign: 'center', marginTop: 24 },
     baslikMetin: { fontSize: 21, fontWeight: '900', color: RENKLER.metin, lineHeight: 26 },
     yazarSatir: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },

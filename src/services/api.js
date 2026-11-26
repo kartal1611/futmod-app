@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 // Local dev default. Override by setting EXPO_PUBLIC_API_URL when starting
 // Expo (e.g. `EXPO_PUBLIC_API_URL=http://192.168.1.5:4000/api npx expo start --tunnel`)
@@ -94,6 +95,23 @@ async function yuklemeYaniti(res, varsayilanHata) {
   return data;
 }
 
+const GORSEL_MAKS_GENISLIK = 1440;
+
+/**
+ * Yüklemeden önce görseli küçültür ve JPEG'e çevirir: telefondan gelen ekran görüntüleri
+ * 8 MB'lık PNG olabiliyor, bunlar forumda çok geç açılıyordu. Başarısız olursa asıl dosya gider.
+ */
+async function gorselHazirla(uri) {
+  try {
+    const bilgi = await manipulateAsync(uri, []);
+    const islem = bilgi.width > GORSEL_MAKS_GENISLIK ? [{ resize: { width: GORSEL_MAKS_GENISLIK } }] : [];
+    const sonuc = await manipulateAsync(uri, islem, { compress: 0.8, format: SaveFormat.JPEG });
+    return { uri: sonuc.uri, ad: 'gorsel.jpg' };
+  } catch {
+    return null;
+  }
+}
+
 // Set by the auth store: a ban signs the member out wherever the next request happens.
 let yasakliHandler = null;
 export function setYasakliHandler(fn) {
@@ -186,6 +204,7 @@ export const api = {
   adminUpdateBanner: (id, payload) => apiFetch(`/admin/banner/${id}`, { method: 'PUT', body: payload }),
   adminMoveBanner: (id, direction) => apiFetch(`/admin/banner/${id}/move`, { method: 'POST', body: { direction } }),
   adminDeleteBanner: (id) => apiFetch(`/admin/banner/${id}`, { method: 'DELETE' }),
+  adminTempPassword: (id) => apiFetch(`/admin/users/${id}/temp-password`, { method: 'POST' }),
   adminBanUser: (id) => apiFetch(`/admin/users/${id}/ban`, { method: 'POST' }),
   adminUnbanUser: (id) => apiFetch(`/admin/users/${id}/unban`, { method: 'POST' }),
 
@@ -196,8 +215,9 @@ export const api = {
     // `{ uri, name, type }` nesne şeklini FormData parçası olarak tanımıyor ve
     // "Unsupported FormDataPart implementation" hatasıyla patlıyor. Dosyayı
     // önce gerçek bir Blob'a çevirip onu eklemek gerekiyor.
-    const blob = await (await fetch(fileUri)).blob();
-    form.append('image', blob, fileName || 'gorsel.jpg');
+    const hazir = await gorselHazirla(fileUri);
+    const blob = await (await fetch(hazir?.uri || fileUri)).blob();
+    form.append('image', blob, hazir?.ad || fileName || 'gorsel.jpg');
     const res = await fetch(`${getBaseUrl()}/forum/threads/upload-image`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -208,6 +228,7 @@ export const api = {
 
   updateDisplayName: (displayName) => apiFetch('/auth/display-name', { method: 'PUT', body: { displayName } }),
   acceptTerms: () => apiFetch('/auth/accept-terms', { method: 'POST' }),
+  changePassword: (currentPassword, newPassword) => apiFetch('/auth/password', { method: 'PUT', body: { currentPassword, newPassword } }),
   deleteAccount: (password) => apiFetch('/auth/delete-account', { method: 'POST', body: { password } }),
 
   blockedUsers: () => apiFetch('/moderation/blocked'),

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { api } from '../../services/api';
+import { useAuthStore } from '../../store/authStore';
 import { useRenkler, useOrtakStil } from '../../constants/theme';
 
 // Moderatör "küçük admin"dir: forumda silme, sabitleme, kilitleme ve üye yasaklama yapabilir.
@@ -19,6 +20,7 @@ export default function AdminKullanicilarSekmesi() {
   const [kullanici, setKullanici] = useState(null);
   const [mesaj, setMesaj] = useState(null);
   const [isleniyor, setIsleniyor] = useState(false);
+  const benimId = useAuthStore((s) => s.user?.id);
 
   // Boş arama en yeni üyeleri getirir; e-posta ya da kullanıcı adının bir parçası yeter.
   const ara = async () => {
@@ -49,6 +51,23 @@ export default function AdminKullanicilarSekmesi() {
     } catch (err) {
       setMesaj(err.message);
     }
+  };
+
+  // E-posta servisi yok: şifresini unutan üyeye geçici şifre verilir, üye Profil'den değiştirir.
+  const geciciSifre = () => {
+    Alert.alert('Geçici şifre', `${kullanici.displayName} için yeni bir geçici şifre oluşturulsun mu? Eski şifresi çalışmaz olur ve tüm oturumları kapanır.`, [
+      { text: 'Vazgeç', style: 'cancel' },
+      {
+        text: 'Oluştur', onPress: async () => {
+          try {
+            const { password } = await api.adminTempPassword(kullanici.id);
+            Alert.alert('Geçici şifre', `${kullanici.email}\n\nŞifre: ${password}\n\nBunu üyeye ilet. Giriş yaptıktan sonra Profil → Şifre değiştir'den kendi şifresini koymalı.`);
+          } catch (err) {
+            setMesaj(err.message);
+          }
+        },
+      },
+    ]);
   };
 
   const askiDegistir = () => {
@@ -98,6 +117,11 @@ export default function AdminKullanicilarSekmesi() {
           <Text style={styles.satir}>
             {[kullanici.isAdmin ? 'Admin' : kullanici.isModerator ? 'Moderatör' : 'Üye', kullanici.isVip && 'VIP', kullanici.isAffiliate && 'Partner', kullanici.isBanned && 'Askıda'].filter(Boolean).join(' · ')}
           </Text>
+          {kullanici.id !== benimId ? (
+            <Pressable style={styles.ikincilButon} onPress={geciciSifre}>
+              <Text style={styles.ikincilMetin}>🔑 Geçici şifre ver</Text>
+            </Pressable>
+          ) : null}
           {!kullanici.isAdmin ? (
             <>
               {ROLLER.map((r) => (

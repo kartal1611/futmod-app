@@ -6,7 +6,7 @@ import { DESTEK_EPOSTA } from '../constants/contact';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
-import { api } from '../services/api';
+import { api, setTokens } from '../services/api';
 import { useRenkler, useOrtakStil, VURGULAR, MODLAR, FONT } from '../constants/theme';
 
 const KATEGORILER = [
@@ -31,6 +31,10 @@ export default function ProfilEkrani() {
   const [bildirimAcik, setBildirimAcik] = useState(false);
   const [islemde, setIslemde] = useState(false);
   const [tercihler, setTercihler] = useState(null);
+  const [sifreAcik, setSifreAcik] = useState(false);
+  const [sifreForm, setSifreForm] = useState({ mevcut: '', yeni: '', tekrar: '' });
+  const [sifreHata, setSifreHata] = useState(null);
+  const [sifreKaydediliyor, setSifreKaydediliyor] = useState(false);
   const [silmeAcik, setSilmeAcik] = useState(false);
   const [silmeSifre, setSilmeSifre] = useState('');
   const [silmeYukleniyor, setSilmeYukleniyor] = useState(false);
@@ -124,6 +128,24 @@ export default function ProfilEkrani() {
       await api.updateNotificationPreferences({ [key]: value });
     } catch {
       setTercihler((onceki) => ({ ...onceki, [key]: !value }));
+    }
+  };
+
+  const sifreDegistir = async () => {
+    setSifreHata(null);
+    if (sifreForm.yeni !== sifreForm.tekrar) { setSifreHata('Yeni şifreler aynı değil'); return; }
+    setSifreKaydediliyor(true);
+    try {
+      const data = await api.changePassword(sifreForm.mevcut, sifreForm.yeni);
+      // Diğer cihazlardaki oturumlar kapandı; bu cihaz yeni token'larla açık kalır.
+      await setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      setSifreAcik(false);
+      setSifreForm({ mevcut: '', yeni: '', tekrar: '' });
+      Alert.alert('Şifre değişti', 'Yeni şifren kaydedildi. Diğer cihazlardaki oturumların kapatıldı.');
+    } catch (err) {
+      setSifreHata(err.message || 'Şifre değiştirilemedi');
+    } finally {
+      setSifreKaydediliyor(false);
     }
   };
 
@@ -229,6 +251,33 @@ export default function ProfilEkrani() {
             </Pressable>
           ))}
         </View>
+      </View>
+
+      <View style={[ORTAK_STIL.kart, { marginTop: 16 }]}>
+        <Pressable onPress={() => { setSifreAcik((v) => !v); setSifreHata(null); }} style={styles.menuSatiri}>
+          <Text style={styles.menuMetin}>🔑 Şifre değiştir</Text>
+          <Text style={styles.menuOk}>{sifreAcik ? '⌄' : '›'}</Text>
+        </Pressable>
+        {sifreAcik ? (
+          <View>
+            {[['mevcut', 'Mevcut (veya geçici) şifre'], ['yeni', 'Yeni şifre (en az 6 karakter)'], ['tekrar', 'Yeni şifre tekrar']].map(([k, ph]) => (
+              <TextInput
+                key={k}
+                style={styles.silmeInput}
+                placeholder={ph}
+                placeholderTextColor={RENKLER.metinUcuncul}
+                secureTextEntry
+                autoCapitalize="none"
+                value={sifreForm[k]}
+                onChangeText={(v) => setSifreForm((f) => ({ ...f, [k]: v }))}
+              />
+            ))}
+            {sifreHata ? <Text style={styles.silmeHataMetin}>{sifreHata}</Text> : null}
+            <TouchableOpacity style={[ORTAK_STIL.buyukButon, { marginTop: 12 }]} onPress={sifreDegistir} disabled={sifreKaydediliyor}>
+              {sifreKaydediliyor ? <ActivityIndicator color={RENKLER.vurguUstu} /> : <Text style={{ color: RENKLER.vurguUstu, fontWeight: '800' }}>Şifreyi Kaydet</Text>}
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
 
       {user?.isAdmin ? (

@@ -324,7 +324,7 @@ function olusturStyles(RENKLER) {
     gundemUst: { fontFamily: FONT.etiket, fontSize: 13, letterSpacing: 1.5, color: RENKLER.vurgu },
     gundemBaslik: { fontFamily: FONT.baslik, fontSize: 25, color: RENKLER.metin, marginTop: 4, lineHeight: 27 },
     gundemAlt: { fontSize: 13, color: RENKLER.metinIkincil, marginTop: 4, lineHeight: 18 },
-    gundemGorsel: { width: 96, height: 118, borderRadius: 4, backgroundColor: RENKLER.bg3 },
+    gundemGorsel: { width: '44%', alignSelf: 'stretch', minHeight: 130, borderRadius: 4, backgroundColor: RENKLER.bg3 },
     gundemButon: { alignSelf: 'flex-start', backgroundColor: RENKLER.vurgu, borderRadius: 2, paddingHorizontal: 14, paddingVertical: 8, marginTop: 12, transform: [{ skewX: '-12deg' }] },
     gundemButonMetin: { fontFamily: FONT.etiketItalik, fontSize: 14, letterSpacing: 1, color: RENKLER.vurguUstu },
     noktalar: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
