@@ -42,16 +42,17 @@ export default function BaslikKarti({ baslik: b, islemler }) {
       <Text style={styles.baslik} numberOfLines={3}>{b.title}</Text>
       {b.body ? <ForumMetin style={styles.govde} numberOfLines={2}>{b.body}</ForumMetin> : null}
 
-      {b.players.length > 0 ? (
-        <View style={styles.kartlar}>
-          {b.players.map((p) => (
-            <OyuncuKarti key={p.futggId} yuzUrl={p.imageUrl} isim={p.name} nadirlik={p.rarity} rating={p.rating} pozisyon={p.position} genislik={92} />
-          ))}
-        </View>
-      ) : b.imageUrls.length > 0 ? (
+      {b.imageUrls.length > 0 ? (
         <View>
           <Image source={{ uri: tamGorselUrl(b.imageUrls[0]) }} style={styles.gorsel} resizeMode="cover" />
           {b.imageUrls.length > 1 ? <Text style={styles.gorselSayi}>+{b.imageUrls.length - 1}</Text> : null}
+        </View>
+      ) : null}
+      {b.players.length > 0 ? (
+        <View style={styles.kartlar}>
+          {b.players.map((p) => (
+            <OyuncuKarti key={p.futggId} yuzUrl={p.imageUrl} isim={p.name} nadirlik={p.rarity} rating={p.rating} pozisyon={p.position} genislik={b.imageUrls.length > 0 ? 64 : 92} />
+          ))}
         </View>
       ) : null}
 
