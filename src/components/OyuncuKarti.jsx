@@ -134,7 +134,7 @@ export default function OyuncuKarti({
         </View>
       ) : null}
 
-      {ulke ? (
+      {ulke && !statGoster ? (
         <Text style={{ position: 'absolute', bottom: '6.5%', alignSelf: 'center', color: palet.metin, opacity: 0.8, fontSize: 6 * o, fontWeight: '800', letterSpacing: 1 * o }}>
           {kisaKod(ulke)}
         </Text>
