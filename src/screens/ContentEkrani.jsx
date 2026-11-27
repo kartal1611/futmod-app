@@ -109,7 +109,7 @@ export default function ContentEkrani() {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                   {veri.newCards.map((k) => (
                     <Pressable key={k.futggId} onPress={() => router.push(`/oyuncular/${k.futggId}`)}>
-                      <OyuncuKarti yuzUrl={k.imageUrl} isim={k.name} nadirlik={k.rarity} rating={k.rating} pozisyon={k.position} genislik={104} />
+                      <OyuncuKarti isim={k.name} nadirlik={k.rarity} rating={k.rating} pozisyon={k.position} genislik={104} />
                       {k.priceCoins ? <Text style={styles.kartFiyat}>{k.priceCoins.toLocaleString('tr-TR')}</Text> : null}
                     </Pressable>
                   ))}

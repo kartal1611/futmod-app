@@ -3,7 +3,7 @@ import { View, Text, TextInput, ScrollView, Pressable, ActivityIndicator } from 
 import { api } from '../../services/api';
 import { useRenkler } from '../../constants/theme';
 import OyuncuKarti from '../OyuncuKarti';
-import { Alan, Buton, Cipler, gorselSecVeYukle, onayla, useAdminStil } from './adminOrtak';
+import { Alan, Buton, Cipler, onayla, useAdminStil } from './adminOrtak';
 
 const POZISYONLAR = ['GK', 'CB', 'LB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'];
 
@@ -56,15 +56,6 @@ export default function AdminKartlarSekmesi() {
     }
   };
 
-  const gorsel = async () => {
-    try {
-      const url = await gorselSecVeYukle();
-      if (url) setForm((f) => ({ ...f, imageUrl: url }));
-    } catch (err) {
-      setHata(err.message);
-    }
-  };
-
   const sil = (k) => onayla('Kartı sil', `${k.name} (${k.rating}) kalıcı olarak silinsin mi? Forum başlıklarındaki bağlantısı da kalkar.`, async () => {
     try {
       await api.adminDeletePlayer(k.id);
@@ -79,7 +70,7 @@ export default function AdminKartlarSekmesi() {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
         <Text style={st.bolum}>{form.id ? 'KARTI DÜZENLE' : 'YENİ KART'}</Text>
         <View style={{ alignItems: 'center', marginTop: 10 }}>
-          <OyuncuKarti yuzUrl={form.imageUrl || null} isim={form.name || 'Oyuncu'} nadirlik={form.rarity} rating={Number(form.rating) || ''} pozisyon={form.position} genislik={110} />
+          <OyuncuKarti ulke={form.nation} isim={form.name || 'Oyuncu'} nadirlik={form.rarity} rating={Number(form.rating) || ''} pozisyon={form.position} genislik={110} />
         </View>
         <Alan etiket="Oyuncu adı" deger={form.name} degistir={alan('name')} />
         <Alan etiket="Reyting" deger={form.rating} degistir={alan('rating')} keyboardType="number-pad" maxLength={2} />
@@ -96,8 +87,6 @@ export default function AdminKartlarSekmesi() {
           secili={form.versionId ?? null}
           sec={alan('versionId')}
         />
-        <Alan etiket="Görsel bağlantısı (isteğe bağlı)" deger={form.imageUrl} degistir={alan('imageUrl')} autoCapitalize="none" />
-        <Buton metin="Galeriden görsel" tur="ikincil" onPress={gorsel} style={{ marginTop: 10 }} />
         {hata ? <Text style={st.hata}>{hata}</Text> : null}
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 18 }}>
           <Buton metin="Vazgeç" tur="ikincil" onPress={() => { setForm(null); setHata(null); }} style={{ flex: 1 }} />
@@ -124,7 +113,7 @@ export default function AdminKartlarSekmesi() {
       {!yukleniyor && liste.length === 0 ? <Text style={st.bos}>Kart bulunamadı.</Text> : null}
       {liste.map((k) => (
         <View key={k.id} style={[st.satir, { flexDirection: 'row', gap: 12, alignItems: 'center' }]}>
-          <OyuncuKarti yuzUrl={k.imageUrl} isim={k.name} nadirlik={k.rarity} rating={k.rating} pozisyon={k.position} genislik={58} />
+          <OyuncuKarti ulke={k.nation} isim={k.name} nadirlik={k.rarity} rating={k.rating} pozisyon={k.position} genislik={58} />
           <View style={{ flex: 1 }}>
             <Text style={st.satirBaslik} numberOfLines={1}>{k.name}</Text>
             <Text style={st.satirAlt} numberOfLines={1}>{[k.rating, k.position, k.rarity, k.club].filter(Boolean).join(' · ')}</Text>

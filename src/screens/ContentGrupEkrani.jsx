@@ -30,7 +30,7 @@ export default function ContentGrupEkrani() {
 
   const kart = (p, genislik) => (
     <Pressable key={p.futggId} onPress={() => router.push(`/oyuncular/${p.futggId}`)} accessibilityRole="button" accessibilityLabel={p.name}>
-      <OyuncuKarti yuzUrl={p.imageUrl} isim={p.name} nadirlik={p.rarity} rating={p.rating} pozisyon={p.position} genislik={genislik} />
+      <OyuncuKarti isim={p.name} nadirlik={p.rarity} rating={p.rating} pozisyon={p.position} genislik={genislik} />
     </Pressable>
   );
 

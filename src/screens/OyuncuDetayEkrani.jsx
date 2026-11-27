@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, Pressable, ActivityIndicator, ScrollView, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, ScrollView, FlatList, StyleSheet } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '../services/api';
 import { useRenkler, useOrtakStil } from '../constants/theme';
-import { getPlaystyleIcon } from '../constants/playstyleIcons';
 import OyuncuKarti from '../components/OyuncuKarti';
 import { usePaylasAkisi } from '../hooks/usePaylasAkisi';
 import PaylasButonu from '../components/share/PaylasButonu';
@@ -30,20 +29,16 @@ function tierRengi(RENKLER, val) {
   return RENKLER.hata;
 }
 
-/** fut.gg's real PlayStyle icon — gold diamond for a + style, silver for a base one. */
+/** FutChat'in kendi PlayStyle rozeti: elmas zemin üstünde stilin baş harfleri (altın = +, gümüş = temel). */
 function PlaystyleIcon({ name, plus, size = 30 }) {
-  const icon = getPlaystyleIcon(name);
+  const harf = String(name || '').split(/[\s-]+/).filter(Boolean).slice(0, 2).map((k) => k[0]).join('').toLocaleUpperCase('tr-TR');
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <View style={[
         StyleSheet.absoluteFill,
         { backgroundColor: plus ? '#e3c075' : '#c7cdd6', borderRadius: 5, transform: [{ rotate: '45deg' }, { scale: 0.72 }] },
       ]} />
-      {icon ? (
-        <Svg width={size * 0.52} height={size * 0.52} viewBox={icon.viewBox}>
-          {icon.paths.map((d, i) => <Path key={i} d={d} fill="#1a1a1a" />)}
-        </Svg>
-      ) : null}
+      <Text style={{ color: '#1a1a1a', fontSize: size * 0.32, fontWeight: '900' }}>{harf}</Text>
     </View>
   );
 }
@@ -120,7 +115,6 @@ export default function OyuncuDetayEkrani() {
 
   const d = player.detail || {};
   const attrs = d.attributes || null;
-  const yuzUrl = d.imageUrl || player.imageUrl || null;
 
   return (
     <View style={ORTAK_STIL.ekran}>
@@ -139,7 +133,7 @@ export default function OyuncuDetayEkrani() {
         <View ref={fiyatRef} collapsable={false}>
           <PaylasimKarti baslik="Market" vurguRenk={RENKLER.vurgu}>
             <View style={styles.paylasUstSatir}>
-              <OyuncuKarti yuzUrl={yuzUrl} nadirlik={d.rarity || player.rarity} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} nationIconUrl={d.nationIconUrl} leagueIconUrl={d.leagueIconUrl} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={110} />
+              <OyuncuKarti ulke={d.nation} nadirlik={d.rarity || player.rarity} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={110} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.paylasIsim} numberOfLines={2}>{d.name || player.name}</Text>
                 <View style={styles.paylasRozetSatiri}>
@@ -167,7 +161,7 @@ export default function OyuncuDetayEkrani() {
         <View ref={statsRef} collapsable={false}>
           <PaylasimKarti baslik="Stats" vurguRenk={RENKLER.vurgu}>
             <View style={styles.paylasUstSatir}>
-              <OyuncuKarti yuzUrl={yuzUrl} nadirlik={d.rarity || player.rarity} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} nationIconUrl={d.nationIconUrl} leagueIconUrl={d.leagueIconUrl} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={90} />
+              <OyuncuKarti ulke={d.nation} nadirlik={d.rarity || player.rarity} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={90} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.paylasIsim} numberOfLines={2}>{d.name || player.name}</Text>
                 <View style={styles.paylasRozetSatiri}>
@@ -216,7 +210,7 @@ export default function OyuncuDetayEkrani() {
       </View>
 
       <View style={styles.ustBolum}>
-        <OyuncuKarti yuzUrl={yuzUrl} nadirlik={d.rarity || player.rarity} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} nationIconUrl={d.nationIconUrl} leagueIconUrl={d.leagueIconUrl} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={168} />
+        <OyuncuKarti ulke={d.nation} nadirlik={d.rarity || player.rarity} rating={d.rating} pozisyon={d.mainPosition || player.position} attrs={attrs} isim={d.name || player.name} weakFoot={d.weakFoot} skillMoves={d.skillMoves} genislik={168} />
 
         <View style={styles.bilgiSutunu}>
           <View style={styles.rozetSatiri}>
@@ -230,11 +224,6 @@ export default function OyuncuDetayEkrani() {
             </View>
           ) : null}
 
-          <View style={styles.ikonSatiri}>
-            {d.nationIconUrl ? <Image source={{ uri: d.nationIconUrl }} style={styles.kucukIkon} /> : null}
-            {d.leagueIconUrl ? <Image source={{ uri: d.leagueIconUrl }} style={styles.kucukIkon} /> : null}
-            {d.clubIconUrl ? <Image source={{ uri: d.clubIconUrl }} style={styles.kucukIkon} /> : null}
-          </View>
           {(d.nation || d.league || d.club) ? (
             <Text style={styles.altMetin}>{[d.nation, d.club, d.league].filter(Boolean).join(' · ')}</Text>
           ) : null}
@@ -291,7 +280,7 @@ export default function OyuncuDetayEkrani() {
             keyExtractor={(v) => v.futggId}
             renderItem={({ item: v }) => (
               <Pressable onPress={() => router.push(`/oyuncular/${v.futggId}`)} style={styles.versKart}>
-                <OyuncuKarti yuzUrl={v.imageUrl} isim={v.name} nadirlik={v.rarity} rating={v.rating} pozisyon={v.position} genislik={72} />
+                <OyuncuKarti isim={v.name} nadirlik={v.rarity} rating={v.rating} pozisyon={v.position} genislik={72} />
                 <Text style={styles.versRating}>{v.rating} OVR</Text>
                 <Text style={styles.versRarity} numberOfLines={2}>{v.rarity || '-'}</Text>
               </Pressable>

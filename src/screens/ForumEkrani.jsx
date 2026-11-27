@@ -248,7 +248,7 @@ export default function ForumEkrani() {
                       </View>
                       {sl.manset?.imageUrl ? <Image source={{ uri: tamGorselUrl(sl.manset.imageUrl) }} style={styles.gundemGorsel} resizeMode="cover" /> : null}
                       {sl.baslik?.players[0] ? (
-                        <OyuncuKarti yuzUrl={sl.baslik.players[0].imageUrl} isim={sl.baslik.players[0].name} nadirlik={sl.baslik.players[0].rarity} rating={sl.baslik.players[0].rating} pozisyon={sl.baslik.players[0].position} genislik={92} />
+                        <OyuncuKarti isim={sl.baslik.players[0].name} nadirlik={sl.baslik.players[0].rarity} rating={sl.baslik.players[0].rating} pozisyon={sl.baslik.players[0].position} genislik={92} />
                       ) : null}
                       {sl.totw ? <Text style={styles.gundemPuan}>{sl.totw.topRating}</Text> : null}
                     </KesikPanel>

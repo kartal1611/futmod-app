@@ -1,13 +1,16 @@
-import { useState } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import Svg, { Defs, LinearGradient, Stop, Path } from 'react-native-svg';
+import { View, Text, StyleSheet } from 'react-native';
+import Svg, { Defs, LinearGradient, RadialGradient, Stop, Path, Circle } from 'react-native-svg';
 
-// FutMod'un kendi kartı: köşeleri kesik altıgen plaka ve çift kenarlık. Apple
-// 5.2.1 reddi EA'in kalkan şablonuna benzeyen kartlar içindi; bu yüzden
-// geometri ve kart görseli bize ait, oyundan yalnızca veri ve yüz gelir.
+// FutChat'in kendi kartı: köşeleri kesik altıgen plaka, çift kenarlık ve
+// stilize oyuncu silüeti. Hiçbir üçüncü taraf görseli (yüz, bayrak, lig/kulüp
+// logosu) kullanılmaz; karttaki her şey burada çizilir, dışarıdan yalnız metin
+// veri (isim, reyting, pozisyon, statlar) gelir.
 const KART_ORAN = 100 / 140;
 const PLAKA = 'M12 2H88L98 12V124L86 138H14L2 124V12Z';
 const IC_KENAR = 'M14 6H86L94 14V122L84 134H16L6 122V14Z';
+
+// Baş, boyun ve omuzlardan oluşan sade oyuncu silüeti (viewBox 100x140).
+const SILUET = 'M57 22C64.5 22 69 28 69 36C69 43 65.5 49 61 51.5V55L76 60C83 62.5 87 67 88 74V82H26V74C27 67 31 62.5 38 60L53 55V51.5C48.5 49 45 43 45 36C45 28 49.5 22 57 22Z';
 
 const STAT_SIRASI = [
   ['pace', 'HIZ'], ['shooting', 'ŞUT'], ['passing', 'PAS'],
@@ -41,15 +44,27 @@ function paletSec(nadirlik, rating) {
 }
 
 /** Soyadı karta sığsın diye uzun adlarda yalnız son kelime yazılır. */
+/** "Kylian Mbappé" → "KM": silüetin göğsündeki monogram. */
+function basHarfler(isim) {
+  const p = String(isim || '').trim().split(/\s+/).filter(Boolean);
+  if (!p.length) return '';
+  const h = p.length === 1 ? p[0].slice(0, 2) : p[0][0] + p[p.length - 1][0];
+  return h.toLocaleUpperCase('tr-TR');
+}
+
+/** Ülke/lig adından kısa etiket: "Brazil" → "BRA". */
+function kisaKod(ad) {
+  return String(ad || '').replace(/[^\p{L}]/gu, '').slice(0, 3).toLocaleUpperCase('tr-TR');
+}
+
 function kartAdi(isim) {
   const ad = String(isim || '');
   return ad.length > 13 ? ad.split(' ').pop() : ad;
 }
 
 export default function OyuncuKarti({
-  yuzUrl, rating, pozisyon, attrs, isim, nadirlik, nationIconUrl, leagueIconUrl, weakFoot, skillMoves, genislik, style,
+  rating, pozisyon, attrs, isim, nadirlik, ulke, weakFoot, skillMoves, genislik, style,
 }) {
-  const [yuzHata, setYuzHata] = useState(false);
   const palet = paletSec(nadirlik, rating);
   const o = genislik / 100;
   const statGoster = genislik >= 100 && !!attrs;
@@ -67,23 +82,26 @@ export default function OyuncuKarti({
             <Stop offset="0.5" stopColor={palet.kenar} />
             <Stop offset="1" stopColor={palet.isik} />
           </LinearGradient>
+          <RadialGradient id="hale" cx="0.5" cy="0.4" r="0.5">
+            <Stop offset="0" stopColor={palet.isik} stopOpacity={0.35} />
+            <Stop offset="1" stopColor={palet.isik} stopOpacity={0} />
+          </RadialGradient>
+          <LinearGradient id="silu" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={palet.isik} stopOpacity={0.75} />
+            <Stop offset="1" stopColor={palet.kenar} stopOpacity={0.15} />
+          </LinearGradient>
         </Defs>
         <Path d={PLAKA} fill="url(#zemin)" stroke="url(#kenar)" strokeWidth={2.4} />
         <Path d="M66 6L94 6V34Z" fill={palet.kenar} opacity={0.3} />
         <Path d="M6 92L52 6H72L6 118Z" fill={palet.isik} opacity={0.08} />
         <Path d={IC_KENAR} fill="none" stroke={palet.kenar} strokeWidth={0.6} opacity={0.65} />
+        <Circle cx={57} cy={statGoster ? 40 : 46} r={30} fill="url(#hale)" />
+        <Path transform={statGoster ? 'translate(0,-6)' : undefined} d={SILUET} fill="url(#silu)" />
       </Svg>
 
-      {yuzUrl && !yuzHata ? (
-        <Image
-          source={{ uri: yuzUrl }}
-          onError={() => setYuzHata(true)}
-          resizeMode="contain"
-          style={{ position: 'absolute', top: '11%', left: '19%', width: '74%', height: statGoster ? '48%' : '56%' }}
-        />
-      ) : (
-        <Text style={{ position: 'absolute', top: '26%', alignSelf: 'center', fontSize: 34 * o }}>⚽</Text>
-      )}
+      <Text style={{ position: 'absolute', top: statGoster ? '40%' : '47%', left: '26%', right: '14%', textAlign: 'center', color: palet.alt, opacity: 0.85, fontSize: 9 * o, fontWeight: '900', letterSpacing: 0.5 * o }}>
+        {basHarfler(isim)}
+      </Text>
 
       <View style={{ position: 'absolute', top: '8%', left: '10%', alignItems: 'center' }}>
         {rating != null ? <Text style={{ color: palet.metin, fontSize: 21 * o, lineHeight: 23 * o, fontWeight: '900' }}>{rating}</Text> : null}
@@ -116,11 +134,10 @@ export default function OyuncuKarti({
         </View>
       ) : null}
 
-      {nationIconUrl || leagueIconUrl ? (
-        <View style={{ position: 'absolute', bottom: '4.5%', alignSelf: 'center', flexDirection: 'row', gap: 4 * o }}>
-          {nationIconUrl ? <Image source={{ uri: nationIconUrl }} style={{ width: 10 * o, height: 7 * o }} resizeMode="contain" /> : null}
-          {leagueIconUrl ? <Image source={{ uri: leagueIconUrl }} style={{ width: 7 * o, height: 7 * o }} resizeMode="contain" /> : null}
-        </View>
+      {ulke ? (
+        <Text style={{ position: 'absolute', bottom: '6.5%', alignSelf: 'center', color: palet.metin, opacity: 0.8, fontSize: 6 * o, fontWeight: '800', letterSpacing: 1 * o }}>
+          {kisaKod(ulke)}
+        </Text>
       ) : null}
     </View>
   );
